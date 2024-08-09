@@ -1,0 +1,12 @@
+<div class="container">
+    <div class="row">
+        <app-location-name [roomDetailsForFilter]="roomDetailsForFilter" (locationChanged)="onFilterChange($event)"></app-location-name>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col py-3" *ngFor="let room of roomAndRoomStayDetails">
+                <app-room-detail-card-for-home [room]="room"></app-room-detail-card-for-home>
+            </div>
+        </div>
+    </div>
+</div>

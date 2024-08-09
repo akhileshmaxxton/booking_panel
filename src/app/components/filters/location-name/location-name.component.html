@@ -1,0 +1,24 @@
+<div class="row">
+    <div class="col">
+      <div class="dropdown">
+        <label for="location">Location</label>
+        <select
+          name="location"
+          id="location"
+          #location
+          class="form-control"
+          (change)="onLocationChange(location.value)"
+        >
+          <option value="">--Select Location--</option>
+          <option
+            *ngFor="let room of roomDetailsForFilter"
+            [value]="room.locationId"
+          >
+            {{ room.locationName }}
+            {{ room.locationId }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+  
