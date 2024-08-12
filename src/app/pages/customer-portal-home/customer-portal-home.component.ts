@@ -14,7 +14,7 @@ import { MergeRoomAndRoomDetails } from '../../utils/merge-room-and-room-details
 export class CustomerPortalHomeComponent implements OnInit {
   public roomStayDetails$!: Observable<RoomStayDetails[]>;
   public roomDetails$!: Observable<RoomDetails[]>;
-  public roomAndRoomStayDetails: RoomAndRoomStayDetails[] = [];
+  public roomAndRoomStayDetails : RoomAndRoomStayDetails[] = [];
   public roomDetailsForFilter : RoomAndRoomStayDetails[] = [];
 
   constructor(
@@ -30,13 +30,11 @@ export class CustomerPortalHomeComponent implements OnInit {
       this.roomAndRoomStayDetails = this.mergePipe.transform(
         roomStayDetails,
         roomDetails
-      );
+      ),
+      this.roomDetailsForFilter = this.roomAndRoomStayDetails
       console.log('mergePipe', this.roomAndRoomStayDetails);
+      console.log('roomDetailsForFilter', this.roomDetailsForFilter);
     });
-    
-    
-    this.roomDetailsForFilter = this.roomAndRoomStayDetails!;
-    console.log('initial filter data', this.roomDetailsForFilter);
     
   }
 
@@ -52,12 +50,12 @@ export class CustomerPortalHomeComponent implements OnInit {
           roomDetails
         );
         console.log('onfilterchange initial data', this.roomAndRoomStayDetails);
+        if(selectedLocation){
+          this.roomAndRoomStayDetails = this.roomAndRoomStayDetails?.filter(room => room.locationId == selectedLocation);
+          console.log('onfiltercgange filtered data on location', this.roomAndRoomStayDetails);
+        }
       });
       
-      if(selectedLocation){
-        this.roomAndRoomStayDetails = this.roomAndRoomStayDetails?.filter(room => room.locationId == selectedLocation);
-        console.log('onfiltercgange filtered data on location', this.roomAndRoomStayDetails);
-      }
     }
     catch(error){
       console.log(error);
