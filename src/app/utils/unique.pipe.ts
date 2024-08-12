@@ -11,6 +11,6 @@ export class UniquePipe implements PipeTransform {
           return value;
         }
         
-        return [...new Set(value.map(item => [item[args], item])).values()];
+        return [...new Map(value.map(item => [item[args], item])).values()];
       }
 }

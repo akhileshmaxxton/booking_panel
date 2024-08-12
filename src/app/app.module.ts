@@ -12,6 +12,12 @@ import { RouterModule } from '@angular/router';
 import { MergeRoomAndRoomDetails } from './utils/merge-room-and-room-details.pipe';
 import { LocationNameComponent } from './components/filters/location-name/location-name.component';
 import { UniquePipe } from './utils/unique.pipe';
+import { LogoComponent } from './components/utils/logo/logo.component';
+import { DateRangeComponent } from './components/filters/date-range/date-range.component';
+import { NumberOfGuestsComponent } from './components/filters/number-of-guests/number-of-guests.component';
+import { PriceComponent } from './components/filters/price/price.component';
+import { NumberOfDaysComponent } from './components/filters/number-of-days/number-of-days.component';
+import { ClearFilterButtonComponent } from './components/filters/clear-filter-button/clear-filter-button.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +26,13 @@ import { UniquePipe } from './utils/unique.pipe';
     CustomerPortalHomeComponent,
     RoomDetailCardForHomeComponent,
     LocationNameComponent,
-    UniquePipe
+    UniquePipe,
+    LogoComponent,
+    DateRangeComponent,
+    NumberOfGuestsComponent,
+    PriceComponent,
+    NumberOfDaysComponent,
+    ClearFilterButtonComponent
   ],
   imports: [
     BrowserModule,
