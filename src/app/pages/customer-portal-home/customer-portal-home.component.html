@@ -9,11 +9,11 @@
             <div class="d-flex w-100 align-items-center justify-content-center px-auto" style="gap: 10px">
                 <app-location-name  [roomDetailsForFilter]="roomDetailsForFilter" (locationChanged)="onFilterChange($event)"></app-location-name>
                 <app-date-range ></app-date-range>
-                <app-number-of-guests></app-number-of-guests>
+                <app-number-of-guests (guestChanged)="onGuestChange($event)"></app-number-of-guests>
             </div>
 
             <div class="d-flex w-100 align-items-center justify-content-center" style="gap: 10px">
-                <app-number-of-days></app-number-of-days>
+                <app-number-of-days (priceChanged)="onPriceChanged($event)"></app-number-of-days>
                 <app-price></app-price>
                 <app-clear-filter-button></app-clear-filter-button>
             </div>

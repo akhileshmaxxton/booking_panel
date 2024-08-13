@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-price',
@@ -6,5 +6,6 @@ import { Component } from '@angular/core';
   styleUrl: './price.component.scss'
 })
 export class PriceComponent {
+  @Output() priceChanged: EventEmitter<number> = new EventEmitter<number>();
 
 }
