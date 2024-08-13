@@ -1,0 +1,36 @@
+.row{
+    height: 100vh;
+}
+
+body{
+    background-color: #d4d4d4;
+}
+.btns{
+    margin: auto;
+    column-gap: 3rem;
+    
+
+}
+
+.btns:has(.btn:hover) .btn:not(:hover) {
+    scale: 0.8;
+    opacity: 0.8;
+    filter: blur(4px);
+}
+
+.btn {
+    border: 1px solid #000000;
+    border-radius:3rem;
+    padding: 2rem 8rem;
+    background-color: #000000;
+      color: #ffffff;
+    cursor: pointer;
+    transition:
+    scale 0.25s ease-in,
+    opacity 0.25s ease-in,
+    filter 0.25s ease-in;
+
+    &:hover {
+        scale: 1.2;
+    }
+}

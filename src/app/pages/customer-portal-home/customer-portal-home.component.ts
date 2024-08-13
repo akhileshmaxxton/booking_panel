@@ -35,7 +35,6 @@ export class CustomerPortalHomeComponent implements OnInit {
       console.log('mergePipe', this.roomAndRoomStayDetails);
       console.log('roomDetailsForFilter', this.roomDetailsForFilter);
     });
-    
   }
 
   onFilterChange(selectedLocation: number) {
@@ -60,5 +59,14 @@ export class CustomerPortalHomeComponent implements OnInit {
     catch(error){
       console.log(error);
     }
+  }
+
+  onPriceChanged(newPrice: number) {
+    console.log('Price changed:', newPrice);
+    // Handle the price value here
+  }
+
+  onGuestChange(guestNo: number) {
+    console.log('Guest changed:', guestNo);
   }
 }

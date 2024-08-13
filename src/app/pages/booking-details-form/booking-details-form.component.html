@@ -1,0 +1,47 @@
+<div class="container py-3">
+  <form [formGroup]="bookingDetails" (ngSubmit)="onSubmit()">
+    <!-- Location Section -->
+    <div class="mb-3">
+      <label for="location" class="form-label">Location</label>
+      <input type="text" id="location" class="form-control" formControlName="locationName" readonly>
+    </div>
+
+    <!-- Room Name Section -->
+    <div class="mb-3">
+      <label for="roomName" class="form-label">Room Name</label>
+      <input type="text" id="roomName" class="form-control" formControlName="roomName"  readonly>
+    </div>
+
+    <!-- Price per day per person Section -->
+    <div class="mb-3">
+      <label for="pricePerDayPerPerson" class="form-label">Price per day per person</label>
+      <input type="number" id="pricePerDayPerPerson" class="form-control" formControlName="pricePerDayPerPerson" readonly>
+    </div>
+
+    <!-- Check In Section -->
+    <div class="mb-3">
+      <label for="checkIn" class="form-label">Check In</label>
+      <input type="date" id="checkIn" class="form-control" formControlName="checkIn" (change)="calculateTotalPrice()">
+    </div>
+
+    <!-- Check Out Section -->
+    <div class="mb-3">
+      <label for="checkOut" class="form-label">Check Out</label>
+      <input type="date" id="checkOut" class="form-control" formControlName="checkOut" (change)="calculateTotalPrice()">
+    </div>
+
+    <!-- Number of Guests Section -->
+    <div class="mb-3">
+      <label for="numberOfGuests" class="form-label">Number of Guests</label>
+      <input type="number" id="numberOfGuests" class="form-control" formControlName="numberOfGuests" (change)="calculateTotalPrice()">
+    </div>
+
+    <!-- Total Price Section -->
+    <div class="mb-3">
+      <label for="totalPrice" class="form-label">Total Price</label>
+      <input type="number" id="totalPrice" class="form-control" formControlName="totalAmount"  readonly>
+    </div>
+   
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>

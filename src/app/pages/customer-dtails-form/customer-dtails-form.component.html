@@ -1,0 +1,53 @@
+<div class="container py-3">
+    <form [formGroup]="customerFormData" (ngSubmit)="onSubmit()">
+        <!-- Location Section -->
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label">Name</label>
+          <input type="text" class="form-control" formControlName="name" aria-describedby="emailHelp" >
+        </div>
+
+
+        <!-- Room Name Section -->
+        <div class="mb-3">
+          <label for="exampleInputPassword1" class="form-label">Birth Date</label>
+          <input type="date" class="form-control" formControlName="birthDate" >
+        </div>
+
+
+        <!-- Price per day per person Section -->
+        <div class="mb-3">
+          <label for="exampleInputPassword1" class="form-label">pincode</label>
+          <input type="number" class="form-control" formControlName="pincode" >
+        </div>
+
+
+        <!-- Check In Section -->
+        <div class="mb-3">
+          <label for="exampleInputPassword1" class="form-label">District</label>
+          <input type="text" class="form-control" formControlName="district" >
+        </div>
+
+
+        <!-- Check Out Section -->
+        <div class="mb-3">
+          <label for="exampleInputPassword1" class="form-label">City</label>
+          <input type="text" class="form-control" formControlName="city" >
+        </div>
+
+
+        <!-- Number of Guests Section -->
+        <div class="mb-3">
+          <label for="exampleInputPassword1" class="form-label">State</label>
+          <input type="text" class="form-control" formControlName="state" >
+        </div>
+
+
+        <!-- Total Price Section -->
+        <div class="mb-3">
+          <label for="exampleInputPassword1" class="form-label">Phone Number</label>
+          <input type="number" class="form-control" formControlName="phoneNumber" >
+        </div>
+       
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+</div>

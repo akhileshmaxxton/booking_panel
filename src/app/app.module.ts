@@ -18,6 +18,10 @@ import { NumberOfGuestsComponent } from './components/filters/number-of-guests/n
 import { PriceComponent } from './components/filters/price/price.component';
 import { NumberOfDaysComponent } from './components/filters/number-of-days/number-of-days.component';
 import { ClearFilterButtonComponent } from './components/filters/clear-filter-button/clear-filter-button.component';
+import { BookingDetailsFormComponent } from './pages/booking-details-form/booking-details-form.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CustomerDtailsFormComponent } from './pages/customer-dtails-form/customer-dtails-form.component';
+import { PaymentDetailFormComponent } from './pages/payment-detail-form/payment-detail-form.component';
 
 @NgModule({
   declarations: [
@@ -32,13 +36,18 @@ import { ClearFilterButtonComponent } from './components/filters/clear-filter-bu
     NumberOfGuestsComponent,
     PriceComponent,
     NumberOfDaysComponent,
-    ClearFilterButtonComponent
+    ClearFilterButtonComponent,
+    BookingDetailsFormComponent,
+    CustomerDtailsFormComponent,
+    PaymentDetailFormComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    RouterModule
+    RouterModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   providers: [RoomDetailsApiService, MergeRoomAndRoomDetails,UniquePipe],
   bootstrap: [AppComponent]

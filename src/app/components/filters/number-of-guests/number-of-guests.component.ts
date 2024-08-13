@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-number-of-guests',
@@ -6,5 +6,14 @@ import { Component } from '@angular/core';
   styleUrl: './number-of-guests.component.scss'
 })
 export class NumberOfGuestsComponent {
+  @Output() guestChanged: EventEmitter<number> = new EventEmitter<number>();
+
+  onGuestChange(event: Event) {
+    const inputElement = event.target as HTMLInputElement;
+    const guest = parseFloat(inputElement.value);
+    if (!isNaN(guest)) {
+      this.guestChanged.emit(guest);
+    }
+  }
 
 }
