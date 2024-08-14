@@ -27,6 +27,8 @@ export class CustomerDtailsFormComponent {
   constructor(private fb: FormBuilder, private router: Router) {
     // data from the previous component
     this.reservationDetails = history.state.reservationDetails;
+    console.log("reservationDetails", this.reservationDetails);
+
 
     // initialize form
     this.customerFormData = this.fb.group({
@@ -109,6 +111,10 @@ export class CustomerDtailsFormComponent {
       this.customerDetails.city = this.customerFormData.get('city')?.value;
       this.customerDetails.state = this.customerFormData.get('state')?.value;
       this.customerDetails.phoneNumber = this.customerFormData.get('phoneNumber')?.value;
+      this.customerDetails.reservationId = [];
+
+      console.log("customerDetails", this.customerDetails);
+
 
 
       this.router.navigate(['/payment-details'],{state: {reservationDetails: this.reservationDetails, customerDetails: this.customerDetails}});

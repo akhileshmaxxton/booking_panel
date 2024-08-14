@@ -151,6 +151,7 @@ export class BookingDetailsFormComponent {
         this.bookingDetails.get('numberOfGuests')?.value;
       this.reservationDetails.pricePerDayPerPerson =
         this.roomToBeBooked.pricePerDayPerPerson;
+        this.reservationDetails.paymentId = [];
 
       this.router.navigate(['/customer-details'], {
         state: { reservationDetails: this.reservationDetails },

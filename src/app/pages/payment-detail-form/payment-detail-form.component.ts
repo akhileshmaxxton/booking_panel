@@ -32,6 +32,7 @@ export class PaymentDetailFormComponent {
     this.reservationDetails = history.state.reservationDetails || { reservationId: '', paymentId: [], customerId: '' };
     this.customerDetails = history.state.customerDetails || { customerId: '', reservationId: [] };
 
+    console.log(this.reservationDetails);
 
     // initialize form
     this.paymentFormData = this.fb.group({
@@ -58,13 +59,11 @@ export class PaymentDetailFormComponent {
 
       // customer details
       this.customerDetails.customerId = generatedCustomerId;
-      // this.customerDetails.reservationId.push(generatedReservationId);
+      this.customerDetails.reservationId.push(generatedReservationId);
       
       // reservation details
       this.reservationDetails.reservationId = generatedReservationId;
-      // this.reservationDetails.paymentId.push(generatedPaymentId);
-      console.log(generatedPaymentId)
-      console.log(this.reservationDetails.paymentId)
+      this.reservationDetails.paymentId.push(generatedPaymentId);
       this.reservationDetails.customerId = generatedCustomerId;
       
       
