@@ -8,6 +8,6 @@ export interface ReservationDetails {
     pricePerDayPerPerson: number;
     numberOfDays: number;
     totalAmount: number;
-    paymentId: any[];
+    paymentId: string[];
     customerId: string;
 }
