@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RoomAndRoomStayDetails } from '../../../interface/room-and-room-stay-details';
 import { NavigationExtras, Router } from '@angular/router';
 
@@ -9,6 +9,8 @@ import { NavigationExtras, Router } from '@angular/router';
 })
 export class RoomDetailCardForHomeComponent {
   @Input() room!: RoomAndRoomStayDetails;
+
+  @Output() onViewRoom: EventEmitter<RoomAndRoomStayDetails> = new EventEmitter<RoomAndRoomStayDetails>();
   
   constructor(private router: Router){}
 
@@ -16,7 +18,8 @@ export class RoomDetailCardForHomeComponent {
      this.router.navigate(['/book'], { state: { room } });
   }
 
-  viewRoom(room: RoomAndRoomStayDetails) {
+  viewRoom(viewRoomData: RoomAndRoomStayDetails) {
+    this.onViewRoom.emit(viewRoomData);
     
   }
 }

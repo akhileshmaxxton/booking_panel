@@ -29,6 +29,8 @@ export class PaymentDetailFormComponent {
     this.reservationDetails = history.state.reservationDetails;
     this.customerDetails = history.state.customerDetails;
 
+    console.log("history in payment",this.reservationDetails,this.customerDetails);
+
     // initialize form
     this.paymentFormData = this.fb.group({
       paymentDate: [''],

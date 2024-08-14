@@ -16,6 +16,7 @@ export class CustomerPortalHomeComponent implements OnInit {
   public roomDetails$!: Observable<RoomDetails[]>;
   public roomAndRoomStayDetails : RoomAndRoomStayDetails[] = [];
   public roomDetailsForFilter : RoomAndRoomStayDetails[] = [];
+  public viewRoomData : RoomAndRoomStayDetails = {} as RoomAndRoomStayDetails;
 
   constructor(
     private roomDetailsApiService: RoomDetailsApiService,
@@ -68,5 +69,10 @@ export class CustomerPortalHomeComponent implements OnInit {
 
   onGuestChange(guestNo: number) {
     console.log('Guest changed:', guestNo);
+  }
+
+  onViewRoom(viewRoomData: RoomAndRoomStayDetails) {
+    console.log("view room outer", viewRoomData)
+    this.viewRoomData = viewRoomData;
   }
 }

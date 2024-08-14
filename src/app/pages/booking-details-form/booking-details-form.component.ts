@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { RoomAndRoomStayDetails } from '../../interface/room-and-room-stay-details';
 import { ReservationDetails } from '../../interface/reservation-details';
@@ -11,36 +11,23 @@ import { ReservationDetails } from '../../interface/reservation-details';
 })
 export class BookingDetailsFormComponent{
   public bookingDetails!: FormGroup;
-  public roomToBeBooked!: RoomAndRoomStayDetails;
-  public reservationDetails: ReservationDetails = {
-    reservationId: 0,
-    roomId: 0,
-    locationId: 0,
-    checkIn: new Date(),
-    checkOut: new Date(),
-    numberOfGuests: 0,
-    pricePerDayPerPerson: 0,
-    numberOfDays: 0,
-    totalAmount: 0
-  };
-
+  public roomToBeBooked: RoomAndRoomStayDetails = {} as RoomAndRoomStayDetails;
+  public reservationDetails: ReservationDetails = {} as ReservationDetails;
 
   constructor(private fb: FormBuilder, private router: Router) {
 
-    console.log("history",history.state);
-    console.log("initialization", this.reservationDetails);
     // data from the previous component
     this.roomToBeBooked = history.state.room;
-    console.log("roomData",this.roomToBeBooked);
+    console.log("roomToBeBooked", this.roomToBeBooked);
 
     // initialize form
     this.bookingDetails = this.fb.group({
       locationName: [''],
       roomName: [''],
       pricePerDayPerPerson: [''],
-      checkIn: [''],
-      checkOut: [''],
-      numberOfGuests: [''],
+      checkIn: ['', [Validators.required, this.checkInDateValidator.bind(this)]],
+      checkOut: ['', [Validators.required, this.checkOutDateValidator.bind(this)]],
+      numberOfGuests: ['', [Validators.required, Validators.min(1), this.guestValidator.bind(this)]],
       totalAmount: ['']
     });
 
@@ -86,10 +73,60 @@ export class BookingDetailsFormComponent{
     }
   }
 
+  checkInDateValidator(control: AbstractControl): ValidationErrors | null {
+    const dateValue = new Date(control.value);
+    console.log('dateValue', dateValue);
+    const stayFromDate = new Date(this.roomToBeBooked?.stayDateFrom);
+    console.log('stayFromDate', stayFromDate);
+
+    if(isNaN(dateValue.getTime())){
+      console.log("came here")
+      return { invalidDate: 'Invalid date' };
+    }
+
+    if (stayFromDate && dateValue.getTime() < stayFromDate.getTime()) {
+      return { pastDate: `Check-in date cannot be less than ${stayFromDate}` };
+    }
+
+    return null;
+  }
+
+
+  checkOutDateValidator(control: AbstractControl): ValidationErrors | null {
+    const dateValue = new Date(control.value);
+    console.log('dateValue', dateValue);
+    const stayToDate = new Date(this.roomToBeBooked?.stayDateTo);
+    console.log('stayFromDate', stayToDate);
+
+    if(isNaN(dateValue.getTime())){
+      console.log("came here")
+      return { invalidDate: 'Invalid date' };
+    }
+
+    if (stayToDate && dateValue.getTime() < stayToDate.getTime()) {
+      return { futureDate: `Check-in date cannot be above ${stayToDate}` };
+    }
+
+    return null;
+  }
+
+ 
+
+
+  guestValidator(control: AbstractControl): ValidationErrors | null {
+    const guests = control.value;
+    const allowedGuests = this.roomToBeBooked?.guestCapacity
+    
+    if (guests <= 0) {
+      return { invalidGuests: 'Number of guests must be greater than 0' };
+    }
+
+    
+    return null;
+  }
 
 
   onSubmit() {
-    console.log(this.bookingDetails.value);
 
     if(this.bookingDetails){
       this.reservationDetails.roomId = this.roomToBeBooked.roomId;
