@@ -4,6 +4,9 @@
         <div class="mb-3">
           <label for="exampleInputEmail1" class="form-label">Name</label>
           <input type="text" class="form-control" formControlName="name" aria-describedby="emailHelp" >
+          <div *ngIf="customerFormData.get('name')?.touched && customerFormData.get('name')?.invalid">
+            <small class="text-danger">Name is required</small>
+          </div>
         </div>
 
 
@@ -11,6 +14,9 @@
         <div class="mb-3">
           <label for="exampleInputPassword1" class="form-label">Birth Date</label>
           <input type="date" class="form-control" formControlName="birthDate" >
+          <div *ngIf="customerFormData.get('birthDate')?.touched && customerFormData.get('birthDate')?.invalid">
+            <small class="text-danger">Birth Date is required</small>
+          </div>
         </div>
 
 
@@ -18,6 +24,9 @@
         <div class="mb-3">
           <label for="exampleInputPassword1" class="form-label">pincode</label>
           <input type="number" class="form-control" formControlName="pincode" >
+          <div *ngIf="customerFormData.get('pincode')?.touched && customerFormData.get('pincode')?.errors?.['invalidPinCode']">
+            <small class="text-danger">Pincode must be a 6-digit number</small>
+          </div>
         </div>
 
 
@@ -46,6 +55,9 @@
         <div class="mb-3">
           <label for="exampleInputPassword1" class="form-label">Phone Number</label>
           <input type="number" class="form-control" formControlName="phoneNumber" >
+          <div *ngIf="customerFormData.get('phoneNumber')?.touched && customerFormData.get('phoneNumber')?.errors?.['invalidPhoneNumber']">
+            <small class="text-danger">Phone Number must be a 10-digit number</small>
+          </div>
         </div>
        
         <button type="submit" class="btn btn-primary">Submit</button>

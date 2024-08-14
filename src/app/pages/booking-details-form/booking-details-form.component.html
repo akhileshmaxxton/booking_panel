@@ -22,18 +22,32 @@
     <div class="mb-3">
       <label for="checkIn" class="form-label">Check In</label>
       <input type="date" id="checkIn" class="form-control" formControlName="checkIn" (change)="calculateTotalPrice()">
+      <div *ngIf="bookingDetails.get('checkIn')?.invalid && bookingDetails.get('checkIn')?.touched" class="text-danger">
+        <div *ngIf="bookingDetails.get('checkIn')?.errors?.['required']">Check-in date is required</div>
+        <div *ngIf="bookingDetails.get('checkIn')?.errors?.['pastDate']">{{bookingDetails.get('checkIn')?.errors?.['dateLessThanStart']}}</div>
+        <div *ngIf="bookingDetails.get('checkIn')?.errors?.['invalidDate']">Invalid date</div>
+      </div>
     </div>
 
     <!-- Check Out Section -->
     <div class="mb-3">
       <label for="checkOut" class="form-label">Check Out</label>
       <input type="date" id="checkOut" class="form-control" formControlName="checkOut" (change)="calculateTotalPrice()">
+      <div *ngIf="bookingDetails.get('checkIn')?.invalid && bookingDetails.get('checkIn')?.touched" class="text-danger">
+        <div *ngIf="bookingDetails.get('checkIn')?.errors?.['required']">Check-in date is required</div>
+        <div *ngIf="bookingDetails.get('checkIn')?.errors?.['futureDate']">{{bookingDetails.get('checkIn')?.errors?.['futureDate']}}</div>
+        <div *ngIf="bookingDetails.get('checkIn')?.errors?.['invalidDate']">Invalid date</div>
+      </div>
     </div>
 
     <!-- Number of Guests Section -->
     <div class="mb-3">
       <label for="numberOfGuests" class="form-label">Number of Guests</label>
       <input type="number" id="numberOfGuests" class="form-control" formControlName="numberOfGuests" (change)="calculateTotalPrice()">
+      <div *ngIf="bookingDetails.get('numberOfGuests')?.invalid && bookingDetails.get('numberOfGuests')?.touched" class="text-danger">
+        <div *ngIf="bookingDetails.get('numberOfGuests')?.errors?.['required']">Number of guests is required</div>
+        <div *ngIf="bookingDetails.get('numberOfGuests')?.errors?.['invalidGuests']">Number of guests must be greater than 0</div>
+      </div>
     </div>
 
     <!-- Total Price Section -->

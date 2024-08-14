@@ -22,6 +22,7 @@ import { BookingDetailsFormComponent } from './pages/booking-details-form/bookin
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CustomerDtailsFormComponent } from './pages/customer-dtails-form/customer-dtails-form.component';
 import { PaymentDetailFormComponent } from './pages/payment-detail-form/payment-detail-form.component';
+import { RoomViewModelComponent } from './components/utils/room-view-model/room-view-model.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import { PaymentDetailFormComponent } from './pages/payment-detail-form/payment-
     ClearFilterButtonComponent,
     BookingDetailsFormComponent,
     CustomerDtailsFormComponent,
-    PaymentDetailFormComponent
+    PaymentDetailFormComponent,
+    RoomViewModelComponent
   ],
   imports: [
     BrowserModule,
