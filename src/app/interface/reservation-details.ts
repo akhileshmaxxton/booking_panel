@@ -1,5 +1,5 @@
 export interface ReservationDetails {
-    reservationId: number;
+    reservationId: string;
     roomId: number;
     locationId: number;
     checkIn: Date;
@@ -8,4 +8,6 @@ export interface ReservationDetails {
     pricePerDayPerPerson: number;
     numberOfDays: number;
     totalAmount: number;
+    paymentId: any[];
+    customerId: string;
 }

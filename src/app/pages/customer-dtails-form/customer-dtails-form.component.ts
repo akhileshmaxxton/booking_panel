@@ -13,6 +13,7 @@ export class CustomerDtailsFormComponent {
   public customerFormData!: FormGroup;
   public reservationDetails!: ReservationDetails;
   public customerDetails: CustomerDetails = {
+    customerId: '',
     name: '',
     birthData: new Date(),
     pincode: 0,
@@ -20,8 +21,7 @@ export class CustomerDtailsFormComponent {
     city: '',
     state: '',
     phoneNumber: 0,
-    bookingId: [],
-    paymentId: [],
+    reservationId: [],
   };
 
   constructor(private fb: FormBuilder, private router: Router) {
@@ -100,7 +100,6 @@ export class CustomerDtailsFormComponent {
   }
 
   onSubmit() {
-    console.log('onSubmit', this.customerFormData.value);
 
     if (this.customerFormData) {
       this.customerDetails.name = this.customerFormData.get('name')?.value;
@@ -111,7 +110,6 @@ export class CustomerDtailsFormComponent {
       this.customerDetails.state = this.customerFormData.get('state')?.value;
       this.customerDetails.phoneNumber = this.customerFormData.get('phoneNumber')?.value;
 
-      console.log('customerDetails', this.customerDetails);
 
       this.router.navigate(['/payment-details'],{state: {reservationDetails: this.reservationDetails, customerDetails: this.customerDetails}});
 
