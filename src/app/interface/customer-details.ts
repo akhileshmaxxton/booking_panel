@@ -1,4 +1,5 @@
 export interface CustomerDetails {
+    customerId: string;
     name: string;
     birthData: Date;
     pincode: number;
@@ -6,6 +7,5 @@ export interface CustomerDetails {
     city: string;
     state: string;
     phoneNumber: number;
-    bookingId: number[];
-    paymentId: number[];
+    reservationId: string[];
 }

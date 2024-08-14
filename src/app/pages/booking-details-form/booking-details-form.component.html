@@ -24,7 +24,7 @@
       <input type="date" id="checkIn" class="form-control" formControlName="checkIn" (change)="calculateTotalPrice()">
       <div *ngIf="bookingDetails.get('checkIn')?.invalid && bookingDetails.get('checkIn')?.touched" class="text-danger">
         <div *ngIf="bookingDetails.get('checkIn')?.errors?.['required']">Check-in date is required</div>
-        <div *ngIf="bookingDetails.get('checkIn')?.errors?.['pastDate']">{{bookingDetails.get('checkIn')?.errors?.['dateLessThanStart']}}</div>
+        <div *ngIf="bookingDetails.get('checkIn')?.errors?.['pastDate']">{{bookingDetails.get('checkIn')?.errors?.['pastDate']}}</div>
         <div *ngIf="bookingDetails.get('checkIn')?.errors?.['invalidDate']">Invalid date</div>
       </div>
     </div>
@@ -33,10 +33,10 @@
     <div class="mb-3">
       <label for="checkOut" class="form-label">Check Out</label>
       <input type="date" id="checkOut" class="form-control" formControlName="checkOut" (change)="calculateTotalPrice()">
-      <div *ngIf="bookingDetails.get('checkIn')?.invalid && bookingDetails.get('checkIn')?.touched" class="text-danger">
-        <div *ngIf="bookingDetails.get('checkIn')?.errors?.['required']">Check-in date is required</div>
-        <div *ngIf="bookingDetails.get('checkIn')?.errors?.['futureDate']">{{bookingDetails.get('checkIn')?.errors?.['futureDate']}}</div>
-        <div *ngIf="bookingDetails.get('checkIn')?.errors?.['invalidDate']">Invalid date</div>
+      <div *ngIf="bookingDetails.get('checkOut')?.invalid && bookingDetails.get('checkOut')?.touched" class="text-danger">
+        <div *ngIf="bookingDetails.get('checkOut')?.errors?.['required']">Check-out date is required</div>
+        <div *ngIf="bookingDetails.get('checkOut')?.errors?.['futureDate']">{{bookingDetails.get('checkOut')?.errors?.['futureDate']}}</div>
+        <div *ngIf="bookingDetails.get('checkOut')?.errors?.['invalidDate']">Invalid date</div>
       </div>
     </div>
 
@@ -46,7 +46,7 @@
       <input type="number" id="numberOfGuests" class="form-control" formControlName="numberOfGuests" (change)="calculateTotalPrice()">
       <div *ngIf="bookingDetails.get('numberOfGuests')?.invalid && bookingDetails.get('numberOfGuests')?.touched" class="text-danger">
         <div *ngIf="bookingDetails.get('numberOfGuests')?.errors?.['required']">Number of guests is required</div>
-        <div *ngIf="bookingDetails.get('numberOfGuests')?.errors?.['invalidGuests']">Number of guests must be greater than 0</div>
+        <div *ngIf="bookingDetails.get('numberOfGuests')?.errors?.['invalidGuests']">{{bookingDetails.get('numberOfGuests')?.errors?.['invalidGuests']}}</div>
       </div>
     </div>
 

@@ -1,6 +1,9 @@
 export interface PaymentDetails {
-    paymentId: number;
-    reservationId: number;
+    paymentId: string;
+    reservationId: string;
+    customerId: string;
     paymentDate: Date;
     paymentAmount: number;
+    paymentMode: string;
+
 }
