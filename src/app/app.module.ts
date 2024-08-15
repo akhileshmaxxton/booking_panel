@@ -23,6 +23,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CustomerDtailsFormComponent } from './pages/customer-dtails-form/customer-dtails-form.component';
 import { PaymentDetailFormComponent } from './pages/payment-detail-form/payment-detail-form.component';
 import { RoomViewModelComponent } from './components/utils/room-view-model/room-view-model.component';
+import { LocalStorageService } from './service/localStorageApi/local-storage.service';
 
 @NgModule({
   declarations: [
@@ -51,7 +52,7 @@ import { RoomViewModelComponent } from './components/utils/room-view-model/room-
     FormsModule,
     ReactiveFormsModule
   ],
-  providers: [RoomDetailsApiService, MergeRoomAndRoomDetails,UniquePipe],
+  providers: [RoomDetailsApiService, MergeRoomAndRoomDetails, UniquePipe, LocalStorageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

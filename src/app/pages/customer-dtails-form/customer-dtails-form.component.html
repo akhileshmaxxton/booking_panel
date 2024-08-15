@@ -3,7 +3,7 @@
         <!-- Location Section -->
         <div class="mb-3">
           <label for="exampleInputEmail1" class="form-label">Name</label>
-          <input type="text" class="form-control" formControlName="name" aria-describedby="emailHelp" >
+          <input type="text" class="form-control" formControlName="name" aria-describedby="emailHelp" [readonly]="customerDetails.customerId" >
           <div *ngIf="customerFormData.get('name')?.touched && customerFormData.get('name')?.invalid">
             <small class="text-danger">Name is required</small>
           </div>
@@ -13,7 +13,7 @@
         <!-- Room Name Section -->
         <div class="mb-3">
           <label for="exampleInputPassword1" class="form-label">Birth Date</label>
-          <input type="date" class="form-control" formControlName="birthDate" >
+          <input type="date" class="form-control" formControlName="birthDate" [readonly]="customerDetails.customerId" >
           <div *ngIf="customerFormData.get('birthDate')?.touched && customerFormData.get('birthDate')?.invalid">
             <small class="text-danger">Birth Date is required</small>
           </div>
@@ -23,7 +23,7 @@
         <!-- Price per day per person Section -->
         <div class="mb-3">
           <label for="exampleInputPassword1" class="form-label">pincode</label>
-          <input type="number" class="form-control" formControlName="pincode" >
+          <input type="number" class="form-control" formControlName="pincode" [readonly]="customerDetails.customerId" >
           <div *ngIf="customerFormData.get('pincode')?.touched && customerFormData.get('pincode')?.errors?.['invalidPinCode']">
             <small class="text-danger">Pincode must be a 6-digit number</small>
           </div>
@@ -33,33 +33,36 @@
         <!-- Check In Section -->
         <div class="mb-3">
           <label for="exampleInputPassword1" class="form-label">District</label>
-          <input type="text" class="form-control" formControlName="district" >
+          <input type="text" class="form-control" formControlName="district" [readonly]="customerDetails.customerId" >
         </div>
 
 
         <!-- Check Out Section -->
         <div class="mb-3">
           <label for="exampleInputPassword1" class="form-label">City</label>
-          <input type="text" class="form-control" formControlName="city" >
+          <input type="text" class="form-control" formControlName="city" [readonly]="customerDetails.customerId">
         </div>
 
 
         <!-- Number of Guests Section -->
         <div class="mb-3">
           <label for="exampleInputPassword1" class="form-label">State</label>
-          <input type="text" class="form-control" formControlName="state" >
+          <input type="text" class="form-control" formControlName="state" [readonly]="customerDetails.customerId">
         </div>
 
 
         <!-- Total Price Section -->
         <div class="mb-3">
           <label for="exampleInputPassword1" class="form-label">Phone Number</label>
-          <input type="number" class="form-control" formControlName="phoneNumber" >
+          <input type="number" class="form-control" formControlName="phoneNumber" [readonly]="customerDetails.customerId">
           <div *ngIf="customerFormData.get('phoneNumber')?.touched && customerFormData.get('phoneNumber')?.errors?.['invalidPhoneNumber']">
             <small class="text-danger">Phone Number must be a 10-digit number</small>
           </div>
         </div>
        
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <div class="d-flex justify-content-between">
+          <button type="button" class="btn btn-secondary" (click)="goBack()">Back</button>
+          <button type="submit" class="btn btn-primary">Next</button>
+        </div>
       </form>
 </div>
