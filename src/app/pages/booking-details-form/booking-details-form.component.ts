@@ -9,6 +9,7 @@ import {
 import { Router } from '@angular/router';
 import { RoomAndRoomStayDetails } from '../../interface/room-and-room-stay-details';
 import { ReservationDetails } from '../../interface/reservation-details';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-booking-details-form',
@@ -20,7 +21,7 @@ export class BookingDetailsFormComponent {
   public roomToBeBooked: RoomAndRoomStayDetails = {} as RoomAndRoomStayDetails;
   public reservationDetails: ReservationDetails = {} as ReservationDetails;
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private router: Router, private location: Location) {
     // data from the previous component
     this.roomToBeBooked = history.state.room;
 
@@ -29,22 +30,9 @@ export class BookingDetailsFormComponent {
       locationName: [''],
       roomName: [''],
       pricePerDayPerPerson: [''],
-      checkIn: [
-        '',
-        [Validators.required, this.checkInDateValidator.bind(this)],
-      ],
-      checkOut: [
-        '',
-        [Validators.required, this.checkOutDateValidator.bind(this)],
-      ],
-      numberOfGuests: [
-        '',
-        [
-          Validators.required,
-          Validators.min(1),
-          this.guestValidator.bind(this),
-        ],
-      ],
+      checkIn: ['', [Validators.required, this.checkInDateValidator.bind(this)]],
+      checkOut: ['', [Validators.required, this.checkOutDateValidator.bind(this)]],
+      numberOfGuests: ['', [Validators.required, Validators.min(1), this.guestValidator.bind(this)]],
       totalAmount: [''],
     });
 
@@ -61,6 +49,16 @@ export class BookingDetailsFormComponent {
       this.bookingDetails.get('checkOut')?.updateValueAndValidity();
       this.bookingDetails.get('numberOfGuests')?.updateValueAndValidity();
     }
+
+    // const nextState = history.state.reservationDetails;
+
+    // if(nextState){
+    //   this.bookingDetails.patchValue({
+    //     checkIn: nextState.checkIn,
+    //     checkOut: nextState.checkOut,
+    //     numberOfGuests: nextState.numberOfGuests
+    //   })
+    // }
   }
 
   calculateTotalPrice() {
@@ -137,24 +135,21 @@ export class BookingDetailsFormComponent {
     return null;
   }
 
+  goBack() {
+    // this.location.back();
+  }
+
   onSubmit() {
     if (this.bookingDetails) {
       this.reservationDetails.roomId = this.roomToBeBooked.roomId;
       this.reservationDetails.locationId = this.roomToBeBooked.locationId;
-      this.reservationDetails.checkIn = new Date(
-        this.bookingDetails.get('checkIn')?.value
-      );
-      this.reservationDetails.checkOut = new Date(
-        this.bookingDetails.get('checkOut')?.value
-      );
-      this.reservationDetails.numberOfGuests =
-        this.bookingDetails.get('numberOfGuests')?.value;
-      this.reservationDetails.pricePerDayPerPerson =
-        this.roomToBeBooked.pricePerDayPerPerson;
-        this.reservationDetails.paymentId = [];
+      this.reservationDetails.checkIn = new Date(this.bookingDetails.get('checkIn')?.value);
+      this.reservationDetails.checkOut = new Date(this.bookingDetails.get('checkOut')?.value);
+      this.reservationDetails.numberOfGuests = this.bookingDetails.get('numberOfGuests')?.value;
+      this.reservationDetails.pricePerDayPerPerson = this.roomToBeBooked.pricePerDayPerPerson;
+      this.reservationDetails.paymentId = [];
 
-      this.router.navigate(['/customer-details'], {
-        state: { reservationDetails: this.reservationDetails },
+      this.router.navigate(['/customer-details'], {state: { reservationDetails: this.reservationDetails },
       });
     }
   }

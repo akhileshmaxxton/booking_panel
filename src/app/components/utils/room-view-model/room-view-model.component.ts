@@ -13,7 +13,6 @@ export class RoomViewModelComponent {
 
   ngOnChanges() {
     if (this.roomViewData.roomId !== null) {
-      console.log('roomViewData internal', this.roomViewData);
       this.openModal();
     }
   }
@@ -21,7 +20,6 @@ export class RoomViewModelComponent {
   openModal() {
     const modalElement = document.getElementById('roomViewModal');
     if (modalElement && this.roomViewData.roomId) {
-      console.log("came here")
       const modal = new bootstrap.Modal(modalElement);
       modal.show();
     }

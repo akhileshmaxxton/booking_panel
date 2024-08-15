@@ -5,6 +5,7 @@ import { CustomerDetails } from '../../interface/customer-details';
 import { PaymentDetails } from '../../interface/payment-details';
 import { Router } from '@angular/router';
 import ShortUniqueId from 'short-unique-id';
+import { LocalStorageService } from '../../service/localStorageApi/local-storage.service';
 
 @Component({
   selector: 'app-payment-detail-form',
@@ -24,15 +25,14 @@ export class PaymentDetailFormComponent {
     paymentAmount: 0,
     paymentMode: ''
   };
+
+  public showModal: boolean = false;
   
 
-  constructor(private fb: FormBuilder, private router: Router) { 
-
+  constructor(private fb: FormBuilder, private router: Router, private localStorageService: LocalStorageService) {
     // data from the previous component
-    this.reservationDetails = history.state.reservationDetails || { reservationId: '', paymentId: [], customerId: '' };
-    this.customerDetails = history.state.customerDetails || { customerId: '', reservationId: [] };
-
-    console.log(this.reservationDetails);
+    this.reservationDetails = history.state.reservationDetails;
+    this.customerDetails = history.state.customerDetails;
 
     // initialize form
     this.paymentFormData = this.fb.group({
@@ -42,11 +42,19 @@ export class PaymentDetailFormComponent {
     });
   }
 
+  openModal() {
+    this.showModal = true;
+  }
+
+  closeModal() {
+    this.showModal = false;
+  }
+
   onSubmit() {
     if(this.paymentFormData.valid){
       const uid = new ShortUniqueId({ length: 10 });
       const generatedReservationId = uid.rnd();
-      const generatedCustomerId = uid.rnd();
+      const generatedCustomerId = this.customerDetails.customerId? this.customerDetails.customerId : uid.rnd();
       const generatedPaymentId = uid.rnd();
 
       //payment details
@@ -66,10 +74,14 @@ export class PaymentDetailFormComponent {
       this.reservationDetails.paymentId.push(generatedPaymentId);
       this.reservationDetails.customerId = generatedCustomerId;
       
+
+      this.localStorageService.setLocalStorage(this.customerDetails, this.reservationDetails, this.paymentDetails);
       
       console.log("reservationDetails",this.reservationDetails);
       console.log("customerDetails",this.customerDetails);
       console.log("paymentDetails",this.paymentDetails);
+
+
     }
   }
 }

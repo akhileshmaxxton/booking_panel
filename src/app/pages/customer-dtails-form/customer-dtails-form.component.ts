@@ -3,6 +3,8 @@ import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators }
 import { NavigationExtras, Router } from '@angular/router';
 import { ReservationDetails } from '../../interface/reservation-details';
 import { CustomerDetails } from '../../interface/customer-details';
+import { LocalStorageService } from '../../service/localStorageApi/local-storage.service';
+import moment from 'moment';
 
 @Component({
   selector: 'app-customer-dtails-form',
@@ -24,11 +26,9 @@ export class CustomerDtailsFormComponent {
     reservationId: [],
   };
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private router: Router, private localStorageService: LocalStorageService) {
     // data from the previous component
     this.reservationDetails = history.state.reservationDetails;
-    console.log("reservationDetails", this.reservationDetails);
-
 
     // initialize form
     this.customerFormData = this.fb.group({
@@ -40,6 +40,23 @@ export class CustomerDtailsFormComponent {
       state: ['',[Validators.required, this.stateValidator]],
       phoneNumber: ['',[Validators.required, this.phoneNumberValidator]],
     });
+
+    this.customerDetails.customerId = this.localStorageService.getCustomerFromSession();
+
+    if(this.customerDetails.customerId){
+
+      this.customerDetails = this.localStorageService.getCustomerFromLocalStorage(this.customerDetails.customerId);
+  
+      this.customerFormData.patchValue({
+        name: this.customerDetails.name,
+        birthDate: moment(this.customerDetails.birthData).format('YYYY-MM-DD'),
+        pincode: this.customerDetails.pincode,
+        district: this.customerDetails.district,
+        city: this.customerDetails.city,
+        state: this.customerDetails.state,
+        phoneNumber: this.customerDetails.phoneNumber
+      })
+    }
   }
 
   nameValidator(control: AbstractControl): ValidationErrors | null {
@@ -101,9 +118,26 @@ export class CustomerDtailsFormComponent {
     return isValid ? null : { invalidPhoneNumber: true };
   }
 
+  goBack() {
+    // this.router.navigate(['/book'], {
+    //   state: { reservationDetails: this.reservationDetails },
+    // });
+  }
+
   onSubmit() {
 
-    if (this.customerFormData) {
+    if(!this.customerDetails.customerId){
+      this.customerDetails.customerId = this.localStorageService.checkCustomerFromLocalStorage(this.customerFormData.value);
+      
+      if(this.customerDetails.customerId){
+        sessionStorage.setItem('customerId', JSON.stringify(this.customerDetails.customerId));
+        this.customerDetails = this.localStorageService.getCustomerFromLocalStorage(this.customerDetails.customerId);
+        console.log("checkcomplete",this.customerDetails);
+        this.router.navigate(['/payment-details'],{state: {reservationDetails: this.reservationDetails, customerDetails: this.customerDetails}});
+      }
+
+    }
+    else{
       this.customerDetails.name = this.customerFormData.get('name')?.value;
       this.customerDetails.birthData = new Date(this.customerFormData.get('birthDate')?.value);
       this.customerDetails.pincode = this.customerFormData.get('pincode')?.value;
@@ -111,15 +145,11 @@ export class CustomerDtailsFormComponent {
       this.customerDetails.city = this.customerFormData.get('city')?.value;
       this.customerDetails.state = this.customerFormData.get('state')?.value;
       this.customerDetails.phoneNumber = this.customerFormData.get('phoneNumber')?.value;
-      this.customerDetails.reservationId = [];
-
-      console.log("customerDetails", this.customerDetails);
-
-
+      this.customerDetails.reservationId ?? [];
 
       this.router.navigate(['/payment-details'],{state: {reservationDetails: this.reservationDetails, customerDetails: this.customerDetails}});
 
-      
     }
+
   }
 }

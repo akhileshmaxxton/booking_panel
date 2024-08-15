@@ -33,13 +33,10 @@ export class CustomerPortalHomeComponent implements OnInit {
         roomDetails
       ),
       this.roomDetailsForFilter = this.roomAndRoomStayDetails
-      console.log('mergePipe', this.roomAndRoomStayDetails);
-      console.log('roomDetailsForFilter', this.roomDetailsForFilter);
     });
   }
 
   onFilterChange(selectedLocation: number) {
-    console.log("onFilterChange",selectedLocation);
     try{
       forkJoin({
         roomStayDetails: this.roomDetailsApiService.getRoomStayDetails(),
@@ -49,10 +46,8 @@ export class CustomerPortalHomeComponent implements OnInit {
           roomStayDetails,
           roomDetails
         );
-        console.log('onfilterchange initial data', this.roomAndRoomStayDetails);
         if(selectedLocation){
           this.roomAndRoomStayDetails = this.roomAndRoomStayDetails?.filter(room => room.locationId == selectedLocation);
-          console.log('onfiltercgange filtered data on location', this.roomAndRoomStayDetails);
         }
       });
       
@@ -72,7 +67,6 @@ export class CustomerPortalHomeComponent implements OnInit {
   }
 
   onViewRoom(viewRoomData: RoomAndRoomStayDetails) {
-    console.log("view room outer", viewRoomData)
     this.viewRoomData = viewRoomData;
   }
 }
