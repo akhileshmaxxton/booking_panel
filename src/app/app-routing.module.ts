@@ -5,6 +5,7 @@ import { CustomerPortalHomeComponent } from './pages/customer-portal-home/custom
 import { BookingDetailsFormComponent } from './pages/booking-details-form/booking-details-form.component';
 import { CustomerDtailsFormComponent } from './pages/customer-dtails-form/customer-dtails-form.component';
 import { PaymentDetailFormComponent } from './pages/payment-detail-form/payment-detail-form.component';
+import { OwnerPortalHomeComponent } from './pages/owner-portal-home/owner-portal-home.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -14,6 +15,7 @@ const routes: Routes = [
   // { path: 'customer/book' , component: BookingDetailsFormComponent},
   { path: 'customer-details' , component: CustomerDtailsFormComponent},
   { path: 'payment-details' , component: PaymentDetailFormComponent},
+  { path: 'owner', component: OwnerPortalHomeComponent}
 ];
 
 @NgModule({
