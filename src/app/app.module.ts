@@ -55,7 +55,7 @@ import { MatDialogModule } from '@angular/material/dialog';
     RouterModule,
     FormsModule,
     ReactiveFormsModule,
-    MatDialogModule
+    MatDialogModule,
     
   ],
   providers: [RoomDetailsApiService, MergeRoomAndRoomDetails, UniquePipe, LocalStorageService, provideAnimationsAsync()],
