@@ -1,0 +1,13 @@
+/* Gantt chart requires specific styles to render correctly */
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  
+  #gantt_here {
+    border: 1px solid #ddd;
+  }
+  
