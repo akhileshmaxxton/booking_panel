@@ -42,19 +42,20 @@ export class CustomerDtailsFormComponent {
     });
 
     this.customerDetails.customerId = this.localStorageService.getCustomerFromSession();
+    
 
-    if(this.customerDetails.customerId){
+    if(this.customerDetails?.customerId){
 
       this.customerDetails = this.localStorageService.getCustomerFromLocalStorage(this.customerDetails.customerId);
   
       this.customerFormData.patchValue({
-        name: this.customerDetails.name,
-        birthDate: moment(this.customerDetails.birthData).format('YYYY-MM-DD'),
-        pincode: this.customerDetails.pincode,
-        district: this.customerDetails.district,
-        city: this.customerDetails.city,
-        state: this.customerDetails.state,
-        phoneNumber: this.customerDetails.phoneNumber
+        name: this.customerDetails?.name,
+        birthDate:this.customerDetails?.birthData? moment(this.customerDetails.birthData).format('YYYY-MM-DD'): null,
+        pincode: this.customerDetails?.pincode,
+        district: this.customerDetails?.district,
+        city: this.customerDetails?.city,
+        state: this.customerDetails?.state,
+        phoneNumber: this.customerDetails?.phoneNumber
       })
     }
   }
@@ -127,6 +128,7 @@ export class CustomerDtailsFormComponent {
   onSubmit() {
 
     if(!this.customerDetails.customerId){
+      console.log("came here")
       this.customerDetails.customerId = this.localStorageService.checkCustomerFromLocalStorage(this.customerFormData.value);
       
       if(this.customerDetails.customerId){
@@ -134,6 +136,18 @@ export class CustomerDtailsFormComponent {
         this.customerDetails = this.localStorageService.getCustomerFromLocalStorage(this.customerDetails.customerId);
         console.log("checkcomplete",this.customerDetails);
         this.router.navigate(['/payment-details'],{state: {reservationDetails: this.reservationDetails, customerDetails: this.customerDetails}});
+      }
+      else{
+        this.customerDetails.name = this.customerFormData.get('name')?.value;
+      this.customerDetails.birthData = new Date(this.customerFormData.get('birthDate')?.value);
+      this.customerDetails.pincode = this.customerFormData.get('pincode')?.value;
+      this.customerDetails.district = this.customerFormData.get('district')?.value;
+      this.customerDetails.city = this.customerFormData.get('city')?.value;
+      this.customerDetails.state = this.customerFormData.get('state')?.value;
+      this.customerDetails.phoneNumber = this.customerFormData.get('phoneNumber')?.value;
+      this.customerDetails.reservationId =  [];
+
+      this.router.navigate(['/payment-details'],{state: {reservationDetails: this.reservationDetails, customerDetails: this.customerDetails}});
       }
 
     }

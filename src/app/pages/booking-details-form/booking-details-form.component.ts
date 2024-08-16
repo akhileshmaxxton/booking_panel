@@ -140,7 +140,7 @@ export class BookingDetailsFormComponent {
   }
 
   onSubmit() {
-    if (this.bookingDetails) {
+    if (this.bookingDetails.valid) {
       this.reservationDetails.roomId = this.roomToBeBooked.roomId;
       this.reservationDetails.locationId = this.roomToBeBooked.locationId;
       this.reservationDetails.checkIn = new Date(this.bookingDetails.get('checkIn')?.value);

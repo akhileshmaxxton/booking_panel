@@ -15,12 +15,13 @@ export class LocalStorageService {
     const customer = localStorage.getItem('customer')? JSON.parse(localStorage.getItem('customer')!) : [];
     const reservation = localStorage.getItem('reservation')? JSON.parse(localStorage.getItem('reservation')!) : [];
     const payment = localStorage.getItem('payment')? JSON.parse(localStorage.getItem('payment')!) : [];
-    if(customerDetails.customerId){
-      customer.find((customer: CustomerDetails) => customer.customerId === customerDetails.customerId).reservationId.push(reservationDetails.reservationId);
+    if(customerDetails?.customerId === customer?.find((customer: CustomerDetails) => customer.customerId === customerDetails.customerId)?.customerId){
+      console.log("Customer ID:", customerDetails.customerId);
+      customer?.find((customer: CustomerDetails) => customer.customerId === customerDetails.customerId)?.reservationId.push(reservationDetails.reservationId);
     }
     else{
+      console.log("came here for else")
       customer.push(customerDetails);
-
     }
     reservation.push(reservationDetails);
     payment.push(paymentDetails);

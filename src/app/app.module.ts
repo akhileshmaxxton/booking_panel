@@ -24,6 +24,9 @@ import { CustomerDtailsFormComponent } from './pages/customer-dtails-form/custom
 import { PaymentDetailFormComponent } from './pages/payment-detail-form/payment-detail-form.component';
 import { RoomViewModelComponent } from './components/utils/room-view-model/room-view-model.component';
 import { LocalStorageService } from './service/localStorageApi/local-storage.service';
+import { OwnerPortalHomeComponent } from './pages/owner-portal-home/owner-portal-home.component';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
@@ -42,7 +45,8 @@ import { LocalStorageService } from './service/localStorageApi/local-storage.ser
     BookingDetailsFormComponent,
     CustomerDtailsFormComponent,
     PaymentDetailFormComponent,
-    RoomViewModelComponent
+    RoomViewModelComponent,
+    OwnerPortalHomeComponent,
   ],
   imports: [
     BrowserModule,
@@ -50,9 +54,11 @@ import { LocalStorageService } from './service/localStorageApi/local-storage.ser
     HttpClientModule,
     RouterModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatDialogModule
+    
   ],
-  providers: [RoomDetailsApiService, MergeRoomAndRoomDetails, UniquePipe, LocalStorageService],
+  providers: [RoomDetailsApiService, MergeRoomAndRoomDetails, UniquePipe, LocalStorageService, provideAnimationsAsync()],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

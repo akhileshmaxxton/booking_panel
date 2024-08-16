@@ -33,6 +33,7 @@ export class CustomerPortalHomeComponent implements OnInit {
         roomDetails
       ),
       this.roomDetailsForFilter = this.roomAndRoomStayDetails
+      console.log(this.roomAndRoomStayDetails);
     });
   }
 
