@@ -27,6 +27,13 @@ import { LocalStorageService } from './service/localStorageApi/local-storage.ser
 import { OwnerPortalHomeComponent } from './pages/owner-portal-home/owner-portal-home.component';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { MatDialogModule } from '@angular/material/dialog';
+import { BookingPageComponent } from './pages/booking-page/booking-page.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { CalendarModule, DateAdapter } from 'angular-calendar';
+import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
+import { PlanningChartComponent } from './components/utils/planning-chart/planning-chart.component';
+import { CalenderHeaderComponent } from './components/utils/calender-header/calender-header.component';
+import { FilterService } from './service/filterService/filter.service';
 
 @NgModule({
   declarations: [
@@ -47,6 +54,9 @@ import { MatDialogModule } from '@angular/material/dialog';
     PaymentDetailFormComponent,
     RoomViewModelComponent,
     OwnerPortalHomeComponent,
+    BookingPageComponent,
+    PlanningChartComponent,
+    CalenderHeaderComponent,
   ],
   imports: [
     BrowserModule,
@@ -56,9 +66,14 @@ import { MatDialogModule } from '@angular/material/dialog';
     FormsModule,
     ReactiveFormsModule,
     MatDialogModule,
+    BrowserAnimationsModule,
+    CalendarModule.forRoot({
+      provide: DateAdapter,
+      useFactory: adapterFactory,
+    }),
     
   ],
-  providers: [RoomDetailsApiService, MergeRoomAndRoomDetails, UniquePipe, LocalStorageService, provideAnimationsAsync()],
+  providers: [RoomDetailsApiService, MergeRoomAndRoomDetails, UniquePipe, LocalStorageService, provideAnimationsAsync(), FilterService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
+import { FilterService } from '../../../service/filterService/filter.service';
 
 @Component({
   selector: 'app-number-of-guests',
@@ -8,11 +9,13 @@ import { Component, EventEmitter, Output } from '@angular/core';
 export class NumberOfGuestsComponent {
   @Output() guestChanged: EventEmitter<number> = new EventEmitter<number>();
 
+  constructor(private filterService: FilterService) {}
+
   onGuestChange(event: Event) {
     const inputElement = event.target as HTMLInputElement;
     const guest = parseFloat(inputElement.value);
     if (!isNaN(guest)) {
-      this.guestChanged.emit(guest);
+      this.filterService.setGuestsFilter(guest);
     }
   }
 

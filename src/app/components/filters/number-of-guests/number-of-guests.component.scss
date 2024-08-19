@@ -1,0 +1,40 @@
+.nice-select {
+    background: transparent;
+    border-radius: 10px;
+    border: 1px solid #2b3146;
+    font-size: 13px;
+    line-height: 40px;
+    height: 40px;
+    color: #777;
+    padding: 0 15px;
+    position: relative;
+    margin-left: 0.8rem;
+    width: 10rem;
+}
+
+/* Hide default number input arrows */
+.nice-select::-webkit-outer-spin-button,
+.nice-select::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+
+
+/* Custom arrow icon for the input field */
+.nice-select:after {
+    content: "\e874";
+    font-family: 'Linearicons-Free';
+    font-size: 13px;
+    color: #777777;
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.nice-select:hover {
+    border-color: #1a73e8; /* Optional: Change border color on hover */
+    color: #1a73e8; /* Optional: Change text color on hover */
+}

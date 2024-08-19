@@ -1,10 +1,14 @@
-<div class="row">
+<!-- <div class="row">
   <div class="dropdown">
-    <select
+    
+  </div>
+</div> -->
+
+<select
       name="location"
       id="location"
       #location
-      class="form-control"
+      class="nice-select"
       (change)="onLocationChange(location.value)"
     >
       <option value="">--Select Location--</option>
@@ -15,5 +19,3 @@
         {{ room.locationName }}
       </option>
     </select>
-  </div>
-</div>

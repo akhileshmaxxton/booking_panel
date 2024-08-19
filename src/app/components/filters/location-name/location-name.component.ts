@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RoomAndRoomStayDetails } from '../../../interface/room-and-room-stay-details';
+import { FilterService } from '../../../service/filterService/filter.service';
 
 @Component({
   selector: 'app-location-name',
@@ -9,11 +10,13 @@ import { RoomAndRoomStayDetails } from '../../../interface/room-and-room-stay-de
 export class LocationNameComponent {
   @Input() roomDetailsForFilter!: RoomAndRoomStayDetails[];
 
-  @Output() locationChanged: EventEmitter<number> = new EventEmitter<number>();
-  selectedLocation?: number;
+  constructor(private filterService: FilterService) {}
+
+  // @Output() locationChanged: EventEmitter<number> = new EventEmitter<number>();
+  // selectedLocation?: number;
 
   onLocationChange(value: string): void {
-    this.selectedLocation =parseInt(value);
-    this.locationChanged.emit(this.selectedLocation);
+    const selectedLocation = parseInt(value);
+    this.filterService.setLocationFilter(isNaN(selectedLocation) ? null : selectedLocation);
   }
 }
