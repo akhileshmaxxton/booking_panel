@@ -1,0 +1,92 @@
+$dark: #222222;
+$yellow: #f3c300;
+$light_blue: #52c5fd;
+
+
+.accomodation_item{
+    margin-bottom: 30px;
+    .hotel_img{
+        position: relative;
+        margin-bottom: 10px;
+        overflow: hidden;
+        border-radius: 10px;
+        img{
+            transition: all 0.4s linear;
+        }
+        .theme_btn{
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translate(-50%);
+            padding: 5px 25px;
+            max-width: 128px;
+        }
+        &:hover{
+            img{
+                transform: scale(1.19);
+            }
+        }
+    }
+    h5{
+        font-size: 24px;
+        line-height: 28px;
+        color: $light_blue;
+        font-weight: 600;
+        margin-bottom: 0px;
+        small{
+            font-weight: 300;
+            font-size: 14px;
+        }
+    }
+}
+.sec_h4{
+    font-size: 18px;
+    line-height: 38px;
+    font-weight: 600;
+    color: $dark;
+    margin-bottom: 0px;
+}
+
+.book_now_btn{
+    width: 100%;
+    display: block;
+    background: #f3c300;
+    color: $dark;
+    text-transform: uppercase;
+    font-size: 14px;
+    line-height: 30px;
+    font-weight: 500;
+    padding: 5px 20px;
+}
+
+
+.button_hover{
+    border-radius: 0px;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s linear;
+    overflow: hidden;
+    border: 0px;
+    display: inline-block;
+    text-align: center;
+    &:before{
+        content: "";
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+        position: absolute;
+        transform: translateX(-100%);
+        z-index: -1;
+        background: #f8b100;
+        transition: all 0.3s linear;
+		opacity: 0;
+    }
+    &:hover{
+        color: #fff;
+        &:before{
+            transform: translateX(0);
+			opacity: 1;
+        }
+    }
+}

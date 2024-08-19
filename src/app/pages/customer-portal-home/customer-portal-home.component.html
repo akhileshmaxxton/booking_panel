@@ -1,36 +1,142 @@
 <app-room-view-model [roomViewData]="viewRoomData"></app-room-view-model>
 
 <div class="container-fluid mt-2">
+  <header class="header_area">
     <app-logo></app-logo>
+  </header>
 
-    <div class="container w-100">
-
-
-       <div class="w-100 d-flex justify-content-center">
-        <div class="w-75 bg-white py-4 px-3 border" style="box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px; top: -3rem; z-index: 10; position: relative; border-radius: 10px; display:flex; flex-direction: column; align-items: center;">
-            <div class="d-flex w-100 align-items-center justify-content-center px-auto" style="gap: 10px">
-                <app-location-name  [roomDetailsForFilter]="roomDetailsForFilter" (locationChanged)="onFilterChange($event)"></app-location-name>
-                <app-date-range ></app-date-range>
-                <app-number-of-guests (guestChanged)="onGuestChange($event)"></app-number-of-guests>
-            </div>
-
-            <div class="d-flex w-100 align-items-center justify-content-center" style="gap: 10px">
-                <app-number-of-days (priceChanged)="onPriceChanged($event)"></app-number-of-days>
-                <app-price></app-price>
-                <app-clear-filter-button></app-clear-filter-button>
-            </div>
-            
-           
+  <section class="banner_area">
+    <div class="booking_table d-flex align-items-center">
+      <div
+        class="overlay bg-parallax"
+        data-stellar-ratio="0.9"
+        data-stellar-vertical-offset="0"
+        data-background=""
+      ></div>
+      <div class="container">
+        <div class="banner_content text-center">
+          <h6>Away from monotonous life</h6>
+          <h2>Relax Your Mind</h2>
+          <p>
+            If you are looking at blank cassettes on the web, you may be very
+            confused at the<br />
+            difference in price. You may see this as a solution for you.
+          </p>
         </div>
-       </div>
-
-
-        <div class="container">
-            <div class="row">
-                <div class="col py-3" *ngFor="let room of roomAndRoomStayDetails">
-                    <app-room-detail-card-for-home [room]="room" (onViewRoom)="onViewRoom(room)"></app-room-detail-card-for-home>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+
+    <div class="position">
+      <div class="container">
+        <div class="hotel_booking_table">
+          <div class="col-md-3">
+            <h2>
+              Book<br />
+              Your Room
+            </h2>
+          </div>
+          <div class="col-md-9">
+            <div class="boking_table">
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="book_tabel_item">
+
+
+                    <!-- Location filter -->
+                    <div class="form-group">
+                      <div class="input-group" id="datetimepicker11">
+                        <app-location-name  [roomDetailsForFilter]="roomDetailsForFilter"></app-location-name>
+                      </div>
+                    </div>
+
+
+                    <!-- Price filter -->
+                    <div class="form-group">
+                      <div class="input-group date" id="datetimepicker1">
+                        <app-price></app-price>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+
+
+                <div class="col-md-4">
+                  <div class="book_tabel_item">
+
+
+                    <!-- Date range filter  -->
+                    <div class="input-group">
+                      <app-date-range></app-date-range>
+                    </div>
+
+
+                    <!-- No of days filter -->
+                    <div class="input-group">
+                      <app-number-of-days></app-number-of-days>
+                    </div>
+                  </div>
+                </div>
+
+
+
+                <div class="col-md-4">
+                  <div class="book_tabel_item">
+
+                    <!-- no of people filter -->
+                    <div class="input-group">
+                      <app-number-of-guests></app-number-of-guests>
+                    </div>
+
+                    <!-- clear filter buton -->
+                    <a class="book_now_btn button_hover" href="#">Clear Filter</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- cards section -->
+
+  <section class="accomodation_area section_gap">
+    <div class="container">
+      <div class="section_title text-center">
+        <h2 class="title_color">Hotel Accomodation</h2>
+        <p>
+          We all live in an age that belongs to the young at heart. Life that is
+          becoming extremely fast,
+        </p>
+      </div>
+      <div class="row mb_30">
+        <div
+          class="col-lg-3 col-sm-6"
+          *ngFor="let room of roomAndRoomStayDetails"
+        >
+          <app-room-detail-card-for-home
+            [room]="room"
+            (onViewRoom)="onViewRoom(room)"
+          ></app-room-detail-card-for-home>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+
+  
+  
+ 
+
+  <!-- <div class="container">
+    <div class="row">
+      <div class="col py-3" *ngFor="let room of roomAndRoomStayDetails">
+        <app-room-detail-card-for-home [room]="room" (onViewRoom)="onViewRoom(room)"></app-room-detail-card-for-home>
+      </div>
+    </div>
+  </div> -->
 </div>

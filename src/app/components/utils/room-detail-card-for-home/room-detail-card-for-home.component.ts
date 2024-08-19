@@ -22,4 +22,8 @@ export class RoomDetailCardForHomeComponent {
     this.onViewRoom.emit(viewRoomData);
     
   }
+  getRandomImagePath(): string {
+    const randomNumber = Math.floor(Math.random() * 4) + 1; 
+    return `/assets/images/room${randomNumber}.jpg`;
+  }
 }

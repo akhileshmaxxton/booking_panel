@@ -5,6 +5,7 @@ import { RoomDetails } from '../../interface/room-details';
 import { RoomAndRoomStayDetails } from '../../interface/room-and-room-stay-details';
 import { RoomDetailsApiService } from '../../service/apiService/room-details-api.service';
 import { MergeRoomAndRoomDetails } from '../../utils/merge-room-and-room-details.pipe';
+import { FilterService } from '../../service/filterService/filter.service';
 
 @Component({
   selector: 'app-customer-portal-home',
@@ -17,11 +18,15 @@ export class CustomerPortalHomeComponent implements OnInit {
   public roomAndRoomStayDetails : RoomAndRoomStayDetails[] = [];
   public roomDetailsForFilter : RoomAndRoomStayDetails[] = [];
   public viewRoomData : RoomAndRoomStayDetails = {} as RoomAndRoomStayDetails;
+  public roomAndRoomStayDetails$!: Observable<RoomAndRoomStayDetails[]>;
 
   constructor(
     private roomDetailsApiService: RoomDetailsApiService,
-    private mergePipe: MergeRoomAndRoomDetails
-  ) {}
+    private mergePipe: MergeRoomAndRoomDetails,
+    private filterService: FilterService
+  ) {
+     this.roomAndRoomStayDetails$ = this.filterService.getFilteredRoomStayDetails();
+  }
 
   ngOnInit() {
     forkJoin({

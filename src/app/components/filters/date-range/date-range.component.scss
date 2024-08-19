@@ -1,0 +1,18 @@
+.form-control{
+    border: 1px solid #2b3146;
+    background: transparent;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 38px;
+    padding: 0px 25px;
+    color: #777777;
+    z-index: 0;
+    width: 10rem;
+    &::placeholder{
+        color: #777777;
+    }
+    &:focus{
+        outline: none;
+        box-shadow: none;
+    }
+}
