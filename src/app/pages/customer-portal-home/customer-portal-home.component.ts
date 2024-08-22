@@ -50,4 +50,5 @@ export class CustomerPortalHomeComponent implements OnInit {
   clearFilter(){
     this.filterService.resetFilters();
   }
+ 
 }

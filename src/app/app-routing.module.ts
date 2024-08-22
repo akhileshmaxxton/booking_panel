@@ -7,6 +7,7 @@ import { CustomerDtailsFormComponent } from './pages/customer-dtails-form/custom
 import { PaymentDetailFormComponent } from './pages/payment-detail-form/payment-detail-form.component';
 import { OwnerPortalHomeComponent } from './pages/owner-portal-home/owner-portal-home.component';
 import { BookingPageComponent } from './pages/booking-page/booking-page.component';
+import { CalenderHeaderComponent } from './components/utils/calender-header/calender-header.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -17,7 +18,8 @@ const routes: Routes = [
   { path: 'customer-details' , component: CustomerDtailsFormComponent},
   { path: 'payment-details' , component: PaymentDetailFormComponent},
   { path: 'owner', component: OwnerPortalHomeComponent},
-  { path: 'booking', component: BookingPageComponent}
+  { path: 'booking', component: BookingPageComponent},
+  { path: 'test', component: CalenderHeaderComponent},
 ];
 
 @NgModule({

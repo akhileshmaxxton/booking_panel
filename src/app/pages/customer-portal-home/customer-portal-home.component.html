@@ -106,16 +106,16 @@
   <section class="accomodation_area section_gap">
     <div class="container">
       <div class="section_title text-center">
-        <h2 class="title_color">Hotel Accomodation</h2>
+        <h2 class="title_color mt-5">Hotel Accomodation</h2>
         <p>
           We all live in an age that belongs to the young at heart. Life that is
-          becoming extremely fast,
+          becoming extremely fast.
         </p>
       </div>
       <div class="row mb_30">
         <div
           class="col-lg-3 col-sm-6"
-          *ngFor="let room of roomAndRoomStayDetails"
+          *ngFor="let room of roomAndRoomStayDetails;"
         >
           <app-room-detail-card-for-home
             [room]="room"

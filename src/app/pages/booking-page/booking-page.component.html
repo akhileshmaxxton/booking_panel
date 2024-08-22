@@ -1,1 +1,68 @@
-<app-planning-chart></app-planning-chart>
+<ng-container *ngIf="currentFormIndex === 0">
+    <app-booking-details-form 
+      [roomToBeBooked]="roomToBeBooked"
+      (reservationConfirmed)="onReservationConfirmed($event)">
+    </app-booking-details-form>
+  </ng-container>
+  
+  <ng-container *ngIf="currentFormIndex === 1">
+    <app-customer-dtails-form
+      (customerDetailsSubmitted)="onCustomerDetailsSubmitted($event)">
+    </app-customer-dtails-form>
+  </ng-container>
+  
+  <ng-container *ngIf="currentFormIndex === 2">
+    <app-payment-detail-form
+    [customerDetails]="customerDetails"
+    [reservationDetails]="reservationDetails"
+    (paymentDetailsSubmitted)="onPaymentDetailsSubmitted($event)">
+      >
+    </app-payment-detail-form>
+  </ng-container>
+
+  <ng-container *ngIf="currentFormIndex === 3">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+          <div class="col-md-8">
+            <div class="card">
+              <div class="card-header text-center">
+                <h4>Booking Confirmation</h4>
+              </div>
+              <div class="card-body">
+                <h5 class="mb-4">Invoice Details</h5>
+                
+                <div class="mb-3">
+                  <h6>Customer Details:</h6>
+                  <p><strong>Name:</strong> {{ customerDetails.name }}</p>
+                  <p><strong>Phone:</strong> {{ customerDetails.phoneNumber }}</p>
+                  
+                </div>
+      
+                <div class="mb-3">
+                  <h6>Booking Details:</h6>
+                  <p><strong>Check-In:</strong> {{ reservationDetails.checkIn | date }}</p>
+                  <p><strong>Check-Out:</strong> {{ reservationDetails.checkOut | date }}</p>
+                  <p><strong>Number of Nights:</strong> {{ reservationDetails.numberOfDays }}</p>
+                  <p><strong>Total Amount:</strong> {{ paymentDetails.paymentAmount | currency }}</p>
+                </div>
+      
+                <div class="mb-3">
+                  <h6>Payment Details:</h6>
+                  <p><strong>Payment Date:</strong> {{ paymentDetails.paymentDate | date }}</p>
+                  <p><strong>Payment Mode:</strong> {{ paymentDetails.paymentMode }}</p>
+                  <p><strong>Payment ID:</strong> {{ paymentDetails.paymentId }}</p>
+                </div>
+      
+                <div class="text-center">
+                  <button class="btn btn-primary" (click)="printInvoice()">Print Invoice</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+  </ng-container>
+
+
+  

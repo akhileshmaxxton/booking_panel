@@ -1,31 +1,12 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CalendarView } from 'angular-calendar';
+import { AfterViewInit, Component, ElementRef } from '@angular/core';
+
+declare var $: any;
 
 @Component({
   selector: 'app-calender-header',
   templateUrl: './calender-header.component.html',
-  styleUrl: './calender-header.component.scss'
+  styleUrls: ['./calender-header.component.scss'] // Corrected 'styleUrl' to 'styleUrls'
 })
-export class CalenderHeaderComponent {
-  @Input() view!: CalendarView;
+export class CalenderHeaderComponent{
 
-  @Input() viewDate!: Date;
-
-  @Input() locale: string = 'en';
-
-  @Output() viewChange = new EventEmitter<CalendarView>();
-
-  @Output() viewDateChange = new EventEmitter<Date>();
-
-  CalendarView = CalendarView;
-
-  // This method is called when a view change button is clicked
-  onViewChange(view: CalendarView) {
-    this.viewChange.emit(view);
-  }
-
-  // This method is called when the view date is changed
-  onViewDateChange(date: Date) {
-    this.viewDateChange.emit(date);
-  }
 }

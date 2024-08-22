@@ -4,8 +4,9 @@
       #location
       class="nice-select"
       (change)="onLocationChange(location.value)"
+      [ngModel]="getLocation"
     >
-      <option value="">--Select Location--</option>
+      <option value="null"> Select Location</option>
       <option
         *ngFor="let room of roomDetailsForFilter | unique: 'locationId'"
         [value]="room.locationId"

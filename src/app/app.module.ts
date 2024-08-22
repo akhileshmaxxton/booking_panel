@@ -34,6 +34,8 @@ import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { PlanningChartComponent } from './components/utils/planning-chart/planning-chart.component';
 import { CalenderHeaderComponent } from './components/utils/calender-header/calender-header.component';
 import { FilterService } from './service/filterService/filter.service';
+import { BaseChartDirective } from 'ng2-charts';
+import { GoogleChartsModule } from 'angular-google-charts';
 
 @NgModule({
   declarations: [
@@ -71,6 +73,8 @@ import { FilterService } from './service/filterService/filter.service';
       provide: DateAdapter,
       useFactory: adapterFactory,
     }),
+    BaseChartDirective,
+    GoogleChartsModule
     
   ],
   providers: [RoomDetailsApiService, MergeRoomAndRoomDetails, UniquePipe, LocalStorageService, provideAnimationsAsync(), FilterService],

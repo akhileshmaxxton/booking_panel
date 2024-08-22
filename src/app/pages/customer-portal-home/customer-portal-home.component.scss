@@ -1,11 +1,18 @@
 .banner_area{
     background: #04091e;
     
+    
 	position: relative;
     z-index: 1;
     .bg-parallax{
-        background: url("../../../../public/assets/images/banner_bg.jpg") no-repeat scroll center 0 / cover;
+        background: url("../../../../public/assets/images/banner_bg.jpg") no-repeat ;
         opacity: 0.50;
+
+  /* Create the parallax scrolling effect */
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
     }
     .position{
         width: 100%;
