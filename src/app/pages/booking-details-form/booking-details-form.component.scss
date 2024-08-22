@@ -1,0 +1,28 @@
+/* Adjust image styling */
+.img-fluid {
+    max-height: 500px; /* Adjust as needed */
+    object-fit: cover;
+    width: 80%;
+    border-radius: 8px;
+  }
+  
+  /* Form fields to be taller and more prominent */
+  .form-control-lg {
+    height: 2rem; /* Adjust height as needed */
+    font-size: .8rem; /* Adjust font size as needed */
+  }
+  
+  /* Ensure form is neatly aligned and spaced */
+  .form-label {
+    font-weight: 500;
+  }
+  
+  .btn {
+    margin-right: 10px;
+  }
+  
+  /* Add some spacing around form controls */
+  .mb-4 {
+    margin-bottom: 1.5rem;
+  }
+  

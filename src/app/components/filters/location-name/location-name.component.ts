@@ -12,6 +12,10 @@ export class LocationNameComponent {
 
   constructor(private filterService: FilterService) {}
 
+  get getLocation(){
+    return this.filterService.filters.location;
+  }
+
   onLocationChange(value: string): void {
     const selectedLocation = parseInt(value);
     this.filterService.setLocationFilter(isNaN(selectedLocation) ? null : selectedLocation);

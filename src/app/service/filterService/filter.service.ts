@@ -15,7 +15,7 @@ export class FilterService {
   ) {}
 
   private roomStayDetails$ = new BehaviorSubject<RoomAndRoomStayDetails[]>([]);
-  private filters = {
+  public filters = {
     location: null as number | null,
     price: null as number | null,
     guests: null as number | null,

@@ -11,6 +11,10 @@ export class NumberOfGuestsComponent {
 
   constructor(private filterService: FilterService) {}
 
+  get gestNumbers(){
+    return this.filterService.filters.guests
+  }
+
   onGuestChange(event: Event) {
     const inputElement = event.target as HTMLInputElement;
     const guest = parseFloat(inputElement.value);

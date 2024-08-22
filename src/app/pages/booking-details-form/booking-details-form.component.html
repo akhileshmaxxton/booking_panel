@@ -1,64 +1,66 @@
-<div class="container py-3">
-  <form [formGroup]="bookingDetails" (ngSubmit)="onSubmit()">
-    <!-- Location Section -->
-    <div class="mb-3">
-      <label for="location" class="form-label">Location</label>
-      <input type="text" id="location" class="form-control" formControlName="locationName" readonly>
-    </div>
+<div class="container py-5">
+  <div class="card shadow-lg">
+    <div class="card-body">
+      <div class="row">
 
-    <!-- Room Name Section -->
-    <div class="mb-3">
-      <label for="roomName" class="form-label">Room Name</label>
-      <input type="text" id="roomName" class="form-control" formControlName="roomName"  readonly>
-    </div>
+        <!-- Left Column: Image and Description -->
+        <div class="col-md-8 d-flex flex-column ">
+          <div class ="container">
+          <img src="assets/images/banner.jpg" class="img-fluid mb-3" alt="Descriptive Image">
+          <p class="display-4 ">Brothel Suite</p>
+          <p class="lead mb-2">lorem ipsum</p>
+          <p class="text-muted mb-4">A cozy room with a beautiful view, perfect for a relaxing stay.</p>
+        </div>
+      </div>
 
-    <!-- Price per day per person Section -->
-    <div class="mb-3">
-      <label for="pricePerDayPerPerson" class="form-label">Price per day per person</label>
-      <input type="number" id="pricePerDayPerPerson" class="form-control" formControlName="pricePerDayPerPerson" readonly>
-    </div>
+        <!-- Right Column: Booking Form -->
+        <div class="col-md-4">
+          <p class="display-4 mb-4 text-start">Booking Form</p>
+          <form [formGroup]="bookingDetails" (ngSubmit)="onSubmit()">
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <label for="checkIn" class="form-label">Check In</label>
+                <input type="date" id="checkIn" class="form-control form-control-lg" formControlName="checkIn" (change)="calculateTotalPrice()">
+                <div *ngIf="bookingDetails.get('checkIn')?.invalid && bookingDetails.get('checkIn')?.touched" class="text-danger">
+                  <div *ngIf="bookingDetails.get('checkIn')?.errors?.['required']">Check-in date is required</div>
+                  <div *ngIf="bookingDetails.get('checkIn')?.errors?.['checkInDateValidation']">{{bookingDetails.get('checkIn')?.errors?.['checkInDateValidation']}}</div>
+                  <div *ngIf="bookingDetails.get('checkIn')?.errors?.['invalidDate']">Invalid date</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="checkOut" class="form-label">Check Out</label>
+                <input type="date" id="checkOut" class="form-control form-control-lg" formControlName="checkOut" (change)="calculateTotalPrice()">
+                <div *ngIf="bookingDetails.get('checkOut')?.invalid && bookingDetails.get('checkOut')?.touched" class="text-danger">
+                  <div *ngIf="bookingDetails.get('checkOut')?.errors?.['required']">Check-out date is required</div>
+                  <div *ngIf="bookingDetails.get('checkOut')?.errors?.['checkOutDateValidation']">{{bookingDetails.get('checkOut')?.errors?.['checkOutDateValidation']}}</div>
+                  <div *ngIf="bookingDetails.get('checkOut')?.errors?.['invalidDate']">Invalid date</div>
+                  <div *ngIf="bookingDetails.get('checkOut')?.errors?.['minStay']">{{bookingDetails.get('checkOut')?.errors?.['minStay']}}</div>
+                  <div *ngIf="bookingDetails.get('checkOut')?.errors?.['maxStay']">{{bookingDetails.get('checkOut')?.errors?.['maxStay']}}</div>
+                </div>
+              </div>
+            </div>
 
-    <!-- Check In Section -->
-    <div class="mb-3">
-      <label for="checkIn" class="form-label">Check In</label>
-      <input type="date" id="checkIn" class="form-control" formControlName="checkIn" (change)="calculateTotalPrice()">
-      <div *ngIf="bookingDetails.get('checkIn')?.invalid && bookingDetails.get('checkIn')?.touched" class="text-danger">
-        <div *ngIf="bookingDetails.get('checkIn')?.errors?.['required']">Check-in date is required</div>
-        <div *ngIf="bookingDetails.get('checkIn')?.errors?.['pastDate']">{{bookingDetails.get('checkIn')?.errors?.['pastDate']}}</div>
-        <div *ngIf="bookingDetails.get('checkIn')?.errors?.['invalidDate']">Invalid date</div>
+            <div class="mb-4">
+              <label for="numberOfGuests" class="form-label">Number of Guests</label>
+              <input type="number" id="numberOfGuests" class="form-control form-control-lg" formControlName="numberOfGuests" (input)="calculateTotalPrice()">
+              <div *ngIf="bookingDetails.get('numberOfGuests')?.invalid && bookingDetails.get('numberOfGuests')?.touched" class="text-danger">
+                <div *ngIf="bookingDetails.get('numberOfGuests')?.errors?.['required']">Number of guests is required</div>
+                <div *ngIf="bookingDetails.get('numberOfGuests')?.errors?.['invalidGuests']">{{bookingDetails.get('numberOfGuests')?.errors?.['invalidGuests']}}</div>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="totalAmount" class="form-label">Total Amount</label>
+              <input type="text" id="totalAmount" class="form-control form-control-lg" formControlName="totalAmount" readonly>
+            </div>
+
+            <div class="d-flex justify-content-end">
+              <button type="submit" class="btn btn-primary me-2" [disabled]="bookingDetails.invalid">Submit</button>
+              <button type="button" class="btn btn-secondary" (click)="goBack()">Back</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
-
-    <!-- Check Out Section -->
-    <div class="mb-3">
-      <label for="checkOut" class="form-label">Check Out</label>
-      <input type="date" id="checkOut" class="form-control" formControlName="checkOut" (change)="calculateTotalPrice()">
-      <div *ngIf="bookingDetails.get('checkOut')?.invalid && bookingDetails.get('checkOut')?.touched" class="text-danger">
-        <div *ngIf="bookingDetails.get('checkOut')?.errors?.['required']">Check-out date is required</div>
-        <div *ngIf="bookingDetails.get('checkOut')?.errors?.['futureDate']">{{bookingDetails.get('checkOut')?.errors?.['futureDate']}}</div>
-        <div *ngIf="bookingDetails.get('checkOut')?.errors?.['invalidDate']">Invalid date</div>
-      </div>
-    </div>
-
-    <!-- Number of Guests Section -->
-    <div class="mb-3">
-      <label for="numberOfGuests" class="form-label">Number of Guests</label>
-      <input type="number" id="numberOfGuests" class="form-control" formControlName="numberOfGuests" (change)="calculateTotalPrice()">
-      <div *ngIf="bookingDetails.get('numberOfGuests')?.invalid && bookingDetails.get('numberOfGuests')?.touched" class="text-danger">
-        <div *ngIf="bookingDetails.get('numberOfGuests')?.errors?.['required']">Number of guests is required</div>
-        <div *ngIf="bookingDetails.get('numberOfGuests')?.errors?.['invalidGuests']">{{bookingDetails.get('numberOfGuests')?.errors?.['invalidGuests']}}</div>
-      </div>
-    </div>
-
-    <!-- Total Price Section -->
-    <div class="mb-3">
-      <label for="totalPrice" class="form-label">Total Price</label>
-      <input type="number" id="totalPrice" class="form-control" formControlName="totalAmount"  readonly>
-    </div>
-   
-    <div class="d-flex justify-content-between">
-      <button type="button" class="btn btn-secondary" (click)="goBack()">Back</button>
-      <button type="submit" class="btn btn-primary">Next</button>
-    </div>
-  </form>
+  </div>
 </div>

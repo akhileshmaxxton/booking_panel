@@ -15,7 +15,7 @@ export class RoomDetailCardForHomeComponent {
   constructor(private router: Router){}
 
   bookRoom(room: RoomAndRoomStayDetails) {
-     this.router.navigate(['/book'], { state: { room } });
+     this.router.navigate(['/booking'], { state: { room } });
   }
 
   viewRoom(viewRoomData: RoomAndRoomStayDetails) {
