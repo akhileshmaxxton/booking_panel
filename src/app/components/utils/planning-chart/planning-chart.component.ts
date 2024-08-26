@@ -3,6 +3,9 @@ import { RoomAndRoomStayDetails } from '../../../interface/room-and-room-stay-de
 import { RoomDetailsApiService } from '../../../service/apiService/room-details-api.service';
 import { MergeRoomAndRoomDetails } from '../../../utils/merge-room-and-room-details.pipe';
 import { forkJoin } from 'rxjs';
+import { LocalStorageService } from '../../../service/localStorageApi/local-storage.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { UniquePipe } from '../../../utils/unique.pipe';
 
 @Component({
   selector: 'app-planning-chart',
@@ -12,16 +15,19 @@ import { forkJoin } from 'rxjs';
 export class PlanningChartComponent implements OnInit, AfterViewInit {
 
   rooms: RoomAndRoomStayDetails[] = []; 
+  roomData?: RoomAndRoomStayDetails;
 
   months: { month: Date; days: Date[] }[] = [];
   isMouseDown = false;
   selectedCells: Set<string> = new Set();
-  markedData: Set<string> = new Set();
+  markedData: Set<string[]> = new Set();
 
   @ViewChild('scrollSentinelNext') scrollSentinelNext?: ElementRef;
   @ViewChild('scrollSentinelPrev') scrollSentinelPrev?: ElementRef;
+
   observer?: IntersectionObserver;
-  options = { rootMargin: '0px', threshold: 0.5 };
+  options = { rootMargin: '200px', threshold: 0.1 }; // Increased rootMargin for earlier detection
+
   private startSelectionDate: Date | null = null;
   private endSelectionDate: Date | null = null;
   private selectionRowId: number | null = null;
@@ -30,8 +36,14 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
   hoveredCellDetails: string = '';
   tooltipStyle: any = {};
 
-  constructor( private roomDetailsApiService: RoomDetailsApiService,
-    private mergePipe: MergeRoomAndRoomDetails) {
+  constructor(
+    private roomDetailsApiService: RoomDetailsApiService,
+    private mergePipe: MergeRoomAndRoomDetails,
+    private uniquePipe: UniquePipe,
+    private localStorageApiService: LocalStorageService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
     this.initCurrentMonth();
   }
 
@@ -44,58 +56,6 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
     this.initObservers();
   }
 
-  fetchData() {
-    forkJoin({
-      roomStayDetails: this.roomDetailsApiService.getRoomStayDetails(),
-      roomDetails: this.roomDetailsApiService.getRoomDetails(),
-    }).subscribe(({ roomStayDetails, roomDetails }) => {
-      this.rooms = this.mergePipe.transform(
-        roomStayDetails,
-        roomDetails
-      );
-    });
-  }
-
-  initCurrentMonth() {
-    const currentMonth = new Date();
-    this.addMonth(currentMonth);
-}
-
-
-
-
-  addMonth(date: Date) {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const numDays = new Date(year, month + 1, 0).getDate();
-    const daysInMonth = this.generateDaysInMonth(date, 1, numDays); // Generate all days
-    this.months.push({ month: new Date(year, month), days: daysInMonth });
-}
-
-
-  loadNextMonth() {
-    const lastMonth = this.months[this.months.length - 1].month;
-    const nextMonth = new Date(lastMonth.getFullYear(), lastMonth.getMonth() + 1, 1);
-    this.addMonth(nextMonth);
-  }
-
-  loadPreviousMonth() {
-    const firstMonth = this.months[0].month;
-    const prevMonth = new Date(firstMonth.getFullYear(), firstMonth.getMonth() - 1, 1);
-    const numDays = new Date(prevMonth.getFullYear(), prevMonth.getMonth() + 1, 0).getDate();
-    this.months.unshift({ month: prevMonth, days: this.generateDaysInMonth(prevMonth, 0, numDays) });
-  }
-  
-
-  generateDaysInMonth(date: Date, startDay: number, endDay: number): Date[] {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const numDays = new Date(year, month + 1, 0).getDate();
-    endDay = Math.min(endDay, numDays);
-    return Array.from({ length: endDay - startDay + 1 }, (_, i) => new Date(year, month, startDay + i));
-}
-
-
   initObservers() {
     this.observer = new IntersectionObserver(this.handleObserver.bind(this), this.options);
     if (this.scrollSentinelNext?.nativeElement) {
@@ -107,29 +67,83 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
   }
 
   handleObserver(entries: IntersectionObserverEntry[]) {
-    entries.forEach(entry => {
+    let shouldLoadNextMonth = false;
+    let shouldLoadPreviousMonth = false;
+
+    entries.forEach((entry) => {
       if (entry.isIntersecting) {
         if (entry.target === this.scrollSentinelNext?.nativeElement) {
-          this.loadNextMonth();
+          shouldLoadNextMonth = true;
         } else if (entry.target === this.scrollSentinelPrev?.nativeElement) {
-          this.loadPreviousMonth();
-        } else {
-          // Get the date from the 'data-date' attribute using bracket notation
-          const targetDate = (entry.target as HTMLElement).dataset['date'];
-  
-          if (targetDate) {
-            const monthIndex = this.months.findIndex(month =>
-              month.days.some(day => day.toDateString() === new Date(targetDate).toDateString())
-            );
-            if (monthIndex !== -1) {
-              this.loadMoreDays(monthIndex);
-            }
-          }
+          shouldLoadPreviousMonth = true;
         }
       }
     });
+
+    if (shouldLoadNextMonth && !shouldLoadPreviousMonth) {
+      setTimeout(() => this.loadNextMonth(), 300); // Add a delay for smoothness
+    } else if (shouldLoadPreviousMonth && !shouldLoadNextMonth) {
+      setTimeout(() => this.loadPreviousMonth(), 300); // Add a delay for smoothness
+    }
   }
+
+  initCurrentMonth() {
+    const currentMonth = new Date();
+    this.months = []; // Clear any existing months
+    this.addMonth(currentMonth);
+  }
+
+  addMonth(date: Date) {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const numDays = new Date(year, month + 1, 0).getDate();
+    const daysInMonth = this.generateDaysInMonth(date, 1, numDays);
+    this.months.push({ month: new Date(year, month), days: daysInMonth });
+
+
+    // Trigger a reflow for smooth loading effect
+    setTimeout(() => {
+      document.querySelector('.booking-chart-container')?.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }, 100);
+  }
+
   
+  loadNextMonth() {
+    const lastMonth = this.months[this.months.length - 1].month;
+    const nextMonth = new Date(lastMonth.getFullYear(), lastMonth.getMonth() + 1, 1);
+    this.addMonth(nextMonth);
+  }
+
+  loadPreviousMonth() {
+    const firstMonth = this.months[0].month;
+    const prevMonth = new Date(firstMonth.getFullYear(), firstMonth.getMonth() - 1, 1);
+    const numDays = new Date(prevMonth.getFullYear(), prevMonth.getMonth() + 1, 0).getDate();
+    this.months.unshift({ month: prevMonth, days: this.generateDaysInMonth(prevMonth, 1, numDays) });
+  }
+
+  generateDaysInMonth(date: Date, startDay: number, endDay: number): Date[] {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const numDays = new Date(year, month + 1, 0).getDate();
+    endDay = Math.min(endDay, numDays);
+    return Array.from({ length: endDay - startDay + 1 }, (_, i) => new Date(year, month, startDay + i));
+  }
+
+  fetchData() {
+    forkJoin({
+      roomStayDetails: this.roomDetailsApiService.getRoomStayDetails(),
+      roomDetails: this.roomDetailsApiService.getRoomDetails(),
+    }).subscribe(({ roomStayDetails, roomDetails }) => {
+      this.rooms = this.mergePipe.transform(
+        roomStayDetails,
+        roomDetails
+      );
+      this.rooms = this.uniquePipe.transform(this.rooms, 'roomId');
+    });
+  }
 
   onMouseDown(roomId: number, day: Date, event: MouseEvent) {
     event.preventDefault();
@@ -158,8 +172,6 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
 
   onMouseOut() {
     // Hide tooltip
-    this.hoveredCell = null;
-    this.tooltipStyle = { display: 'none' };
   }
 
   onMouseUp(event: MouseEvent) {
@@ -198,7 +210,6 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
     }
   }
 
-  
 
   toggleSelection(roomId: number, day: Date) {
     const cellKey = `${roomId}-${day.toISOString().split('T')[0]}`;
@@ -214,21 +225,27 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
   }
 
   loadMarkedDataFromLocalStorage() {
-    const reservations = JSON.parse(localStorage.getItem('reservation') || '[]');
+    const reservations = this.localStorageApiService.getAllReservationsFromLocalStorage();
     this.markedData.clear();
-    reservations.forEach((reservation: { checkIn: string | number | Date; numberOfDays: any; roomId: any; }) => {
+    
+    reservations.forEach((reservation: { checkIn: Date; numberOfDays: number; roomId: number; }) => {
       const checkInDate = new Date(reservation.checkIn);
-      const numDays = reservation.numberOfDays;
-      for (let i = 0; i < numDays; i++) {
+      const reservationDates: string[] = [];
+  
+      for (let i = 0; i < reservation.numberOfDays; i++) {
         const date = new Date(checkInDate);
         date.setDate(checkInDate.getDate() + i);
-        this.markedData.add(`${reservation.roomId}-${date.toISOString().split('T')[0]}`);
+        reservationDates.push(`${reservation.roomId}-${date.toISOString().split('T')[0]}`);
       }
+  
+      // Add this reservation's dates to the marked data as a new array
+      this.markedData.add(reservationDates);
     });
   }
 
   isMarked(roomId: number, day: Date): boolean {
-    return this.markedData.has(`${roomId}-${day.toISOString().split('T')[0]}`);
+    const cellKey = `${roomId}-${day.toISOString().split('T')[0]}`;
+    return Array.from(this.markedData).some(reservationDates => reservationDates.includes(cellKey));
   }
 
   loadMoreDays(monthIndex: number) {
@@ -244,7 +261,10 @@ isHalfStart(roomId: number, day: Date): boolean {
   previousDay.setDate(day.getDate() - 1);
   const prevCellKey = `${roomId}-${previousDay.toISOString().split('T')[0]}`;
 
-  return this.markedData.has(cellKey) && (!this.markedData.has(prevCellKey) || this.isStartOfMonth(day));
+  return Array.from(this.markedData).some(reservationDates => 
+    reservationDates.includes(cellKey) && 
+    (!reservationDates.includes(prevCellKey) || this.isStartOfMonth(day))
+  );
 }
 
 isHalfEnd(roomId: number, day: Date): boolean {
@@ -253,7 +273,10 @@ isHalfEnd(roomId: number, day: Date): boolean {
   nextDay.setDate(day.getDate() + 1);
   const nextCellKey = `${roomId}-${nextDay.toISOString().split('T')[0]}`;
 
-  return this.markedData.has(cellKey) && (!this.markedData.has(nextCellKey) || this.isEndOfMonth(day));
+  return Array.from(this.markedData).some(reservationDates => 
+    reservationDates.includes(cellKey) && 
+    (!reservationDates.includes(nextCellKey) || this.isEndOfMonth(day))
+  );
 }
 
 isStartOfMonth(day: Date): boolean {
@@ -264,5 +287,36 @@ isEndOfMonth(day: Date): boolean {
   const nextDay = new Date(day);
   nextDay.setDate(day.getDate() + 1);
   return nextDay.getDate() === 1;
+}
+
+navigateWithSelectedData() {
+  if (this.selectedCells.size > 0) {
+    const selectedArray = Array.from(this.selectedCells);
+
+    const startCell = selectedArray[0];
+    const endCell = selectedArray[selectedArray.length - 1];
+
+    const [startRoomId, startDateStr] = startCell.split('-');
+    const [endRoomId, endDateStr] = endCell.split('-');
+
+    const startDate = new Date(startDateStr);
+    const endDate = new Date(endDateStr);
+
+    this.roomDetailsApiService.findRoomByRoomId(parseInt(startRoomId)).subscribe(room => {
+      this.roomData = room;
+      console.log("roomData", this.roomData);
+    })
+
+    this.router.navigate(['/booking'], {
+      relativeTo: this.route,
+      queryParams: {
+        startDate: startDate.toISOString(),  
+        endDate: endDate.toISOString(),    
+        room: this.roomData 
+      }
+    });
+  } else {
+    console.error('No cells selected.');
+  }
 }
 }

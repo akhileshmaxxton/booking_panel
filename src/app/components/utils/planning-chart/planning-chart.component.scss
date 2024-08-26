@@ -12,14 +12,13 @@
     position: sticky;
     left: 0;
     z-index: 1;
-    text-align: center; /* Horizontally center the text */
-    vertical-align: middle; /* Vertically center the text */
-  
+    text-align: center;
+    vertical-align: middle;
   }
   
   .room-name {
     padding: 1rem;
-    border-bottom: 0.1rem solid #ddd;
+    border-bottom: 0.1rem solid #f8f9fa;
     text-align: center;
     font-size: 1rem;
     white-space: nowrap;
@@ -58,17 +57,20 @@
   
   .booking-cell.selected {
     background-color: lightblue;
-    color: white;
     border: none; /* Remove border to make the selection seamless */
+    box-shadow: none;
   }
   
   .booking-cell.marked {
     background-color: lightcoral;
+    position: relative;
   }
   
   .booking-cell.full-marked {
     border-left: none;
     border-right: none;
+    top: 0;
+    bottom: 0;
   }
   
   .booking-cell.half-start::before,
@@ -77,47 +79,26 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    background-color: lightcoral;
-    // z-index: 1;
+    background-color: white;
+    z-index: 1;
   }
   
   .booking-cell.half-start::before {
     left: 0;
     width: 50%;
-    border-right: none; /* Ensure no right border on half-start */
-    border-left: none;  /* Remove left border to ensure seamless transition */
-    background-color: white;
   }
   
   .booking-cell.half-end::before {
     right: 0;
     width: 50%;
-    border-left: none; /* Ensure no left border on half-end */
-    border-right: none; /* Remove right border to ensure seamless transition */
-    background-color: white;
   }
   
-  /* Remove default borders from marked cells */
-  .booking-cell.half-start {
-    border-right: none;
-  }
-  
-  .booking-cell.half-end {
-    border-left: none;
-  }
-  
-  /* Special case: If a cell is both half-start and half-end (single-day reservation) */
   .booking-cell.half-start.half-end::before {
     width: 100%;
     left: 0;
     right: 0;
-    border-left: none;
-    border-right: none;
   }
-  
 
- 
-  
   .month-navigation {
     display: flex;
     justify-content: space-between;
@@ -154,7 +135,7 @@
 .scroll-container {
   display: flex;
   overflow-x: auto;
-  scroll-snap-type: x mandatory;
+  // scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
 }
 
@@ -164,12 +145,5 @@
   padding: 10px;
 }
 
-.tooltip {
-  position: absolute;
-  background: #fff;
-  border: 1px solid #ddd;
-  padding: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  pointer-events: none;
-  z-index: 1000;
-}
+
+

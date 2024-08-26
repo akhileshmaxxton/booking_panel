@@ -10,9 +10,7 @@ import moment from 'moment';
   styleUrls: ['./customer-dtails-form.component.scss'],
 })
 export class CustomerDtailsFormComponent {
-goBack() {
-throw new Error('Method not implemented.');
-}
+
   public customerFormData!: FormGroup;
   public customerDetails: CustomerDetails = {
     customerId: '',
@@ -27,13 +25,10 @@ throw new Error('Method not implemented.');
   };
 
   @Output() customerDetailsSubmitted = new EventEmitter<CustomerDetails>();
+  @Output() backToBookingForm = new EventEmitter<void>();
 
-  constructor(
-    private fb: FormBuilder,
-    private localStorageService: LocalStorageService
-  ) {
+  constructor(private fb: FormBuilder, private localStorageService: LocalStorageService) {
     this.initializeForm();
-    this.loadCustomerDetails();
   }
 
   private initializeForm() {
@@ -46,26 +41,6 @@ throw new Error('Method not implemented.');
       state: ['', [Validators.required, this.stateValidator]],
       phoneNumber: ['', [Validators.required, this.phoneNumberValidator]],
     });
-  }
-
-  private loadCustomerDetails() {
-    const customerId = this.localStorageService.getCustomerFromSession();
-
-    if (customerId) {
-      this.customerDetails = this.localStorageService.getCustomerFromLocalStorage(customerId);
-
-      if (this.customerDetails) {
-        this.customerFormData.patchValue({
-          name: this.customerDetails?.name,
-          birthDate: this.customerDetails?.birthData ? moment(this.customerDetails.birthData).format('YYYY-MM-DD') : null,
-          pincode: this.customerDetails?.pincode,
-          district: this.customerDetails?.district,
-          city: this.customerDetails?.city,
-          state: this.customerDetails?.state,
-          phoneNumber: this.customerDetails?.phoneNumber,
-        });
-      }
-    }
   }
 
   nameValidator(control: AbstractControl): ValidationErrors | null {
@@ -103,6 +78,10 @@ throw new Error('Method not implemented.');
     const value = control.value;
     const isValid = /^\d{10}$/.test(value);
     return !isValid ? { invalidPhoneNumber: 'Phone Number must be a 10-digit number' } : null;
+  }
+
+  goBack() {
+    this.backToBookingForm.emit();
   }
 
   onSubmit() {

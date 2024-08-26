@@ -1,6 +1,5 @@
 import { AfterViewInit, Component, ElementRef } from '@angular/core';
 
-declare var $: any;
 
 @Component({
   selector: 'app-calender-header',
@@ -8,5 +7,6 @@ declare var $: any;
   styleUrls: ['./calender-header.component.scss'] // Corrected 'styleUrl' to 'styleUrls'
 })
 export class CalenderHeaderComponent{
+
 
 }

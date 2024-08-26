@@ -1,13 +1,16 @@
 <ng-container *ngIf="currentFormIndex === 0">
     <app-booking-details-form 
       [roomToBeBooked]="roomToBeBooked"
-      (reservationConfirmed)="onReservationConfirmed($event)">
+      [reservationDetailsFromParent] = "reservationDetails"
+      (reservationConfirmed)="onReservationConfirmed($event)"
+      (backToBookingForm)="onBackToBookingForm()">
     </app-booking-details-form>
   </ng-container>
   
   <ng-container *ngIf="currentFormIndex === 1">
     <app-customer-dtails-form
-      (customerDetailsSubmitted)="onCustomerDetailsSubmitted($event)">
+      (customerDetailsSubmitted)="onCustomerDetailsSubmitted($event)"
+      (backToBookingForm)="onBackToBookingForm()">
     </app-customer-dtails-form>
   </ng-container>
   

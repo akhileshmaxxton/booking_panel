@@ -4,7 +4,7 @@
     border-radius: 10px;
     font-size: 13px;
     line-height: 38px;
-    padding: 0px 25px;
+    padding: 0px 20px;
     color: #777777;
     z-index: 0;
     width: 10rem;
@@ -20,4 +20,9 @@
 .nice-select:hover {
     border-color: #1a73e8; /* Optional: Change border color on hover */
     color: #1a73e8; /* Optional: Change text color on hover */
+}
+
+.dropdown-menu {
+  min-width: 25rem;
+  overflow-y: auto;
 }

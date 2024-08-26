@@ -37,6 +37,10 @@ export class BookingPageComponent {
     // Handle payment submission and final steps
   }
 
+  onBackToBookingForm() {
+    this.currentFormIndex = 0;
+  }
+
   printInvoice() {
     window.print();
   }

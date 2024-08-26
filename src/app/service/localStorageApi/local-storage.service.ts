@@ -28,12 +28,6 @@ export class LocalStorageService {
     localStorage.setItem('customer', JSON.stringify(customer));
     localStorage.setItem('reservation', JSON.stringify(reservation));
     localStorage.setItem('payment', JSON.stringify(payment));
-    sessionStorage.setItem('customerId', JSON.stringify(customerDetails.customerId));
-  }
-
-  getCustomerFromSession(){
-    const customerId = sessionStorage.getItem('customerId')? JSON.parse(sessionStorage.getItem('customerId')!) : '';
-    return customerId;
   }
 
   getCustomerFromLocalStorage(customerID : string){
@@ -59,6 +53,18 @@ export class LocalStorageService {
     }
   
     return null;
+  }
+
+  getAllReservationsFromLocalStorage(){
+    return localStorage.getItem('reservation')? JSON.parse(localStorage.getItem('reservation')!) : [];
+  }
+
+  getAllPaymentsFromLocalStorage(){
+    return localStorage.getItem('payment')? JSON.parse(localStorage.getItem('payment')!) : [];
+  }
+
+  getAllCustomersFromLocalStorage(){
+    return localStorage.getItem('customer')? JSON.parse(localStorage.getItem('customer')!) : [];
   }
   
 }

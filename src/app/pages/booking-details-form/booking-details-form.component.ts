@@ -3,6 +3,7 @@ import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators }
 import { RoomAndRoomStayDetails } from '../../interface/room-and-room-stay-details';
 import { ReservationDetails } from '../../interface/reservation-details';
 import moment from 'moment';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-booking-details-form',
@@ -13,7 +14,10 @@ export class BookingDetailsFormComponent {
   public bookingDetails!: FormGroup;
   @Input() roomToBeBooked!: RoomAndRoomStayDetails;
   @Output() reservationConfirmed = new EventEmitter<ReservationDetails>();
-  public reservationDetails: ReservationDetails = {
+  @Input() reservationDetailsFromParent!: ReservationDetails;
+  @Output() backToBookingForm = new EventEmitter<void>();
+  reservationDetails: ReservationDetails = {
+    
     roomId: 0,
     locationId: 0,
     checkIn: new Date(),
@@ -25,8 +29,13 @@ export class BookingDetailsFormComponent {
     reservationId: '',
     totalAmount: 0,
     customerId: ''
+    
   };
-  constructor(private fb: FormBuilder) {
+
+  startDate: string | null = null;
+  endDate: string | null = null;
+
+  constructor(private fb: FormBuilder, private route: ActivatedRoute) {
     this.bookingDetails = this.fb.group({
       locationName: [''],
       roomName: [''],
@@ -36,20 +45,60 @@ export class BookingDetailsFormComponent {
       numberOfGuests: ['', [Validators.required, Validators.min(1), this.guestValidator.bind(this)]],
       totalAmount: [''],
     });
+
+    if(this.reservationDetailsFromParent?.checkIn && this.reservationDetailsFromParent?.checkOut && this.reservationDetailsFromParent?.numberOfGuests && this.reservationDetailsFromParent?.totalAmount) {
+      this.bookingDetails.patchValue({
+        checkIn: new Date(this.reservationDetailsFromParent?.checkIn),
+        checkOut: new Date(this.reservationDetailsFromParent?.checkOut),
+        numberOfGuests: this.reservationDetailsFromParent?.numberOfGuests,
+        totalAmount: this.reservationDetailsFromParent?.totalAmount
+      })
+    }
+
+
+    console.log('Initial reservationDetails: constructor  ', this.reservationDetails);
   }
 
   ngOnInit() {
+    console.log('Initial reservationDetails:', this.reservationDetails);
     if (this.roomToBeBooked) {
+      console.log("Room to be booked:", this.roomToBeBooked);
       this.bookingDetails.patchValue({
-        locationName: this.roomToBeBooked.locationName,
-        roomName: this.roomToBeBooked.roomName,
-        pricePerDayPerPerson: this.roomToBeBooked.pricePerDayPerPerson,
+        locationName: this.roomToBeBooked?.locationName,
+        roomName: this.roomToBeBooked?.roomName,
+        pricePerDayPerPerson: this.roomToBeBooked?.pricePerDayPerPerson,
       });
 
       this.bookingDetails.get('checkIn')?.updateValueAndValidity();
       this.bookingDetails.get('checkOut')?.updateValueAndValidity();
       this.bookingDetails.get('numberOfGuests')?.updateValueAndValidity();
     }
+
+    this.route.queryParams.subscribe(params => {
+      if(params['startDate'] && params['endDate'] && params['room']) {
+        this.startDate = params['startDate'] || null;
+        this.endDate = params['endDate'] || null;
+        this.roomToBeBooked = params['room'] || null;
+
+        this.bookingDetails.patchValue({
+          checkIn: this.startDate ? new Date(this.startDate).toISOString().split('T')[0] : '',
+          checkOut: this.endDate ? new Date(this.endDate).toISOString().split('T')[0] : '',
+        })
+      }
+
+     
+      console.log('Start Date:', this.startDate);
+      console.log('End Date:', this.endDate);
+      console.log('Room ID:', this.roomToBeBooked);
+    });
+
+    
+  
+
+    
+
+    
+
   }
 
   calculateTotalPrice() {
@@ -61,11 +110,16 @@ export class BookingDetailsFormComponent {
 
     if (checkInDate && checkOutDate && pricePerDayPerPerson && numberOfGuests) {
       const timeDifference = Number(checkOutDate?.getTime() - checkInDate?.getTime()) ?? 0;
+      console.log("Time difference",typeof timeDifference);
       const numberOfDays = Math.ceil(timeDifference / (1000 * 3600 * 24));
 
-      this.reservationDetails.numberOfDays = numberOfDays;
+      console.log("Number of days", numberOfDays);
+
+      this.reservationDetails.numberOfDays = numberOfDays ? numberOfDays : 0;
 
       const totalPrice = numberOfDays * numberOfGuests * pricePerDayPerPerson;
+
+      console.log("Total price", totalPrice);
 
       this.bookingDetails.patchValue({
         totalAmount: totalPrice > 0 ? totalPrice : 0,
@@ -147,7 +201,7 @@ export class BookingDetailsFormComponent {
   }
 
   goBack() {
-    // Implement your back navigation logic
+    this.backToBookingForm.emit();
   }
 
   
@@ -168,5 +222,3 @@ export class BookingDetailsFormComponent {
     }
   }
 }
-
-

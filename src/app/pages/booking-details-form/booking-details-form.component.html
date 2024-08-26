@@ -7,7 +7,7 @@
         <div class="col-md-8 d-flex flex-column ">
           <div class ="container">
           <img src="assets/images/banner.jpg" class="img-fluid mb-3" alt="Descriptive Image">
-          <p class="display-4 ">Brothel Suite</p>
+          <p class="display-4 ">{{roomToBeBooked?.roomName}}</p>
           <p class="lead mb-2">lorem ipsum</p>
           <p class="text-muted mb-4">A cozy room with a beautiful view, perfect for a relaxing stay.</p>
         </div>
@@ -42,7 +42,7 @@
 
             <div class="mb-4">
               <label for="numberOfGuests" class="form-label">Number of Guests</label>
-              <input type="number" id="numberOfGuests" class="form-control form-control-lg" formControlName="numberOfGuests" (input)="calculateTotalPrice()">
+              <input type="number" id="numberOfGuests" class="form-control form-control-lg" formControlName="numberOfGuests" (change)="calculateTotalPrice()">
               <div *ngIf="bookingDetails.get('numberOfGuests')?.invalid && bookingDetails.get('numberOfGuests')?.touched" class="text-danger">
                 <div *ngIf="bookingDetails.get('numberOfGuests')?.errors?.['required']">Number of guests is required</div>
                 <div *ngIf="bookingDetails.get('numberOfGuests')?.errors?.['invalidGuests']">{{bookingDetails.get('numberOfGuests')?.errors?.['invalidGuests']}}</div>
