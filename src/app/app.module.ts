@@ -36,6 +36,8 @@ import { CalenderHeaderComponent } from './components/utils/calender-header/cale
 import { FilterService } from './service/filterService/filter.service';
 import { BaseChartDirective } from 'ng2-charts';
 import { GoogleChartsModule } from 'angular-google-charts';
+import { ErrorPageComponent } from './pages/error-page/error-page.component';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 @NgModule({
   declarations: [
@@ -59,6 +61,7 @@ import { GoogleChartsModule } from 'angular-google-charts';
     BookingPageComponent,
     PlanningChartComponent,
     CalenderHeaderComponent,
+    ErrorPageComponent,
   ],
   imports: [
     BrowserModule,
@@ -74,7 +77,8 @@ import { GoogleChartsModule } from 'angular-google-charts';
       useFactory: adapterFactory,
     }),
     BaseChartDirective,
-    GoogleChartsModule
+    GoogleChartsModule,
+    ScrollingModule 
     
   ],
   providers: [RoomDetailsApiService, MergeRoomAndRoomDetails, UniquePipe, LocalStorageService, provideAnimationsAsync(), FilterService],

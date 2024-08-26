@@ -3,6 +3,7 @@ import { BehaviorSubject, forkJoin } from 'rxjs';
 import { RoomAndRoomStayDetails } from '../../interface/room-and-room-stay-details';
 import { RoomDetailsApiService } from '../apiService/room-details-api.service';
 import { MergeRoomAndRoomDetails } from '../../utils/merge-room-and-room-details.pipe';
+import { LocalStorageService } from '../localStorageApi/local-storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,8 @@ export class FilterService {
 
   constructor(
     private roomDetailsApiService: RoomDetailsApiService,
-    private mergePipe: MergeRoomAndRoomDetails
+    private mergePipe: MergeRoomAndRoomDetails,
+    private localStorageService: LocalStorageService
   ) {}
 
   private roomStayDetails$ = new BehaviorSubject<RoomAndRoomStayDetails[]>([]);
@@ -19,7 +21,9 @@ export class FilterService {
     location: null as number | null,
     price: null as number | null,
     guests: null as number | null,
-    days: null as number | null
+    days: null as number | null,
+    checkInDate: null as string | null,
+    checkOutDate: null as string | null
   };
 
   setRoomStayDetails(details: RoomAndRoomStayDetails[]) {
@@ -47,6 +51,14 @@ export class FilterService {
     this.applyFilters();
   }
 
+  setDateRange(checkIn: string, checkOut: string) {
+    this.filters.checkInDate = checkIn;
+    this.filters.checkInDate = checkIn;
+    this.filters.checkOutDate = checkOut;
+    console.log(`Check-in: ${this.filters.checkInDate}, Check-out: ${this.filters.checkOutDate}`);
+    // Add your logic to handle the selected date range
+  }
+
   private applyFilters() {
     forkJoin({
       roomStayDetails: this.roomDetailsApiService.getRoomStayDetails(),
@@ -67,6 +79,14 @@ export class FilterService {
       if(this.filters.days !== null) {
         mergedData = mergedData.filter(room => room.minStay! <= this.filters.days! && room.maxStay! >= this.filters.days!);
       }
+
+      // Retrieve reservations from local storage
+    const reservations = this.localStorageService.getAllReservationsFromLocalStorage();
+
+    // Remove booked rooms from the list
+    mergedData = mergedData.filter(room => 
+      !reservations.some((reservation: { roomId: number; }) => reservation.roomId === room.roomId)
+    );
       // Emit the filtered data
       this.roomStayDetails$.next(mergedData);
       console.log("Filtered Data:", mergedData);
@@ -82,7 +102,9 @@ export class FilterService {
       location: null,
       price: null,
       guests: null,
-      days: null
+      days: null,
+      checkInDate: null,
+      checkOutDate: null
     };
     this.applyFilters();
   }
