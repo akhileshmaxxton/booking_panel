@@ -4,6 +4,7 @@ import { RoomAndRoomStayDetails } from '../../interface/room-and-room-stay-detai
 import { RoomDetailsApiService } from '../apiService/room-details-api.service';
 import { MergeRoomAndRoomDetails } from '../../utils/merge-room-and-room-details.pipe';
 import { LocalStorageService } from '../localStorageApi/local-storage.service';
+import { UniquePipe } from '../../utils/unique.pipe';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,7 @@ export class FilterService {
   constructor(
     private roomDetailsApiService: RoomDetailsApiService,
     private mergePipe: MergeRoomAndRoomDetails,
+    private uniquePipe: UniquePipe,
     private localStorageService: LocalStorageService
   ) {}
 
@@ -23,8 +25,18 @@ export class FilterService {
     guests: null as number | null,
     days: null as number | null,
     checkInDate: null as string | null,
-    checkOutDate: null as string | null
+    checkOutDate: null as string | null,
+    isCustomer: true as boolean
   };
+
+  setIsCustomer(isCustomer: boolean) {
+    this.filters.isCustomer = isCustomer;
+    this.applyFilters();
+  }
+
+  getIsCustomer() {
+    return this.filters.isCustomer;
+  }
 
   setRoomStayDetails(details: RoomAndRoomStayDetails[]) {
     this.roomStayDetails$.next(details);
@@ -60,11 +72,9 @@ export class FilterService {
   }
 
   private applyFilters() {
-    forkJoin({
-      roomStayDetails: this.roomDetailsApiService.getRoomStayDetails(),
-      roomDetails: this.roomDetailsApiService.getRoomDetails(),
-    }).subscribe(({ roomStayDetails, roomDetails }) => {
-      let mergedData = this.mergePipe.transform(roomStayDetails, roomDetails);
+    this.roomDetailsApiService.fetchAllDataForCustomerPortal().subscribe((data) => {
+      let mergedData = data;
+      mergedData = this.uniquePipe.transform(mergedData, 'roomId')
       
       // Apply filters
       if (this.filters.location !== null) {
@@ -84,9 +94,26 @@ export class FilterService {
     const reservations = this.localStorageService.getAllReservationsFromLocalStorage();
 
     // Remove booked rooms from the list
-    mergedData = mergedData.filter(room => 
-      !reservations.some((reservation: { roomId: number; }) => reservation.roomId === room.roomId)
-    );
+    if(this.filters.isCustomer){
+      mergedData = mergedData.filter(room => {
+        // Find all reservations for the current room
+        const roomReservations = reservations.filter((reservation: { roomId: number; }) => reservation.roomId === room.roomId);
+      
+        // Check if there is a continuous duration available between minStay and maxStay
+        let isRoomAvailable = true;
+        
+        roomReservations.forEach((reservation: { checkOut: { getTime: () => number; }; checkIn: { getTime: () => number; }; }) => {
+          const stayDuration = (reservation.checkOut.getTime() - reservation.checkIn.getTime()) / (1000 * 3600 * 24);
+      
+          // Check if the stay duration fits within the room's minStay and maxStay
+          if (stayDuration < room.minStay || stayDuration > room.maxStay) {
+            isRoomAvailable = false;
+          }
+        });
+      
+        return isRoomAvailable;
+      });
+    }
       // Emit the filtered data
       this.roomStayDetails$.next(mergedData);
       console.log("Filtered Data:", mergedData);
@@ -104,7 +131,8 @@ export class FilterService {
       guests: null,
       days: null,
       checkInDate: null,
-      checkOutDate: null
+      checkOutDate: null,
+      isCustomer: true
     };
     this.applyFilters();
   }

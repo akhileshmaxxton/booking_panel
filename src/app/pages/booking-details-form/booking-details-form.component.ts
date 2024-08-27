@@ -4,6 +4,9 @@ import { RoomAndRoomStayDetails } from '../../interface/room-and-room-stay-detai
 import { ReservationDetails } from '../../interface/reservation-details';
 import moment from 'moment';
 import { ActivatedRoute } from '@angular/router';
+import { LocalStorageService } from '../../service/localStorageApi/local-storage.service';
+import { FilterService } from '../../service/filterService/filter.service';
+import { RoomDetailsApiService } from '../../service/apiService/room-details-api.service';
 
 @Component({
   selector: 'app-booking-details-form',
@@ -12,30 +15,32 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class BookingDetailsFormComponent {
   public bookingDetails!: FormGroup;
-  @Input() roomToBeBooked!: RoomAndRoomStayDetails;
+  @Input() roomToBeBooked?: RoomAndRoomStayDetails[];
   @Output() reservationConfirmed = new EventEmitter<ReservationDetails>();
-  @Input() reservationDetailsFromParent!: ReservationDetails;
-  @Output() backToBookingForm = new EventEmitter<void>();
+  @Input() reservationDetailsFromParent?: ReservationDetails;
   reservationDetails: ReservationDetails = {
-    
-    roomId: 0,
+    reservationId: '',
     locationId: 0,
+    roomId: 0,
+    customerId: '',
     checkIn: new Date(),
     checkOut: new Date(),
-    numberOfGuests: 0,
-    numberOfDays: 0,
-    pricePerDayPerPerson: 0,
-    paymentId: [],
-    reservationId: '',
+    reservationDate: new Date(),
     totalAmount: 0,
-    customerId: ''
-    
+    status: '',
+    paidAmount: 0,
+    numberOfGuests: 0,
+
+    pricePerDayPerPerson: 0,
+    numberOfDays: 0,
+    paymentIds: [],
   };
 
   startDate: string | null = null;
   endDate: string | null = null;
+  roomId: number | null = null;
 
-  constructor(private fb: FormBuilder, private route: ActivatedRoute) {
+  constructor(private fb: FormBuilder, private route: ActivatedRoute, private localStorageService: LocalStorageService, private filterService: FilterService, private roomDetailsApiService: RoomDetailsApiService) {
     this.bookingDetails = this.fb.group({
       locationName: [''],
       roomName: [''],
@@ -57,45 +62,48 @@ export class BookingDetailsFormComponent {
 
 
     console.log('Initial reservationDetails: constructor  ', this.reservationDetails);
+
+    if(!this.filterService.getIsCustomer()){
+      this.route.queryParams.subscribe(params => {
+        if(params['startDate'] && params['endDate'] && params['roomId']) {
+          this.startDate = params['startDate'] || null;
+          this.endDate = params['endDate'] || null;
+          this.roomId = params['roomId'] || null;
+
+          this.roomDetailsApiService.findRoomByRoomId(parseInt(params['roomId'])).subscribe(data => {
+            this.roomToBeBooked = data;
+            console.log("roomData", this.roomToBeBooked);
+          })
+  
+          this.bookingDetails.patchValue({
+            checkIn: this.startDate ? new Date(this.startDate).toISOString().split('T')[0] : '',
+            checkOut: this.endDate ? new Date(this.endDate).toISOString().split('T')[0] : '',
+          })
+        }
+        
+        console.log('Start Date:', this.startDate);
+        console.log('End Date:', this.endDate);
+        console.log('Room ID:', this.roomId);
+      });
+    }
   }
 
   ngOnInit() {
     console.log('Initial reservationDetails:', this.reservationDetails);
-    if (this.roomToBeBooked) {
-      console.log("Room to be booked:", this.roomToBeBooked);
-      this.bookingDetails.patchValue({
-        locationName: this.roomToBeBooked?.locationName,
-        roomName: this.roomToBeBooked?.roomName,
-        pricePerDayPerPerson: this.roomToBeBooked?.pricePerDayPerPerson,
-      });
-
-      this.bookingDetails.get('checkIn')?.updateValueAndValidity();
-      this.bookingDetails.get('checkOut')?.updateValueAndValidity();
-      this.bookingDetails.get('numberOfGuests')?.updateValueAndValidity();
-    }
-
-    this.route.queryParams.subscribe(params => {
-      if(params['startDate'] && params['endDate'] && params['room']) {
-        this.startDate = params['startDate'] || null;
-        this.endDate = params['endDate'] || null;
-        this.roomToBeBooked = params['room'] || null;
-
+    if(this.filterService.getIsCustomer()) {
+      if (this.roomToBeBooked) {
+        console.log("Room to be booked:", this.roomToBeBooked);
         this.bookingDetails.patchValue({
-          checkIn: this.startDate ? new Date(this.startDate).toISOString().split('T')[0] : '',
-          checkOut: this.endDate ? new Date(this.endDate).toISOString().split('T')[0] : '',
-        })
-      }
-
-     
-      console.log('Start Date:', this.startDate);
-      console.log('End Date:', this.endDate);
-      console.log('Room ID:', this.roomToBeBooked);
-    });
-
-    
+          locationName: this.roomToBeBooked[0]?.locationName,
+          roomName: this.roomToBeBooked[0]?.roomName,
+          pricePerDayPerPerson: this.roomToBeBooked[0]?.pricePerDayPerPerson,
+        });
   
-
-    
+        this.bookingDetails.get('checkIn')?.updateValueAndValidity();
+        this.bookingDetails.get('checkOut')?.updateValueAndValidity();
+        this.bookingDetails.get('numberOfGuests')?.updateValueAndValidity();
+      }
+    }
 
     
 
@@ -105,120 +113,186 @@ export class BookingDetailsFormComponent {
     const checkInDate = new Date(this.bookingDetails?.get('checkIn')?.value) ?? new Date();
     const checkOutDate = new Date(this.bookingDetails?.get('checkOut')?.value ?? new Date());
     const numberOfGuests = this.bookingDetails?.get('numberOfGuests')?.value ?? 0;
-    const pricePerDayPerPerson = this.roomToBeBooked?.pricePerDayPerPerson;
-    console.log("checkInDate", checkInDate, "checkOutDate", checkOutDate, "numberOfGuests", numberOfGuests, "pricePerDayPerPerson", pricePerDayPerPerson);
-
-    if (checkInDate && checkOutDate && pricePerDayPerPerson && numberOfGuests) {
-      const timeDifference = Number(checkOutDate?.getTime() - checkInDate?.getTime()) ?? 0;
-      console.log("Time difference",typeof timeDifference);
-      const numberOfDays = Math.ceil(timeDifference / (1000 * 3600 * 24));
-
-      console.log("Number of days", numberOfDays);
-
-      this.reservationDetails.numberOfDays = numberOfDays ? numberOfDays : 0;
-
-      const totalPrice = numberOfDays * numberOfGuests * pricePerDayPerPerson;
-
-      console.log("Total price", totalPrice);
-
+  
+    // Find the matching room based on the check-in and check-out dates
+    const matchingRoom = this.roomToBeBooked?.find(room => {
+      const stayFromDate = new Date(room.stayDateFrom);
+      const stayToDate = new Date(room.stayDateTo);
+      return checkInDate >= stayFromDate && checkOutDate <= stayToDate;
+    });
+  
+    if (matchingRoom) {
+      const pricePerDayPerPerson = matchingRoom.pricePerDayPerPerson;
+  
+      if (checkInDate && checkOutDate && pricePerDayPerPerson && numberOfGuests) {
+        const timeDifference = checkOutDate.getTime() - checkInDate.getTime();
+        const numberOfDays = Math.ceil(timeDifference / (1000 * 3600 * 24));
+  
+        this.reservationDetails.numberOfDays = numberOfDays > 0 ? numberOfDays : 0;
+  
+        const totalPrice = numberOfDays * numberOfGuests * pricePerDayPerPerson;
+  
+        this.bookingDetails.patchValue({
+          totalAmount: totalPrice > 0 ? totalPrice : 0,
+        });
+      }
+    } else {
+      console.log("No matching room found for the selected dates.");
       this.bookingDetails.patchValue({
-        totalAmount: totalPrice > 0 ? totalPrice : 0,
+        totalAmount: 0,
       });
     }
   }
-
+  
   checkInDateValidator(control: AbstractControl): ValidationErrors | null {
     const dateValue = moment(control.value);
-    const stayFromDate = moment(this.roomToBeBooked?.stayDateFrom);
-    const stayToDate = moment(this.roomToBeBooked?.stayDateTo);
-    const arrivalDays: string[] = this.roomToBeBooked?.arrivalDays.map(day => day.toLowerCase()) ?? [];
+    const matchingRoom = this.roomToBeBooked?.find(room => {
+      const stayFromDate = moment(room.stayDateFrom);
+      const stayToDate = moment(room.stayDateTo);
+      return dateValue.isBetween(stayFromDate, stayToDate, null, '[]'); // inclusive of boundaries
+    });
+  
+    if (!matchingRoom) {
+      return { invalidDate: 'Check-in date does not match any available booking period' };
+    }
+  
+    const arrivalDays: string[] = matchingRoom.arrivalDays.map(day => day.toLowerCase()) ?? [];
     const dateDay = dateValue.format('ddd').toLowerCase();
-
-    if (!dateValue.isValid()) {
-      return { invalidDate: 'Invalid date' };
-    }
-
-    if (dateValue.isBefore(stayFromDate) || dateValue.isAfter(stayToDate)) {
-      return { checkInDateValidation: `Check-in date must be between ${stayFromDate.format('YYYY-MM-DD')} and ${stayToDate.format('YYYY-MM-DD')}` };
-    }
-
+  
     if (!arrivalDays.includes(dateDay)) {
       return { checkInDateValidation: `Check-in date must be on ${arrivalDays.join(', ')}` };
     }
-
+  
+    const storedReservations = this.localStorageService.getReservationsById(matchingRoom.roomId) ?? [];
+    const overlappingReservation = storedReservations.find((reservation: ReservationDetails) => {
+      return reservation.roomId === matchingRoom.roomId && 
+             dateValue.isBetween(moment(reservation.checkIn), moment(reservation.checkOut), null, '[]');
+    });
+  
+    if (overlappingReservation) {
+      return { duplicateReservation: 'This check-in date overlaps with an existing reservation for this room.' };
+    }
+  
     return null;
   }
-
+  
   checkOutDateValidator(control: AbstractControl): ValidationErrors | null {
     const dateValue = moment(control.value);
     const checkInDate = moment(this.bookingDetails?.get('checkIn')?.value);
-    const stayToDate = moment(this.roomToBeBooked?.stayDateTo);
-    const departureDays: string[] = this.roomToBeBooked?.departureDays.map(day => day.toLowerCase()) ?? [];
+  
+    const matchingRoom = this.roomToBeBooked?.find(room => {
+      const stayFromDate = moment(room.stayDateFrom);
+      const stayToDate = moment(room.stayDateTo);
+      return checkInDate.isBetween(stayFromDate, stayToDate, null, '[]') && dateValue.isBetween(stayFromDate, stayToDate, null, '[]');
+    });
+  
+    if (!matchingRoom) {
+      return { invalidDate: 'Check-out date does not match any available booking period' };
+    }
+  
+    const departureDays: string[] = matchingRoom.departureDays.map(day => day.toLowerCase()) ?? [];
     const dateDay = dateValue.format('ddd').toLowerCase();
-
-    if (!dateValue.isValid()) {
-      return { invalidDate: 'Invalid date' };
-    }
-
-    if (dateValue.isBefore(checkInDate)) {
-      return { invalidDate: 'Check-out date must be after check-in date' };
-    }
-
-    if (dateValue.isAfter(stayToDate)) {
-      return { futureDate: `Check-out date cannot be after ${stayToDate.format('YYYY-MM-DD')}` };
-    }
-
+  
     if (!departureDays.includes(dateDay)) {
       return { checkOutDateValidation: `Check-out date must be on ${departureDays.join(', ')}` };
     }
-
+  
     const numberOfDays = dateValue.diff(checkInDate, 'days') + 1;
-
-    if (numberOfDays < this.roomToBeBooked.minStay) {
-      return { minStay: `Minimum stay is ${this.roomToBeBooked.minStay} nights` };
+  
+    if (numberOfDays < matchingRoom.minStay) {
+      return { minStay: `Minimum stay is ${matchingRoom.minStay} nights` };
     }
-
-    if (numberOfDays > this.roomToBeBooked.maxStay) {
-      return { maxStay: `Maximum stay is ${this.roomToBeBooked.maxStay} nights` };
+  
+    if (numberOfDays > matchingRoom.maxStay) {
+      return { maxStay: `Maximum stay is ${matchingRoom.maxStay} nights` };
     }
-
+  
+    const storedReservations = this.localStorageService.getReservationsById(matchingRoom.roomId) ?? [];
+    const overlappingReservation = storedReservations.find((reservation: ReservationDetails) => {
+      return reservation.roomId === matchingRoom.roomId && 
+             dateValue.isBetween(moment(reservation.checkIn), moment(reservation.checkOut), null, '[]');
+    });
+  
+    if (overlappingReservation) {
+      return { duplicateReservation: 'This check-out date overlaps with an existing reservation for this room.' };
+    }
+  
     return null;
   }
+  
+  
 
   guestValidator(control: AbstractControl): ValidationErrors | null {
     const guests = control.value;
-    const allowedGuests = this.roomToBeBooked?.guestCapacity;
-
+    const checkInDate = new Date(this.bookingDetails?.get('checkIn')?.value);
+    const checkOutDate = new Date(this.bookingDetails?.get('checkOut')?.value);
+  
+    // Find the matching room based on the check-in and check-out dates
+    const matchingRoom = this.roomToBeBooked?.find(room => {
+      const stayFromDate = new Date(room.stayDateFrom);
+      const stayToDate = new Date(room.stayDateTo);
+      return checkInDate >= stayFromDate && checkOutDate <= stayToDate;
+    });
+  
+    if (!matchingRoom) {
+      return { invalidGuests: 'No matching room found for the selected dates' };
+    }
+  
+    const allowedGuests = matchingRoom.guestCapacity;
+  
     if (guests < 1) {
       return { invalidGuests: 'Number of guests must be greater than 0' };
     }
-
+  
     if (allowedGuests && guests > allowedGuests) {
       return { invalidGuests: `Number of guests cannot exceed ${allowedGuests}` };
     }
-
+  
     return null;
   }
+  
 
   goBack() {
-    this.backToBookingForm.emit();
+    
   }
 
   
   onSubmit() {
     if (this.bookingDetails.valid) {
-      this.reservationDetails = {
-        ...this.reservationDetails,
-        roomId: this.roomToBeBooked.roomId,
-        locationId: this.roomToBeBooked.locationId,
-        checkIn: new Date(this.bookingDetails.get('checkIn')?.value),
-        checkOut: new Date(this.bookingDetails.get('checkOut')?.value),
-        numberOfGuests: this.bookingDetails.get('numberOfGuests')?.value,
-        pricePerDayPerPerson: this.roomToBeBooked.pricePerDayPerPerson,
-        paymentId: [],
-      };
-
-      this.reservationConfirmed.emit(this.reservationDetails);
+      const checkInDate = new Date(this.bookingDetails.get('checkIn')?.value);
+      const checkOutDate = new Date(this.bookingDetails.get('checkOut')?.value);
+  
+      // Find the matching room based on the check-in and check-out dates
+      const matchingRoom = this.roomToBeBooked?.find(room => {
+        const stayFromDate = new Date(room.stayDateFrom);
+        const stayToDate = new Date(room.stayDateTo);
+        return checkInDate >= stayFromDate && checkOutDate <= stayToDate;
+      });
+  
+      if (matchingRoom) {
+        this.reservationDetails = {
+          ...this.reservationDetails,
+          reservationId: '',
+          locationId: matchingRoom.locationId,
+          roomId: matchingRoom.roomId,
+          checkIn: checkInDate,
+          checkOut: checkOutDate,
+          reservationDate: new Date(),
+          totalAmount: this.bookingDetails.get('totalAmount')?.value,
+          status: 'Pending',
+          paidAmount: 0,
+          numberOfGuests: this.bookingDetails.get('numberOfGuests')?.value,
+          pricePerDayPerPerson: matchingRoom.pricePerDayPerPerson,
+          numberOfDays: checkOutDate.getDate() - checkInDate.getDate() + 1,
+          paymentIds: [],
+        };
+  
+        this.reservationConfirmed.emit(this.reservationDetails);
+      } else {
+        console.error("No matching room found for the selected dates.");
+        // Handle the case where no matching room is found, possibly by showing an error message to the user.
+      }
     }
   }
+  
 }

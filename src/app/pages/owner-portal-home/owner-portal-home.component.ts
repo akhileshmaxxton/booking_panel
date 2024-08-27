@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { FilterService } from '../../service/filterService/filter.service';
 
 @Component({
   selector: 'app-owner-portal-home',
@@ -6,5 +7,10 @@ import { Component } from '@angular/core';
   styleUrl: './owner-portal-home.component.scss'
 })
 export class OwnerPortalHomeComponent {
+
+  constructor(private filterService: FilterService) {
+    this.filterService.setIsCustomer(false);
+
+   }
 
 }

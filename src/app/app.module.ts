@@ -38,6 +38,7 @@ import { BaseChartDirective } from 'ng2-charts';
 import { GoogleChartsModule } from 'angular-google-charts';
 import { ErrorPageComponent } from './pages/error-page/error-page.component';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { TableForOwnerPortalComponent } from './components/utils/table-for-owner-portal/table-for-owner-portal.component';
 
 @NgModule({
   declarations: [
@@ -62,6 +63,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
     PlanningChartComponent,
     CalenderHeaderComponent,
     ErrorPageComponent,
+    TableForOwnerPortalComponent,
   ],
   imports: [
     BrowserModule,

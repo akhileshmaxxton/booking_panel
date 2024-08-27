@@ -30,10 +30,17 @@ export class MergeRoomAndRoomDetails implements PipeTransform {
             departureDays: stayDetail.departureDays,
             minStay: stayDetail.minStay,
             maxStay: stayDetail.maxStay,
+            imageSrc: this.getRandomImagePath(),
           } as RoomAndRoomStayDetails;
         }
         return null;
       })
       .filter((detail) => detail !== null) as RoomAndRoomStayDetails[];
+  }
+
+
+  getRandomImagePath(): string {
+    const randomNumber = Math.floor(Math.random() * 4) + 1; 
+    return `/assets/images/room${randomNumber}.jpg`;
   }
 }

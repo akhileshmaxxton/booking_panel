@@ -4,42 +4,32 @@
   <h1>Planning Chart</h1>
 
   <div class="booking-chart-container">
+    
+
     <table class="table table-bordered">
+      <!-- Scroll Sentinel for Loading Previous Month -->
+    <div #scrollSentinelPrev observeVisibility (visible)="loadPreviousMonth()"></div>
       <thead>
         <tr class="month-header-wrapper">
           <th class="room-names" rowspan="2">Room ID</th>
-          <div
-            #scrollSentinelPrev
-            observeVisibility
-            (visible)="loadPreviousMonth()"
-          ></div>
           <ng-container *ngFor="let month of months">
             <th [attr.colspan]="month.days.length" class="month-header">
               {{ month.month | date : "MMMM yyyy" }}
             </th>
           </ng-container>
-          <div
-            #scrollSentinelNext
-            observeVisibility
-            (visible)="loadNextMonth()"
-          ></div>
         </tr>
         <tr>
-          <ng-container class="scroll-container">
-            <ng-container *ngFor="let month of months" class="month-container">
-              <ng-container
-                *ngFor="let day of month.days; let last = last"
-                class="day-cell"
-              >
-                <th *ngIf="!last" class="date-cell">{{ day | date : "dd"  }}</th>
-                <th *ngIf="last" #scrollSentinelNext class="date-cell">
-                  {{ day | date : "dd" }}
-                </th>
-              </ng-container>
+          <ng-container *ngFor="let month of months">
+            <ng-container *ngFor="let day of month.days; let last = last">
+              <th *ngIf="!last" class="date-cell">{{ day | date : "dd" }}</th>
+              <th *ngIf="last" class="date-cell">{{ day | date : "dd" }}</th>
             </ng-container>
           </ng-container>
+          <!-- Scroll Sentinel for Loading Next Month -->
+    <div #scrollSentinelNext observeVisibility (visible)="loadNextMonth()"></div>
         </tr>
       </thead>
+       
       <tbody>
         <tr *ngFor="let room of rooms">
           <td class="room-name">{{ room.roomId }}</td>
@@ -48,11 +38,11 @@
               <td
                 class="booking-cell"
                 [ngClass]="{
-                  selected: isSelected(room.roomId, day),
-                  marked: isMarked(room.roomId, day),
-                  'half-start': isHalfStart(room.roomId, day),
-                  'half-end': isHalfEnd(room.roomId, day),
-                  'full-marked': isMarked(room.roomId, day) && !isHalfStart(room.roomId, day) && !isHalfEnd(room.roomId, day)
+                  'selected': isSelected(room.roomId, day),
+                  'middle-of-reservation': isMiddleOfReservation(room.roomId, day),
+                  'start-of-reservation': isStartOfReservation(room.roomId, day),
+                  'end-start-of-reservation': isEndOfReservation(room.roomId, day),
+                  
                 }"
                 (mousedown)="onMouseDown(room.roomId, day, $event)"
                 (mouseover)="onMouseOver(room.roomId, day, $event)"
@@ -64,5 +54,7 @@
         </tr>
       </tbody>
     </table>
+
+   
   </div>
 </div>

@@ -1,11 +1,14 @@
 export interface CustomerDetails {
     customerId: string;
-    name: string;
     birthData: Date;
-    pincode: number;
-    district: string;
-    city: string;
+    firstName: string;
+    middleName: string;
+    lastName: string;
+    country: string;
     state: string;
+    city: string;
+    pincode: number;
     phoneNumber: number;
-    reservationId: string[];
+    
+    reservationIds: string[];
 }

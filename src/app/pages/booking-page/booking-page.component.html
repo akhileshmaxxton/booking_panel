@@ -3,12 +3,13 @@
       [roomToBeBooked]="roomToBeBooked"
       [reservationDetailsFromParent] = "reservationDetails"
       (reservationConfirmed)="onReservationConfirmed($event)"
-      (backToBookingForm)="onBackToBookingForm()">
+      >
     </app-booking-details-form>
   </ng-container>
   
   <ng-container *ngIf="currentFormIndex === 1">
     <app-customer-dtails-form
+      [submittedCustomerDetails]="customerDetails"
       (customerDetailsSubmitted)="onCustomerDetailsSubmitted($event)"
       (backToBookingForm)="onBackToBookingForm()">
     </app-customer-dtails-form>
@@ -18,8 +19,9 @@
     <app-payment-detail-form
     [customerDetails]="customerDetails"
     [reservationDetails]="reservationDetails"
-    (paymentDetailsSubmitted)="onPaymentDetailsSubmitted($event)">
-      >
+    (paymentDetailsSubmitted)="onPaymentDetailsSubmitted($event)"
+    (backToCustomerForm)="backToCustomerForm()">
+      
     </app-payment-detail-form>
   </ng-container>
 
@@ -36,8 +38,8 @@
                 
                 <div class="mb-3">
                   <h6>Customer Details:</h6>
-                  <p><strong>Name:</strong> {{ customerDetails.name }}</p>
-                  <p><strong>Phone:</strong> {{ customerDetails.phoneNumber }}</p>
+                  <p><strong>Name:</strong> {{ customerDetails?.firstName }}</p>
+                  <p><strong>Phone:</strong> {{ customerDetails?.phoneNumber }}</p>
                   
                 </div>
       

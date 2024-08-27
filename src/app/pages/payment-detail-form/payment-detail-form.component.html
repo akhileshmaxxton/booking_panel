@@ -32,9 +32,9 @@
 
             <div class="form-group">
               <label for="paymentDate">Payment Date</label>
-              <input type="date" class="form-control" id="paymentDate" formControlName="paymentDate" [value]="paymentFormData.get('paymentDate')?.value">
+              <input type="date" class="form-control" id="paymentDate" formControlName="paymentDate" [value]="paymentFormData.get('paymentDate')?.value" readonly>
             </div>
-
+            <button class="btn btn-primary btn-block" (click)="goBack()">Back</button>
             <button type="submit" class="btn btn-primary btn-block">Submit Payment</button>
           </form>
         </div>

@@ -9,6 +9,7 @@ import { OwnerPortalHomeComponent } from './pages/owner-portal-home/owner-portal
 import { BookingPageComponent } from './pages/booking-page/booking-page.component';
 import { CalenderHeaderComponent } from './components/utils/calender-header/calender-header.component';
 import { ErrorPageComponent } from './pages/error-page/error-page.component';
+import { TableForOwnerPortalComponent } from './components/utils/table-for-owner-portal/table-for-owner-portal.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -21,6 +22,7 @@ const routes: Routes = [
   { path: 'owner', component: OwnerPortalHomeComponent},
   { path: 'booking', component: BookingPageComponent},
   { path: 'test', component: CalenderHeaderComponent},
+  { path: 'table', component: TableForOwnerPortalComponent},
   { path: '**', component: ErrorPageComponent }
 ];
 

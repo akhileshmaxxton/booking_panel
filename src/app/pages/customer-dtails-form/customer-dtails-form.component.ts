@@ -1,8 +1,9 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { CustomerDetails } from '../../interface/customer-details';
 import { LocalStorageService } from '../../service/localStorageApi/local-storage.service';
 import moment from 'moment';
+import { FilterService } from '../../service/filterService/filter.service';
 
 @Component({
   selector: 'app-customer-dtails-form',
@@ -14,31 +15,64 @@ export class CustomerDtailsFormComponent {
   public customerFormData!: FormGroup;
   public customerDetails: CustomerDetails = {
     customerId: '',
-    name: '',
     birthData: new Date(),
-    pincode: 0,
-    district: '',
-    city: '',
+    firstName: '',
+    middleName: '',
+    lastName: '',
+    country: '',
     state: '',
+    city: '',
+    pincode: 0,
     phoneNumber: 0,
-    reservationId: [],
+    reservationIds: [],
   };
-
+  @Input() submittedCustomerDetails!: CustomerDetails;
   @Output() customerDetailsSubmitted = new EventEmitter<CustomerDetails>();
   @Output() backToBookingForm = new EventEmitter<void>();
 
-  constructor(private fb: FormBuilder, private localStorageService: LocalStorageService) {
+  customers?: CustomerDetails[] = [];
+
+  constructor(private fb: FormBuilder, private localStorageService: LocalStorageService, private filterService: FilterService) {  
     this.initializeForm();
   }
 
+  ngOnInit(){
+    if(this.submittedCustomerDetails) {
+      this.customerFormData.patchValue({
+        firstName: this.submittedCustomerDetails.firstName,
+        middleName: this.submittedCustomerDetails.middleName,
+        lastName: this.submittedCustomerDetails.lastName,
+        birthDate: this.submittedCustomerDetails.birthData,
+        country: this.submittedCustomerDetails.country,
+        state: this.submittedCustomerDetails.state,
+        city: this.submittedCustomerDetails.city,
+        pincode: this.submittedCustomerDetails.pincode,
+        phoneNumber: this.submittedCustomerDetails.phoneNumber,
+      });
+    }
+
+    
+  }
+
+  loadCustomerDetails(customerId: number) {
+    // Load customer details here
+    console.log(`Loading customer details for customer ID ${customerId}`);
+  }
+
+
+  getIsCustomerFromService() {
+    return this.filterService.getIsCustomer();
+  }
   private initializeForm() {
     this.customerFormData = this.fb.group({
-      name: ['', [Validators.required, this.nameValidator]],
+      firstName: ['', [Validators.required, this.nameValidator]],
+      middleName: [''],
+      lastName: ['', [Validators.required, this.nameValidator]],
       birthDate: ['', [Validators.required, this.birthDateValidator]],
-      pincode: ['', [Validators.required, this.pincodeValidator]],
-      district: ['', [Validators.required, this.districtValidator]],
-      city: ['', [Validators.required, this.cityValidator]],
+      country: ['', [Validators.required, this.countryValidator]],
       state: ['', [Validators.required, this.stateValidator]],
+      city: ['', [Validators.required, this.cityValidator]],
+      pincode: ['', [Validators.required, this.pincodeValidator]],
       phoneNumber: ['', [Validators.required, this.phoneNumberValidator]],
     });
   }
@@ -59,9 +93,9 @@ export class CustomerDtailsFormComponent {
     return !isValid ? { invalidPincode: 'Pincode must be a 6-digit number' } : null;
   }
 
-  districtValidator(control: AbstractControl): ValidationErrors | null {
+  countryValidator(control: AbstractControl): ValidationErrors | null {
     const value = control.value;
-    return !value ? { invalidDistrict: 'District is required' } : null;
+    return !value ? { invalidCountry: 'Country is required' } : null;
   }
 
   cityValidator(control: AbstractControl): ValidationErrors | null {
@@ -86,20 +120,25 @@ export class CustomerDtailsFormComponent {
 
   onSubmit() {
     if (this.customerFormData.invalid) {
+      alert('Please fill all the required fields');
       return;
     }
 
     const existingCustomer = this.localStorageService.checkCustomerFromLocalStorage(this.customerFormData.value);
-    
-    if (existingCustomer) {
-      this.customerDetails.customerId = existingCustomer.customerId;
-    } else {
-      this.customerDetails = {
-        ...this.customerDetails,
-        ...this.customerFormData.value,
-        birthData: new Date(this.customerFormData.get('birthDate')?.value),
-        reservationId: [],
-      };
+
+    this.customerDetails = {
+      ...this.customerDetails,
+      customerId : existingCustomer ? existingCustomer.customerId : '',
+      birthData : new Date(this.customerFormData?.get('birthDate')?.value),
+      firstName : this.customerFormData?.get('firstName')?.value,
+      middleName : this.customerFormData?.get('middleName')?.value,
+      lastName : this.customerFormData?.get('lastName')?.value,
+      country : this.customerFormData?.get('country')?.value,
+      state : this.customerFormData?.get('state')?.value,
+      city : this.customerFormData?.get('city')?.value,
+      pincode : this.customerFormData?.get('pincode')?.value,
+      phoneNumber : this.customerFormData?.get('phoneNumber')?.value,
+      reservationIds: existingCustomer ? existingCustomer.reservationId : [],
     }
 
     this.customerDetailsSubmitted.emit(this.customerDetails);
