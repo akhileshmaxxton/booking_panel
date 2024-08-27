@@ -11,4 +11,5 @@ export interface RoomAndRoomStayDetails {
     departureDays: string[];
     minStay: number;
     maxStay: number;
+    imageSrc: string;
 }

@@ -18,6 +18,7 @@ export class PaymentDetailFormComponent implements OnInit {
   @Input() customerDetails!: CustomerDetails;
   
   @Output() paymentDetailsSubmitted = new EventEmitter<PaymentDetails>();
+  @Output() backToCustomerForm = new EventEmitter<void>();
 
   public paymentFormData!: FormGroup;
   public paymentDetails: PaymentDetails = {
@@ -26,7 +27,8 @@ export class PaymentDetailFormComponent implements OnInit {
     customerId: '',
     paymentDate: new Date(),
     paymentAmount: 0,
-    paymentMode: ''
+    paymentMode: '',
+    paymentDue: 0,
   };
 
   public showModal: boolean = false;
@@ -36,8 +38,8 @@ export class PaymentDetailFormComponent implements OnInit {
   ngOnInit(): void {
     // Initialize form with validation
     this.paymentFormData = this.fb.group({
-      paymentDate: [{ value: new Date().toISOString().split('T')[0], disabled: true }, Validators.required],
-      paymentAmount: ['', [Validators.required, Validators.min(0)]],
+      paymentDate: [new Date().toISOString().split('T')[0], Validators.required],
+      paymentAmount: ['', [Validators.required, Validators.min(this.reservationDetails?.totalAmount*0.1)]],
       paymentMode: ['', Validators.required]
     });
 
@@ -56,34 +58,47 @@ export class PaymentDetailFormComponent implements OnInit {
     this.showModal = false;
   }
 
+  goBack(){
+    this.backToCustomerForm.emit();
+
+  }
+
   onSubmit() {
     if(this.paymentFormData.valid) {
       const uid = new ShortUniqueId({ length: 10 });
       const generatedReservationId = uid.rnd();
-      const generatedCustomerId = this.customerDetails.customerId ? this.customerDetails.customerId : uid.rnd();
+      const generatedCustomerId = this.customerDetails?.customerId ? this.customerDetails?.customerId : uid.rnd();
       const generatedPaymentId = uid.rnd();
 
       // Payment details
       this.paymentDetails = {
+        ...this.paymentDetails,
         paymentId: generatedPaymentId,
         reservationId: generatedReservationId,
         customerId: generatedCustomerId,
         paymentDate: new Date(this.paymentFormData.get('paymentDate')?.value),
         paymentAmount: this.paymentFormData.get('paymentAmount')?.value,
         paymentMode: this.paymentFormData.get('paymentMode')?.value,
+        paymentDue: this.reservationDetails?.totalAmount - this.paymentFormData.get('paymentAmount')?.value
       };
 
       // Update customer and reservation details
-      this.customerDetails.customerId = generatedCustomerId;
-      this.customerDetails.reservationId.push(generatedReservationId);
+    this.customerDetails = {
+      ...this.customerDetails,
+      customerId: generatedCustomerId,
+      reservationIds: [...(this.customerDetails.reservationIds || []), generatedReservationId]
+    };
 
-      this.reservationDetails.reservationId = generatedReservationId;
-      this.reservationDetails.paymentId.push(generatedPaymentId);
-      this.reservationDetails.customerId = generatedCustomerId;
+    this.reservationDetails = {
+      ...this.reservationDetails,
+      reservationId: generatedReservationId,
+      customerId: generatedCustomerId,
+      paymentIds: [...(this.reservationDetails.paymentIds || []), generatedPaymentId]
+    };
 
       // Optionally save data to local storage or any other service
-      // this.localStorageService.setLocalStorage(this.customerDetails, this.reservationDetails, this.paymentDetails);
-      
+      this.localStorageService.setLocalStorage(this.customerDetails, this.reservationDetails, this.paymentDetails);
+
       console.log("reservationDetails", this.reservationDetails);
       console.log("customerDetails", this.customerDetails);
       console.log("paymentDetails", this.paymentDetails);

@@ -24,7 +24,7 @@ export class RoomDetailsApiService {
     return this.http.get<RoomDetails[]>(this.roomDetailsUrl);
   }
 
-  findRoomByRoomId(roomId: number): Observable<RoomAndRoomStayDetails | undefined> {
+  findRoomByRoomId(roomId: number): Observable<RoomAndRoomStayDetails[] | undefined> {
     return forkJoin({
       roomStayDetails: this.getRoomStayDetails(),
       roomDetails: this.getRoomDetails(),
@@ -32,7 +32,20 @@ export class RoomDetailsApiService {
       map(({ roomStayDetails, roomDetails }) => {
         const mergedData = this.mergePipe.transform(roomStayDetails, roomDetails);
         // Find the room that matches the roomId
-        return mergedData.find(room => room.roomId === roomId);
+        return mergedData.filter(room => room.roomId === roomId);
+
+      })
+    );
+  }
+
+  fetchAllDataForCustomerPortal(){
+    return forkJoin({
+      roomStayDetails: this.getRoomStayDetails(),
+      roomDetails: this.getRoomDetails(),
+    }).pipe(
+      map(({ roomStayDetails, roomDetails }) => {
+        const mergedData = this.mergePipe.transform(roomStayDetails, roomDetails);
+        return mergedData;
       })
     );
   }

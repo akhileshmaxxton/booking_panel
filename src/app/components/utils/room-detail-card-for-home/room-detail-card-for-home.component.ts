@@ -14,16 +14,12 @@ export class RoomDetailCardForHomeComponent {
   
   constructor(private router: Router){}
 
-  bookRoom(room: RoomAndRoomStayDetails) {
-     this.router.navigate(['/booking'], { state: { room } });
+  bookRoom(roomId: number) {
+     this.router.navigate(['/booking'], { state: { roomId } });
   }
 
   viewRoom(viewRoomData: RoomAndRoomStayDetails) {
     this.onViewRoom.emit(viewRoomData);
     
-  }
-  getRandomImagePath(): string {
-    const randomNumber = Math.floor(Math.random() * 4) + 1; 
-    return `/assets/images/room${randomNumber}.jpg`;
   }
 }

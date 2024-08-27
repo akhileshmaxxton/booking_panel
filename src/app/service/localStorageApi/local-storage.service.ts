@@ -12,9 +12,9 @@ export class LocalStorageService {
   constructor() { }
 
   setLocalStorage(customerDetails: CustomerDetails, reservationDetails: ReservationDetails, paymentDetails: PaymentDetails) {
-    const customer = localStorage.getItem('customer')? JSON.parse(localStorage.getItem('customer')!) : [];
-    const reservation = localStorage.getItem('reservation')? JSON.parse(localStorage.getItem('reservation')!) : [];
-    const payment = localStorage.getItem('payment')? JSON.parse(localStorage.getItem('payment')!) : [];
+    const customer = localStorage.getItem('customers')? JSON.parse(localStorage.getItem('customers')!) : [];
+    const reservation = localStorage.getItem('reservations')? JSON.parse(localStorage.getItem('reservations')!) : [];
+    const payment = localStorage.getItem('payments')? JSON.parse(localStorage.getItem('payments')!) : [];
     if(customerDetails?.customerId === customer?.find((customer: CustomerDetails) => customer.customerId === customerDetails.customerId)?.customerId){
       console.log("Customer ID:", customerDetails.customerId);
       customer?.find((customer: CustomerDetails) => customer.customerId === customerDetails.customerId)?.reservationId.push(reservationDetails.reservationId);
@@ -25,18 +25,18 @@ export class LocalStorageService {
     }
     reservation.push(reservationDetails);
     payment.push(paymentDetails);
-    localStorage.setItem('customer', JSON.stringify(customer));
-    localStorage.setItem('reservation', JSON.stringify(reservation));
-    localStorage.setItem('payment', JSON.stringify(payment));
+    localStorage.setItem('customers', JSON.stringify(customer));
+    localStorage.setItem('reservations', JSON.stringify(reservation));
+    localStorage.setItem('payments', JSON.stringify(payment));
   }
 
   getCustomerFromLocalStorage(customerID : string){
-    const customer = localStorage.getItem('customer')? JSON.parse(localStorage.getItem('customer')!) : [];
+    const customer = localStorage.getItem('customers')? JSON.parse(localStorage.getItem('customers')!) : [];
     return customer.find((customer: CustomerDetails) => customer.customerId === customerID);
   }
 
   checkCustomerFromLocalStorage(customerData: any) {
-    const customers = JSON.parse(localStorage.getItem('customer') || '[]');
+    const customers = JSON.parse(localStorage.getItem('customers') || '[]');
   
     for (let customer of customers) {
       if (
@@ -48,7 +48,7 @@ export class LocalStorageService {
         customer.state === customerData.state &&
         customer.phoneNumber === customerData.phoneNumber
       ) {
-        return customer.customerId;
+        return customer;
       }
     }
   
@@ -56,15 +56,24 @@ export class LocalStorageService {
   }
 
   getAllReservationsFromLocalStorage(){
-    return localStorage.getItem('reservation')? JSON.parse(localStorage.getItem('reservation')!) : [];
+    return localStorage.getItem('reservations')? JSON.parse(localStorage.getItem('reservations')!) : [];
   }
 
   getAllPaymentsFromLocalStorage(){
-    return localStorage.getItem('payment')? JSON.parse(localStorage.getItem('payment')!) : [];
+    return localStorage.getItem('payments')? JSON.parse(localStorage.getItem('payments')!) : [];
   }
 
   getAllCustomersFromLocalStorage(){
-    return localStorage.getItem('customer')? JSON.parse(localStorage.getItem('customer')!) : [];
+    return localStorage.getItem('customers')? JSON.parse(localStorage.getItem('customers')!) : [];
+  }
+
+  getReservationsById(roomId: number){
+    const reservations = localStorage.getItem('reservations')? JSON.parse(localStorage.getItem('reservations')!) : [];
+    return reservations.filter((reservation: ReservationDetails) => reservation.roomId === roomId);
+  }
+
+  setReservations(reservations: ReservationDetails[]){
+    localStorage.setItem('reservations', JSON.stringify(reservations));
   }
   
 }

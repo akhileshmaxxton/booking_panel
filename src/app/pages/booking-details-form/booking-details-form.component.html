@@ -7,8 +7,9 @@
         <div class="col-md-8 d-flex flex-column ">
           <div class ="container">
           <img src="assets/images/banner.jpg" class="img-fluid mb-3" alt="Descriptive Image">
-          <p class="display-4 ">{{roomToBeBooked?.roomName}}</p>
+          <p class="display-4 ">{{roomToBeBooked?.[0]?.roomName}}</p>
           <p class="lead mb-2">lorem ipsum</p>
+          <p *ngFor="let room of roomToBeBooked">{{ room | json }}</p>
           <p class="text-muted mb-4">A cozy room with a beautiful view, perfect for a relaxing stay.</p>
         </div>
       </div>

@@ -3,6 +3,7 @@ import { RoomAndRoomStayDetails } from '../../interface/room-and-room-stay-detai
 import { ReservationDetails } from '../../interface/reservation-details';
 import { PaymentDetails } from '../../interface/payment-details';
 import { CustomerDetails } from '../../interface/customer-details';
+import { RoomDetailsApiService } from '../../service/apiService/room-details-api.service';
 
 @Component({
   selector: 'app-booking-page',
@@ -10,15 +11,20 @@ import { CustomerDetails } from '../../interface/customer-details';
   styleUrls: ['./booking-page.component.scss']
 })
 export class BookingPageComponent {
-  public roomToBeBooked!: RoomAndRoomStayDetails;
+  public roomToBeBooked?: RoomAndRoomStayDetails[];
   public reservationDetails!: ReservationDetails;
   public customerDetails!: CustomerDetails;
   public paymentDetails!: PaymentDetails;
 
   public currentFormIndex: number = 0;
 
-  constructor() {
-    this.roomToBeBooked = history.state.room;
+  constructor(private roomDetailsApiService: RoomDetailsApiService) {
+    const roomId = history.state.roomId;
+    if(roomId) {
+      this.roomDetailsApiService.findRoomByRoomId(roomId).subscribe(room => {
+        this.roomToBeBooked = room;
+      })
+    }
   }
 
   onReservationConfirmed(reservationDetails: ReservationDetails) {
@@ -39,6 +45,10 @@ export class BookingPageComponent {
 
   onBackToBookingForm() {
     this.currentFormIndex = 0;
+  }
+
+  backToCustomerForm() {
+    this.currentFormIndex = 1;
   }
 
   printInvoice() {

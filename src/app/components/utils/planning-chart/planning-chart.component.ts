@@ -15,7 +15,7 @@ import { UniquePipe } from '../../../utils/unique.pipe';
 export class PlanningChartComponent implements OnInit, AfterViewInit {
 
   rooms: RoomAndRoomStayDetails[] = []; 
-  roomData?: RoomAndRoomStayDetails;
+  roomData?: RoomAndRoomStayDetails[];
 
   months: { month: Date; days: Date[] }[] = [];
   isMouseDown = false;
@@ -160,14 +160,7 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
       this.updateSelection();
     }
 
-    // Display tooltip details
-    this.hoveredCell = { roomId, day };
-    this.hoveredCellDetails = this.getCellDetails(roomId, day);
-    this.tooltipStyle = {
-      left: `${event.clientX}px`,
-      top: `${event.clientY}px`,
-      display: 'block'
-    };
+    
   }
 
   onMouseOut() {
@@ -176,18 +169,9 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
 
   onMouseUp(event: MouseEvent) {
     this.isMouseDown = false;
-    this.startSelectionDate = null; // Reset start date
-    this.endSelectionDate = null; // Reset end date
-    this.selectionRowId = null; // Reset the selected row
-  }
-
-  private getCellDetails(roomId: number, day: Date): string {
-    if (this.isMarked(roomId, day)) {
-      return `Marked - Room: ${roomId}, Date: ${day.toDateString()}`;
-    } else if (this.isSelected(roomId, day)) {
-      return `Selected - Room: ${roomId}, Date: ${day.toDateString()}`;
-    }
-    return '';
+    this.startSelectionDate = null;
+    this.endSelectionDate = null;
+    this.selectionRowId = null;
   }
 
   private updateSelection() {
@@ -198,7 +182,6 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
       // Determine the range of days
       const startDate = this.startSelectionDate;
       const endDate = this.endSelectionDate;
-
       // Loop through all months and days to select the range within the specified row
       this.months.forEach(month => {
         month.days.forEach(day => {
@@ -207,16 +190,6 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
           }
         });
       });
-    }
-  }
-
-
-  toggleSelection(roomId: number, day: Date) {
-    const cellKey = `${roomId}-${day.toISOString().split('T')[0]}`;
-    if (this.selectedCells.has(cellKey)) {
-      this.selectedCells.delete(cellKey);
-    } else {
-      this.selectedCells.add(cellKey);
     }
   }
 
@@ -231,7 +204,8 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
     reservations.forEach((reservation: { checkIn: Date; numberOfDays: number; roomId: number; }) => {
       const checkInDate = new Date(reservation.checkIn);
       const reservationDates: string[] = [];
-  
+      checkInDate.setHours(0, 0, 0, 0);
+
       for (let i = 0; i < reservation.numberOfDays; i++) {
         const date = new Date(checkInDate);
         date.setDate(checkInDate.getDate() + i);
@@ -243,31 +217,29 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
     });
   }
 
-  isMarked(roomId: number, day: Date): boolean {
+  isMiddleOfReservation(roomId: number, day: Date): boolean {
     const cellKey = `${roomId}-${day.toISOString().split('T')[0]}`;
     return Array.from(this.markedData).some(reservationDates => reservationDates.includes(cellKey));
   }
 
-  loadMoreDays(monthIndex: number) {
-    const currentMonth = this.months[monthIndex];
-    const currentDays = currentMonth.days.length;
-    const newDays = this.generateDaysInMonth(currentMonth.month, currentDays, currentDays + 7);
-    this.months[monthIndex].days.push(...newDays);
-}
+  isStartOfReservation(roomId: number, day: Date): boolean {
+    const cellKey = `${roomId}-${day.toISOString().split('T')[0]}`;
+    const previousDay = new Date(day);
+    previousDay.setDate(day.getDate() - 1);
+    const prevCellKey = `${roomId}-${previousDay.toISOString().split('T')[0]}`;
 
-isHalfStart(roomId: number, day: Date): boolean {
-  const cellKey = `${roomId}-${day.toISOString().split('T')[0]}`;
-  const previousDay = new Date(day);
-  previousDay.setDate(day.getDate() - 1);
-  const prevCellKey = `${roomId}-${previousDay.toISOString().split('T')[0]}`;
+    if(Array.from(this.markedData).some(reservationDates => 
+      reservationDates.includes(cellKey) && 
+      (!reservationDates.includes(prevCellKey) || this.isStartOfMonth(day))
+    )){
+    }
+    return Array.from(this.markedData).some(reservationDates => 
+      reservationDates.includes(cellKey) && 
+      (!reservationDates.includes(prevCellKey) || this.isStartOfMonth(day))
+    );
+  }
 
-  return Array.from(this.markedData).some(reservationDates => 
-    reservationDates.includes(cellKey) && 
-    (!reservationDates.includes(prevCellKey) || this.isStartOfMonth(day))
-  );
-}
-
-isHalfEnd(roomId: number, day: Date): boolean {
+isEndOfReservation(roomId: number, day: Date): boolean {
   const cellKey = `${roomId}-${day.toISOString().split('T')[0]}`;
   const nextDay = new Date(day);
   nextDay.setDate(day.getDate() + 1);
@@ -302,19 +274,17 @@ navigateWithSelectedData() {
     const startDate = new Date(startDateStr);
     const endDate = new Date(endDateStr);
 
-    this.roomDetailsApiService.findRoomByRoomId(parseInt(startRoomId)).subscribe(room => {
-      this.roomData = room;
-      console.log("roomData", this.roomData);
-    })
-
+    
+    
     this.router.navigate(['/booking'], {
       relativeTo: this.route,
       queryParams: {
         startDate: startDate.toISOString(),  
         endDate: endDate.toISOString(),    
-        room: this.roomData 
+        roomId: startRoomId 
       }
     });
+   
   } else {
     console.error('No cells selected.');
   }

@@ -5,5 +5,6 @@ export interface PaymentDetails {
     paymentDate: Date;
     paymentAmount: number;
     paymentMode: string;
+    paymentDue: number;
 
 }

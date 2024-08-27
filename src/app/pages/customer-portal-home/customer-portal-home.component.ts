@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable, forkJoin } from 'rxjs';
 import { RoomAndRoomStayDetails } from '../../interface/room-and-room-stay-details';
 import { RoomDetailsApiService } from '../../service/apiService/room-details-api.service';
 import { MergeRoomAndRoomDetails } from '../../utils/merge-room-and-room-details.pipe';
@@ -22,20 +21,13 @@ export class CustomerPortalHomeComponent implements OnInit {
   ) {  }
 
   ngOnInit() {
+    this.filterService.setIsCustomer(true);
     this.fetchDataAndApplyFilters();
   }
   
   private fetchDataAndApplyFilters() {
-    forkJoin({
-      roomStayDetails: this.roomDetailsApiService.getRoomStayDetails(),
-      roomDetails: this.roomDetailsApiService.getRoomDetails(),
-    }).subscribe(({ roomStayDetails, roomDetails }) => {
-      this.roomAndRoomStayDetails = this.mergePipe.transform(
-        roomStayDetails,
-        roomDetails
-      );
-      this.roomDetailsForFilter = this.roomAndRoomStayDetails;
-      this.filterService.setRoomStayDetails(this.roomAndRoomStayDetails);
+    this.roomDetailsApiService.fetchAllDataForCustomerPortal().subscribe((mergedData) => {
+      this.roomDetailsForFilter = mergedData;
       this.filterService.getFilteredRoomStayDetails().subscribe((data) => {
         this.roomAndRoomStayDetails = data;
         console.log("roomDetailsForFilter",this.roomAndRoomStayDetails);

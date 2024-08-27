@@ -52,52 +52,72 @@
     text-align: center;
     cursor: pointer;
     white-space: nowrap;
-    position: relative; /* To allow inner styling */
-  }
-  
-  .booking-cell.selected {
-    background-color: lightblue;
-    border: none; /* Remove border to make the selection seamless */
-    box-shadow: none;
-  }
-  
-  .booking-cell.marked {
-    background-color: lightcoral;
     position: relative;
+    background-color: transparent;
+    box-sizing: border-box; /* Ensures padding doesn't affect the size */
   }
   
-  .booking-cell.full-marked {
-    border-left: none;
-    border-right: none;
-    top: 0;
-    bottom: 0;
+  .middle-of-reservation,
+  .start-of-reservation,
+  .end-start-of-reservation {
+    position: relative;
+    background-color: transparent;
   }
   
-  .booking-cell.half-start::before,
-  .booking-cell.half-end::before {
-    content: "";
+  .middle-of-reservation::before,
+  .start-of-reservation::before,
+  .end-start-of-reservation::before {
+    content: '';
     position: absolute;
     top: 0;
     bottom: 0;
-    background-color: white;
-    z-index: 1;
+    background-color: coral; /* The coral color */
+    z-index: 1; /* Ensures it covers the background */
   }
   
-  .booking-cell.half-start::before {
+  .start-of-reservation::before {
     left: 0;
-    width: 50%;
+    right: 50%; /* Cover the left half of the cell */
+    border-top-left-radius: 5px; /* Optional: Round the top left corner */
+    border-bottom-left-radius: 5px; /* Optional: Round the bottom left corner */
   }
   
-  .booking-cell.half-end::before {
-    right: 0;
-    width: 50%;
-  }
-  
-  .booking-cell.half-start.half-end::before {
-    width: 100%;
+  .middle-of-reservation::before {
     left: 0;
-    right: 0;
+    right: 0; /* Cover the full cell */
   }
+  
+  .end-start-of-reservation::before {
+    left: 50%;
+    right: 0; /* Cover the right half of the cell */
+    border-top-right-radius: 5px; /* Optional: Round the top right corner */
+    border-bottom-right-radius: 5px; /* Optional: Round the bottom right corner */
+  }
+  
+  /* Optional: Remove borders between reservation cells */
+  .middle-of-reservation,
+  .start-of-reservation,
+  .end-start-of-reservation {
+    border-left: none;
+    border-right: none;
+  }
+  
+  .start-of-reservation {
+    border-right: none;
+  }
+  
+  .end-start-of-reservation {
+    border-left: none;
+  }
+
+  .selected {
+    background-color: #ffebcc;
+    border-color: #ffebcc;
+  }
+  
+  
+  
+  
 
   .month-navigation {
     display: flex;
@@ -119,14 +139,8 @@
     background: white; /* Ensures background covers table content */
     z-index: 10; /* Ensures it stays above other content */
   }
-
-  .booking-cell.selected {
-    background-color: lightblue; /* Color for selected cells */
-  }
   
-  .booking-cell.marked {
-    background-color: lightcoral; /* Color for marked cells */
-  }
+  
 
   #scrollSentinel {
     height: 1px; // Invisible element to trigger infinite scroll
