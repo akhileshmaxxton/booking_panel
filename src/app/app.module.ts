@@ -39,6 +39,8 @@ import { GoogleChartsModule } from 'angular-google-charts';
 import { ErrorPageComponent } from './pages/error-page/error-page.component';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { TableForOwnerPortalComponent } from './components/utils/table-for-owner-portal/table-for-owner-portal.component';
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -80,7 +82,9 @@ import { TableForOwnerPortalComponent } from './components/utils/table-for-owner
     }),
     BaseChartDirective,
     GoogleChartsModule,
-    ScrollingModule 
+    ScrollingModule,
+    TooltipModule.forRoot(),
+    MatTooltipModule
     
   ],
   providers: [RoomDetailsApiService, MergeRoomAndRoomDetails, UniquePipe, LocalStorageService, provideAnimationsAsync(), FilterService],

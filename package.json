@@ -37,6 +37,7 @@
     "intersection-observer": "^0.12.2",
     "jquery": "^3.7.1",
     "ng2-charts": "^6.0.1",
+    "ngx-bootstrap": "^18.0.2",
     "rxjs": "~7.8.0",
     "scss": "^0.2.4",
     "short-unique-id": "^5.2.0",

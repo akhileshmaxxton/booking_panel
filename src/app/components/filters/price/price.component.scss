@@ -1,6 +1,6 @@
 .nice-select {
-    background: transparent;
-    border-radius: 10px;
+    background: white;
+    // border-radius: 10px;
     border: 1px solid #2b3146;
     font-size: 13px;
     line-height: 40px;
@@ -9,7 +9,7 @@
     padding: 0 20px;
     position: relative;
     margin-left: 0.8rem;
-    width: 10rem;
+    // width: 10rem;
 }
 
 /* Hide default number input arrows */
@@ -37,6 +37,6 @@
 }
 
 .nice-select:hover {
-    border-color: #1a73e8; /* Optional: Change border color on hover */
+    border-color: #ebedf0; /* Optional: Change border color on hover */
     color: #1a73e8; /* Optional: Change text color on hover */
 }

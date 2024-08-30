@@ -1,0 +1,69 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  .form-page-cover-image-wrapper {
+    background-image: url('../../../../public/assets/images/bridge.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+  }
+  
+  .form-all {
+    background-color: rgba(255, 255, 255, 0.2); 
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    max-width: 600px;
+    width: 100%;
+  }
+  
+  .form-header {
+    font-size: 2rem;
+    color: #333;
+  }
+  
+  .form-subHeader {
+    font-size: 1.2rem;
+    color: #666;
+  }
+  
+  .form-label {
+    // font-weight: bold;
+    // color: white;
+    margin-block: 0.5rem;
+  }
+  
+  .btn {
+    font-size: 1rem;
+    padding: 10px 20px;
+  }
+  
+  .btn-primary {
+    background-color: #007bff;
+    border: none;
+  }
+  
+  .btn-secondary {
+    background-color: #6c757d;
+    border: none;
+  }
+  
+  .text-danger {
+    font-size: 0.875rem;
+  }
+  
+  .glass-card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }

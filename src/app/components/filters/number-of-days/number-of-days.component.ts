@@ -11,11 +11,18 @@ export class NumberOfDaysComponent {
 
   constructor(private filterService: FilterService) {}
 
+  get getNoOfDays(){
+    return this.filterService.filters.days;
+  }
+
   onNoOfDaysChangeInput(event: Event) {
     const inputElement = event.target as HTMLInputElement;
-    const price = parseFloat(inputElement.value);
-    if (!isNaN(price)) {
-      this.filterService.setDaysFilter(price);
+    const days = parseFloat(inputElement.value);
+    if (!isNaN(days)) {
+      this.filterService.setDaysFilter(days);
+    }
+    if(!days){
+      this.filterService.setDaysFilter(null);
     }
   }
 }

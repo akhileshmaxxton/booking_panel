@@ -27,7 +27,7 @@
 	position: relative;
 	overflow: hidden;
 	width: 100%;
-	min-height: 45rem;
+	min-height: 30rem;
 }
 .overlay{
     position: absolute;
@@ -85,7 +85,7 @@
             .form-control{
                 border: 1px solid #2b3146;
                 background: transparent;
-                border-radius: 0px;
+                // border-radius: 0px;
                 font-size: 13px;
                 line-height: 38px;
                 padding: 0px 20px;
@@ -199,7 +199,7 @@ $yellow: #f3c300;
 }
 
 .book_now_btn{
-    width: 100%;
+    min-width: 12.5rem;
     display: block;
     background: #f3c300;
     color: $dark;
@@ -208,6 +208,8 @@ $yellow: #f3c300;
     line-height: 30px;
     font-weight: 500;
     padding: 5px 20px;
+    text-decoration: none;
+    border-radius: none !important;
 }
 
 
@@ -251,12 +253,12 @@ $yellow: #f3c300;
     font-size: 14px;
     line-height: 30px;
     font-weight: 500;
-    padding: 5px 20px;
-    width: 10rem;
+    padding: 5px 10px;
+    width: 9.5rem;
 }
 
 .button_hover{
-    border-radius: 10px;
+    // border-radius: 10px;
     position: relative;
     z-index: 1;
     transition: all 0.3s linear;

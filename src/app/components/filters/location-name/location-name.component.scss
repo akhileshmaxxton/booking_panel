@@ -1,14 +1,14 @@
 
 .nice-select{
-    background: transparent;
-    border-radius: 10px;
+    background: white;
+    // border-radius: 10px;
     border: 1px solid #2b3146;
     padding: 0px 20px;
     font-size: 13px;
     line-height: 40px;
     height: 40px;
     color: #777;
-    width: 10rem;
+    width: 13rem;
     &:after{
         content: "\e874";
         font-family: 'Linearicons-Free';
@@ -24,6 +24,6 @@
 }
 
 .nice-select:hover {
-    border-color: #1a73e8; /* Optional: Change border color on hover */
+    border-color: #ebedf0; /* Optional: Change border color on hover */
     color: #1a73e8; /* Optional: Change text color on hover */
 }

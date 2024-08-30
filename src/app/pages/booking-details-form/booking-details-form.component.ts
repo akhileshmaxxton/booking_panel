@@ -14,10 +14,13 @@ import { RoomDetailsApiService } from '../../service/apiService/room-details-api
   styleUrls: ['./booking-details-form.component.scss'],
 })
 export class BookingDetailsFormComponent {
+  minDate = new Date().toISOString().split('T')[0];
   public bookingDetails!: FormGroup;
   @Input() roomToBeBooked?: RoomAndRoomStayDetails[];
   @Output() reservationConfirmed = new EventEmitter<ReservationDetails>();
   @Input() reservationDetailsFromParent?: ReservationDetails;
+   checkInDateFromOwner?: Date;
+   checkOutDateFromOwner? : Date;
   reservationDetails: ReservationDetails = {
     reservationId: '',
     locationId: 0,
@@ -36,77 +39,52 @@ export class BookingDetailsFormComponent {
     paymentIds: [],
   };
 
-  startDate: string | null = null;
-  endDate: string | null = null;
-  roomId: number | null = null;
+
 
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private localStorageService: LocalStorageService, private filterService: FilterService, private roomDetailsApiService: RoomDetailsApiService) {
+    console.log("service details", this.filterService.filters.checkInDate)
     this.bookingDetails = this.fb.group({
       locationName: [''],
       roomName: [''],
-      pricePerDayPerPerson: [''],
-      checkIn: ['', [Validators.required, this.checkInDateValidator.bind(this)]],
-      checkOut: ['', [Validators.required, this.checkOutDateValidator.bind(this)]],
+      checkIn: [ this.filterService.filters.checkInDate, [Validators.required, this.checkInDateValidator.bind(this)]],
+      checkOut: [ this.filterService.filters.checkInDate, [Validators.required, this.checkOutDateValidator.bind(this)]],
       numberOfGuests: ['', [Validators.required, Validators.min(1), this.guestValidator.bind(this)]],
       totalAmount: [''],
     });
 
-    if(this.reservationDetailsFromParent?.checkIn && this.reservationDetailsFromParent?.checkOut && this.reservationDetailsFromParent?.numberOfGuests && this.reservationDetailsFromParent?.totalAmount) {
+    if(this.reservationDetailsFromParent?.numberOfGuests && this.reservationDetailsFromParent?.totalAmount) {
       this.bookingDetails.patchValue({
-        checkIn: new Date(this.reservationDetailsFromParent?.checkIn),
-        checkOut: new Date(this.reservationDetailsFromParent?.checkOut),
-        numberOfGuests: this.reservationDetailsFromParent?.numberOfGuests,
-        totalAmount: this.reservationDetailsFromParent?.totalAmount
+        numberOfGuests: this.reservationDetailsFromParent?.numberOfGuests? this.reservationDetailsFromParent?.numberOfGuests : '',
+        totalAmount: this.reservationDetailsFromParent?.totalAmount? this.reservationDetailsFromParent?.totalAmount : '',
       })
     }
 
-
-    console.log('Initial reservationDetails: constructor  ', this.reservationDetails);
-
-    if(!this.filterService.getIsCustomer()){
-      this.route.queryParams.subscribe(params => {
-        if(params['startDate'] && params['endDate'] && params['roomId']) {
-          this.startDate = params['startDate'] || null;
-          this.endDate = params['endDate'] || null;
-          this.roomId = params['roomId'] || null;
-
-          this.roomDetailsApiService.findRoomByRoomId(parseInt(params['roomId'])).subscribe(data => {
-            this.roomToBeBooked = data;
-            console.log("roomData", this.roomToBeBooked);
-          })
-  
-          this.bookingDetails.patchValue({
-            checkIn: this.startDate ? new Date(this.startDate).toISOString().split('T')[0] : '',
-            checkOut: this.endDate ? new Date(this.endDate).toISOString().split('T')[0] : '',
-          })
-        }
-        
-        console.log('Start Date:', this.startDate);
-        console.log('End Date:', this.endDate);
-        console.log('Room ID:', this.roomId);
-      });
+    if(this.filterService.filters.checkInDate || this.filterService.filters.checkOutDate || this.filterService.filters.guests) {
+      console.log("checkInDate to booking", this.filterService.filters.checkInDate)
+      this.bookingDetails.patchValue({
+        checkIn: this.filterService.filters?.checkInDate ? moment(this.filterService.filters?.checkInDate).format('YYYY-MM-DD'): '',
+        checkOut: this.filterService.filters?.checkOutDate ? moment(this.filterService.filters?.checkOutDate).format('YYYY-MM-DD'): '',
+        numberOfGuests: this.filterService.filters?.guests ? this.filterService.filters?.guests : '',
+      })
     }
+    
+    
   }
 
   ngOnInit() {
-    console.log('Initial reservationDetails:', this.reservationDetails);
-    if(this.filterService.getIsCustomer()) {
-      if (this.roomToBeBooked) {
-        console.log("Room to be booked:", this.roomToBeBooked);
-        this.bookingDetails.patchValue({
-          locationName: this.roomToBeBooked[0]?.locationName,
-          roomName: this.roomToBeBooked[0]?.roomName,
-          pricePerDayPerPerson: this.roomToBeBooked[0]?.pricePerDayPerPerson,
-        });
-  
-        this.bookingDetails.get('checkIn')?.updateValueAndValidity();
-        this.bookingDetails.get('checkOut')?.updateValueAndValidity();
-        this.bookingDetails.get('numberOfGuests')?.updateValueAndValidity();
-      }
-    }
-
     
+     
+    
+  }
 
+  get getCheckInDate() {
+    return this.filterService.filters?.checkInDate ? this.filterService.filters?.checkInDate : new Date();
+  }
+
+
+  get getCheckOutDate() {
+    console.log("checkOutDatefgggggggg", this.filterService.filters.checkOutDate)
+    return this.filterService.filters?.checkOutDate ? this.filterService.filters?.checkOutDate : new Date();
   }
 
   calculateTotalPrice() {
@@ -114,7 +92,6 @@ export class BookingDetailsFormComponent {
     const checkOutDate = new Date(this.bookingDetails?.get('checkOut')?.value ?? new Date());
     const numberOfGuests = this.bookingDetails?.get('numberOfGuests')?.value ?? 0;
   
-    // Find the matching room based on the check-in and check-out dates
     const matchingRoom = this.roomToBeBooked?.find(room => {
       const stayFromDate = new Date(room.stayDateFrom);
       const stayToDate = new Date(room.stayDateTo);
@@ -149,7 +126,7 @@ export class BookingDetailsFormComponent {
     const matchingRoom = this.roomToBeBooked?.find(room => {
       const stayFromDate = moment(room.stayDateFrom);
       const stayToDate = moment(room.stayDateTo);
-      return dateValue.isBetween(stayFromDate, stayToDate, null, '[]'); // inclusive of boundaries
+      return dateValue.isBetween(stayFromDate, stayToDate, null, '[]');
     });
   
     if (!matchingRoom) {
@@ -227,7 +204,6 @@ export class BookingDetailsFormComponent {
     const checkInDate = new Date(this.bookingDetails?.get('checkIn')?.value);
     const checkOutDate = new Date(this.bookingDetails?.get('checkOut')?.value);
   
-    // Find the matching room based on the check-in and check-out dates
     const matchingRoom = this.roomToBeBooked?.find(room => {
       const stayFromDate = new Date(room.stayDateFrom);
       const stayToDate = new Date(room.stayDateTo);
@@ -252,8 +228,8 @@ export class BookingDetailsFormComponent {
   }
   
 
-  goBack() {
-    
+  goBack(): void {
+    window.history.back();
   }
 
   

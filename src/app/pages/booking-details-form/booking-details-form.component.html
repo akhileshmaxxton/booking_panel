@@ -1,40 +1,50 @@
-<div class="container py-5">
-  <div class="card shadow-lg">
-    <div class="card-body">
-      <div class="row">
-
-        <!-- Left Column: Image and Description -->
-        <div class="col-md-8 d-flex flex-column ">
-          <div class ="container">
-          <img src="assets/images/banner.jpg" class="img-fluid mb-3" alt="Descriptive Image">
-          <p class="display-4 ">{{roomToBeBooked?.[0]?.roomName}}</p>
-          <p class="lead mb-2">lorem ipsum</p>
-          <p *ngFor="let room of roomToBeBooked">{{ room | json }}</p>
-          <p class="text-muted mb-4">A cozy room with a beautiful view, perfect for a relaxing stay.</p>
+<div class="full-screen-container d-flex align-items-center">
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Left Column: Room Details (8 columns) -->
+      <div class="col-md-8 d-flex align-items-center justify-content-center text-dark text-center">
+        <div class="room-details p-4 rounded shadow-lg ">
+          <p class="display-3">{{ roomToBeBooked?.[0]?.roomName }}</p>
+          <h4 class="mb-3">{{ roomToBeBooked?.[0]?.locationName }}</h4>
+          <p class="lead mb-4 styled-text" >{{ roomToBeBooked?.[0]?.guestCapacity }} Guests · ${{ roomToBeBooked?.[0]?.pricePerDayPerPerson }} per day per person</p>
+          
+          <div  class="additional-info row">
+            
+            <div *ngFor="let room of roomToBeBooked" class="room-option p-3 mb-2 rounded shadow-lg col mx-3 text-dark">
+              <p class="mb-0"><strong >Stay Duration:</strong> {{ room.minStay }} - {{ room.maxStay }} days</p>
+              <p class="mb-0"><strong>Available From:</strong> {{ room.stayDateFrom }} to {{ room.stayDateTo }}</p>
+              <p class="mb-0"><strong>Arrival Days:</strong> {{ room.arrivalDays.join(', ') }}</p>
+              <p class="mb-0"><strong>Departure Days:</strong> {{ room.departureDays.join(', ') }}</p>
+            </div>
+          </div>
+          
+          <p *ngIf="roomToBeBooked?.length === 1" class="mt-4 dancing-script lead">A cozy room with a beautiful view, perfect for a relaxing stay.</p>
         </div>
       </div>
+      
 
-        <!-- Right Column: Booking Form -->
-        <div class="col-md-4">
-          <p class="display-4 mb-4 text-start">Booking Form</p>
+      <!-- Right Column: Booking Form (4 columns) -->
+      <div class="col-md-3 d-flex justify-content-center align-items-center">
+        <div class="glass-card p-4 w-100">
+          <p class="display-5 mb-4 text-center">Booking</p>
           <form [formGroup]="bookingDetails" (ngSubmit)="onSubmit()">
             <div class="row mb-4">
-              <div class="col-md-6">
-                <label for="checkIn" class="form-label">Check In</label>
-                <input type="date" id="checkIn" class="form-control form-control-lg" formControlName="checkIn" (change)="calculateTotalPrice()">
+              <div class="col-6">
+                <label for="checkIn" class="form-label">Check In<span class="text-danger">*</span></label>
+                <input type="date" id="checkIn" [min]="minDate" class="form-control form-control-lg" formControlName="checkIn" (change)="calculateTotalPrice()" >
                 <div *ngIf="bookingDetails.get('checkIn')?.invalid && bookingDetails.get('checkIn')?.touched" class="text-danger">
                   <div *ngIf="bookingDetails.get('checkIn')?.errors?.['required']">Check-in date is required</div>
                   <div *ngIf="bookingDetails.get('checkIn')?.errors?.['checkInDateValidation']">{{bookingDetails.get('checkIn')?.errors?.['checkInDateValidation']}}</div>
-                  <div *ngIf="bookingDetails.get('checkIn')?.errors?.['invalidDate']">Invalid date</div>
+                  <div *ngIf="bookingDetails.get('checkIn')?.errors?.['invalidDate']">{{bookingDetails.get('checkIn')?.errors?.['invalidDate']}}</div>
                 </div>
               </div>
-              <div class="col-md-6">
-                <label for="checkOut" class="form-label">Check Out</label>
-                <input type="date" id="checkOut" class="form-control form-control-lg" formControlName="checkOut" (change)="calculateTotalPrice()">
+              <div class="col-6">
+                <label for="checkOut" class="form-label">Check Out<span class="text-danger">*</span></label>
+                <input type="date" id="checkOut" [min]="minDate" class="form-control form-control-lg" formControlName="checkOut" (change)="calculateTotalPrice()" >
                 <div *ngIf="bookingDetails.get('checkOut')?.invalid && bookingDetails.get('checkOut')?.touched" class="text-danger">
                   <div *ngIf="bookingDetails.get('checkOut')?.errors?.['required']">Check-out date is required</div>
                   <div *ngIf="bookingDetails.get('checkOut')?.errors?.['checkOutDateValidation']">{{bookingDetails.get('checkOut')?.errors?.['checkOutDateValidation']}}</div>
-                  <div *ngIf="bookingDetails.get('checkOut')?.errors?.['invalidDate']">Invalid date</div>
+                  <div *ngIf="bookingDetails.get('checkOut')?.errors?.['invalidDate']">{{bookingDetails.get('checkOut')?.errors?.['invalidDate']}}</div>
                   <div *ngIf="bookingDetails.get('checkOut')?.errors?.['minStay']">{{bookingDetails.get('checkOut')?.errors?.['minStay']}}</div>
                   <div *ngIf="bookingDetails.get('checkOut')?.errors?.['maxStay']">{{bookingDetails.get('checkOut')?.errors?.['maxStay']}}</div>
                 </div>
@@ -42,7 +52,7 @@
             </div>
 
             <div class="mb-4">
-              <label for="numberOfGuests" class="form-label">Number of Guests</label>
+              <label for="numberOfGuests" class="form-label">Number of Guests<span class="text-danger">*</span></label>
               <input type="number" id="numberOfGuests" class="form-control form-control-lg" formControlName="numberOfGuests" (change)="calculateTotalPrice()">
               <div *ngIf="bookingDetails.get('numberOfGuests')?.invalid && bookingDetails.get('numberOfGuests')?.touched" class="text-danger">
                 <div *ngIf="bookingDetails.get('numberOfGuests')?.errors?.['required']">Number of guests is required</div>
@@ -55,9 +65,9 @@
               <input type="text" id="totalAmount" class="form-control form-control-lg" formControlName="totalAmount" readonly>
             </div>
 
-            <div class="d-flex justify-content-end">
-              <button type="submit" class="btn btn-primary me-2" [disabled]="bookingDetails.invalid">Submit</button>
-              <button type="button" class="btn btn-secondary" (click)="goBack()">Back</button>
+            <div class="d-flex justify-content-between">
+              <button class="btn btn-secondary" (click)="goBack()">Back</button>
+              <button type="submit" class="btn btn-primary me-2" [disabled]="bookingDetails.invalid">Next</button>
             </div>
           </form>
         </div>

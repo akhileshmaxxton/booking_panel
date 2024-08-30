@@ -1,22 +1,22 @@
-<div class="container mt-5">
+<div class="container-fluid mt-5">
   <div class="row justify-content-center">
     <div class="col-md-6">
-      <div class="card">
-        <div class="card-header text-center">
+      <div class="card shadow-sm">
+        <div class="card-header text-center bg-primary text-white">
           <h4>Payment Details</h4>
         </div>
-        <div class="card-body">
+        <div class="card-body p-4">
           <form [formGroup]="paymentFormData" (ngSubmit)="onSubmit()">
-            <div class="form-group">
-              <label for="paymentAmount">Payment Amount</label>
+            <div class="form-group inputbox">
+              <label for="paymentAmount">Payment Amount<span class="text-danger">*</span></label>
               <input type="number" class="form-control" id="paymentAmount" formControlName="paymentAmount" placeholder="Enter amount">
-              <div *ngIf="paymentFormData.get('paymentAmount')?.invalid && paymentFormData.get('paymentAmount')?.touched" class="text-danger">
-                Payment amount is required and must be a positive number.
+              <div *ngIf="paymentFormData.get('paymentAmount')?.invalid && paymentFormData.get('paymentAmount')?.touched" class="text-danger mt-2">
+                Payment amount is required and must be at least 10% of the total amount.
               </div>
             </div>
 
-            <div class="form-group">
-              <label for="paymentMode">Payment Mode</label>
+            <div class="form-group inputbox">
+              <label for="paymentMode">Payment Mode<span class="text-danger">*</span></label>
               <select class="form-control" id="paymentMode" formControlName="paymentMode">
                 <option value="">Select Payment Mode</option>
                 <option value="credit-card">Credit Card</option>
@@ -25,17 +25,19 @@
                 <option value="upi">UPI</option>
                 <option value="cash">Cash</option>
               </select>
-              <div *ngIf="paymentFormData.get('paymentMode')?.invalid && paymentFormData.get('paymentMode')?.touched" class="text-danger">
+              <div *ngIf="paymentFormData.get('paymentMode')?.invalid && paymentFormData.get('paymentMode')?.touched" class="text-danger mt-2">
                 Payment mode is required.
               </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group inputbox">
               <label for="paymentDate">Payment Date</label>
               <input type="date" class="form-control" id="paymentDate" formControlName="paymentDate" [value]="paymentFormData.get('paymentDate')?.value" readonly>
             </div>
-            <button class="btn btn-primary btn-block" (click)="goBack()">Back</button>
-            <button type="submit" class="btn btn-primary btn-block">Submit Payment</button>
+            <div class="d-flex justify-content-between mt-4">
+              <button type="button" class="btn btn-secondary" (click)="goBack()">Back</button>
+              <button type="submit" class="btn btn-primary">Submit Payment</button>
+            </div>
           </form>
         </div>
       </div>
