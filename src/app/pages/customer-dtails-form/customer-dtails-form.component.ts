@@ -12,6 +12,8 @@ import { FilterService } from '../../service/filterService/filter.service';
 })
 export class CustomerDtailsFormComponent {
 
+  maxDate = new Date().toISOString().split('T')[0];
+
   public customerFormData!: FormGroup;
   public customerDetails: CustomerDetails = {
     customerId: '',
@@ -30,7 +32,7 @@ export class CustomerDtailsFormComponent {
   @Output() customerDetailsSubmitted = new EventEmitter<CustomerDetails>();
   @Output() backToBookingForm = new EventEmitter<void>();
 
-  customers?: CustomerDetails[] = [];
+  customersForDropDown?: CustomerDetails[] = [];
 
   constructor(private fb: FormBuilder, private localStorageService: LocalStorageService, private filterService: FilterService) {  
     this.initializeForm();
@@ -51,18 +53,33 @@ export class CustomerDtailsFormComponent {
       });
     }
 
-    
+    if(!this.getIsCustomerFromService()){
+      this.customersForDropDown = this.localStorageService.getAllCustomersFromLocalStorage() ?? [];
+    }
   }
 
-  loadCustomerDetails(customerId: number) {
-    // Load customer details here
-    console.log(`Loading customer details for customer ID ${customerId}`);
-  }
-
-
+  
   getIsCustomerFromService() {
     return this.filterService.getIsCustomer();
   }
+
+  onCustomerSelect(customerId: string) {
+    const customer = this.customersForDropDown?.find(customer => customer.customerId === customerId);
+    if(customer) {
+      this.customerFormData.patchValue({
+        firstName: customer.firstName,
+        middleName: customer.middleName,
+        lastName: customer.lastName,
+        birthDate: customer.birthData,
+        country: customer.country,
+        state: customer.state,
+        city: customer.city,
+        pincode: customer.pincode,
+        phoneNumber: customer.phoneNumber,
+      });
+    }
+  }
+
   private initializeForm() {
     this.customerFormData = this.fb.group({
       firstName: ['', [Validators.required, this.nameValidator]],

@@ -1,60 +1,124 @@
-<button (click)="navigateWithSelectedData()">Book</button>
 
-<div class="container">
-  <h1>Planning Chart</h1>
+  <!-- <div class="container-fluid">
+    <div class="container justify-content-center align-items-center">
+      <section class="row no-gutters justify-content-center align-items-center d-flex">
+        <div class="col-md-3 section-title">
+          <h2>
+            Book<br />
+            Your Room
+          </h2>
+        </div>
+        <div class="col-md-9">
+          <div class="row app-row">
+            <div class="col-md-3 app-col">
+              <app-location-name [roomDetailsForFilter]="roomDetailsForFilter"></app-location-name>
+            </div>
+            <div class="col-md-3 app-col">
+              <app-price></app-price>
+            </div>
+            <div class="col-md-3 app-col">
+              <app-date-range></app-date-range>
+            </div>
+          </div>
+          <div class="row app-row">
+            <div class="col-md-3 app-col">
+              <app-number-of-days></app-number-of-days>
+            </div>
+            <div class="col-md-3 app-col">
+              <app-number-of-guests></app-number-of-guests>
+            </div>
+            <div class="col-md-3 app-col">
+              <a class="book_now_btn button_hover" (click)="clearFilter()">Clear Filter</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  
 
-  <div class="booking-chart-container">
+  <div class="container-fluid mx-5 px-5 bordered">
     
-
-    <table class="table table-bordered">
-      <!-- Scroll Sentinel for Loading Previous Month -->
-    <div #scrollSentinelPrev observeVisibility (visible)="loadPreviousMonth()"></div>
-      <thead>
-        <tr class="month-header-wrapper">
-          <th class="room-names" rowspan="2">Room ID</th>
-          <ng-container *ngFor="let month of months">
-            <th [attr.colspan]="month.days.length" class="month-header">
-              {{ month.month | date : "MMMM yyyy" }}
-            </th>
-          </ng-container>
-        </tr>
-        <tr>
-          <ng-container *ngFor="let month of months">
-            <ng-container *ngFor="let day of month.days; let last = last">
-              <th *ngIf="!last" class="date-cell">{{ day | date : "dd" }}</th>
-              <th *ngIf="last" class="date-cell">{{ day | date : "dd" }}</th>
-            </ng-container>
-          </ng-container>
-          <!-- Scroll Sentinel for Loading Next Month -->
-    <div #scrollSentinelNext observeVisibility (visible)="loadNextMonth()"></div>
-        </tr>
-      </thead>
-       
-      <tbody>
-        <tr *ngFor="let room of rooms">
-          <td class="room-name">{{ room.roomId }}</td>
-          <ng-container *ngFor="let month of months">
-            <ng-container *ngFor="let day of month.days">
-              <td
-                class="booking-cell"
-                [ngClass]="{
-                  'selected': isSelected(room.roomId, day),
-                  'middle-of-reservation': isMiddleOfReservation(room.roomId, day),
-                  'start-of-reservation': isStartOfReservation(room.roomId, day),
-                  'end-start-of-reservation': isEndOfReservation(room.roomId, day),
-                  
-                }"
-                (mousedown)="onMouseDown(room.roomId, day, $event)"
-                (mouseover)="onMouseOver(room.roomId, day, $event)"
-                (mouseout)="onMouseOut()"
-                (mouseup)="onMouseUp($event)"
-              ></td>
-            </ng-container>
-          </ng-container>
-        </tr>
-      </tbody>
-    </table>
-
-   
   </div>
+</div> -->
+
+
+<div class="container-fluid justify-content-center align-items-center">
+  
+<h1 class="text-center">Planning Chart</h1>
+
+<!-- <div class="container">
+  <div class="row">
+    <div class="col-4 filter-container">
+      <app-location-name [roomDetailsForFilter]="roomDetailsForFilter"></app-location-name>
+    </div>
+    <div class="col-4">
+      <app-price></app-price>
+    </div>
+    <div class="col-4">
+      <app-date-range></app-date-range>
+    </div>
+  </div>
+</div> -->
+
+<div class="booking-chart-container">
+  <table class="table table-bordered">
+    <!-- <div #scrollSentinelPrev observeVisibility (visible)="loadPreviousMonth()"></div> -->
+    <thead class="sticky-top">
+      <tr class="month-header-wrapper">
+        <th class="room-names" rowspan="3">Room ID</th>
+        <ng-container *ngFor="let month of months">
+          <th [attr.colspan]="month.days.length" class="month-header">
+            {{ month.month | date : "MMMM yyyy" }}
+          </th>
+        </ng-container>
+      </tr>
+      <tr>
+        <ng-container *ngFor="let month of months">
+          <ng-container *ngFor="let day of month.days; let last = last">
+            <th *ngIf="!last" class="date-cell text-dark">{{ day | date : "dd" }}</th>
+            <th *ngIf="last" class="date-cell text-dark">{{ day | date : "dd" }}</th>
+          </ng-container>
+        </ng-container>
+      </tr>
+      <tr>
+        <ng-container *ngFor="let month of months">
+          <ng-container *ngFor="let day of month.days; let last = last">
+            <th *ngIf="!last" class="date-cell text-dark">{{ day | date : "EEE" }}</th>
+            <th *ngIf="last" class="date-cell text-dark">{{ day | date : "EEE" }}</th>
+          </ng-container>
+        </ng-container>
+        <div #scrollSentinelNext observeVisibility (visible)="loadNextMonth()"></div>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let room of rooms">
+        <td class="room-name"
+        >{{ room.roomId }}.{{room.roomName}}</td>
+        <ng-container *ngFor="let month of months">
+          <ng-container *ngFor="let day of month.days">
+            <td
+              class="booking-cell"
+              [ngClass]="{
+                'selected': isSelected(room.roomId, day),
+                'start-of-reservation': isStartOfReservation(room.roomId, day),
+                'middle-of-reservation': isMiddleOfReservation(room.roomId, day),
+                'end-of-reservation': isEndOfReservation(room.roomId, day),
+                'cursor-disabled': isNotAvailable(room.roomId, day),
+                'arrival-cell': isArrivalCell(room.roomId, day),
+                'departure-cell': isDepartureCell(room.roomId, day)
+              }"
+              [attr.title]="isStartOfReservation(room.roomId, day) || isMiddleOfReservation(room.roomId, day) || isEndOfReservation(room.roomId, day) ? getTooltipText(room.roomId, day) : null"
+              (mousedown)="onMouseDown(room.roomId, day, $event)"
+              (mouseover)="onMouseOver(room.roomId, day, $event)"
+              (mouseup)="onMouseUp($event)"
+              (mouseout)="onMouseOut()"
+            ></td>
+          </ng-container>
+        </ng-container>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 </div>

@@ -38,8 +38,8 @@
                 
                 <div class="mb-3">
                   <h6>Customer Details:</h6>
-                  <p><strong>Name:</strong> {{ customerDetails?.firstName }}</p>
-                  <p><strong>Phone:</strong> {{ customerDetails?.phoneNumber }}</p>
+                  <p><strong>Name:</strong> {{ customerDetails.firstName }}</p>
+                  <p><strong>Phone:</strong> {{ customerDetails.phoneNumber }}</p>
                   
                 </div>
       
@@ -48,7 +48,8 @@
                   <p><strong>Check-In:</strong> {{ reservationDetails.checkIn | date }}</p>
                   <p><strong>Check-Out:</strong> {{ reservationDetails.checkOut | date }}</p>
                   <p><strong>Number of Nights:</strong> {{ reservationDetails.numberOfDays }}</p>
-                  <p><strong>Total Amount:</strong> {{ paymentDetails.paymentAmount | currency }}</p>
+                  <p><strong>Total Amount Paid:</strong> {{ paymentDetails.paymentAmount | currency }}</p>
+                  <p><strong>Total Amount Duw:</strong> {{ paymentDetails.paymentDue | currency }}</p>
                 </div>
       
                 <div class="mb-3">
@@ -59,7 +60,7 @@
                 </div>
       
                 <div class="text-center">
-                  <button class="btn btn-primary" (click)="printInvoice()">Print Invoice</button>
+                  <button class="btn btn-primary" (click)="goToHome()">Home</button>
                 </div>
               </div>
             </div>

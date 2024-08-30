@@ -1,79 +1,103 @@
-<div class="container py-3 d-flex justify-content-center">
-  <div class="shadow p-4 bg-white rounded" style="max-width: 800px; width: 100%;">
-    <ng-container *ngIf="!getIsCustomerFromService()">
+<div class="form-page-cover-image-wrapper">
+  <div class="form-all glass-card">
+    <div class="form-header-group header-large">
+      <div class="header-text">
+        <h2 class="form-header text-dark">Customer Registration Form</h2>
+        <div class="form-subHeader text-dark my-2">
+          Please fill out the form below to register as a customer.
+        </div>
+        <ng-container class="row" *ngIf="!getIsCustomerFromService()">
+          <label class="form-label">Select Customer</label>
+          <select
+            name="customer"
+            id="customer"
+            #customer
+            class="form-control"
+            (change)="onCustomerSelect(customer.value)"
+          >
+      <option value="null">New Customer</option>
+      <option
+        *ngFor="let customer of customersForDropDown "
+        [value]="customer.customerId"
+      >
+        {{ customer.firstName + customer.middleName + customer.lastName }}
+      </option>
       
-    </ng-container>
-    
+          </select>
+        </ng-container>
+      </div>
+    </div>
+
     <form [formGroup]="customerFormData" (ngSubmit)="onSubmit()">
-      <div class="row mb-3">
+      <div class="row mb-4">
         <div class="col-md-4">
-          <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" formControlName="firstName">
+          <label for="firstName" class="form-label ">First Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" formControlName="firstName" />
           <div *ngIf="customerFormData.get('firstName')?.touched && customerFormData.get('firstName')?.invalid">
             <small class="text-danger">{{ customerFormData.get('firstName')?.errors?.['invalidName'] }}</small>
           </div>
         </div>
         <div class="col-md-4">
           <label for="middleName" class="form-label">Middle Name</label>
-          <input type="text" class="form-control" formControlName="middleName">
+          <input type="text" class="form-control" formControlName="middleName" />
           <div *ngIf="customerFormData.get('middleName')?.touched && customerFormData.get('middleName')?.invalid">
             <small class="text-danger">{{ customerFormData.get('middleName')?.errors?.['invalidName'] }}</small>
           </div>
         </div>
         <div class="col-md-4">
           <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" formControlName="lastName">
+          <input type="text" class="form-control" formControlName="lastName" />
           <div *ngIf="customerFormData.get('lastName')?.touched && customerFormData.get('lastName')?.invalid">
             <small class="text-danger">{{ customerFormData.get('lastName')?.errors?.['invalidName'] }}</small>
           </div>
         </div>
       </div>
 
-      <div class="row mb-3">
+      <div class="row mb-4">
         <div class="col-md-6">
           <label for="birthDate" class="form-label">Birth Date <span class="text-danger">*</span></label>
-          <input type="date" class="form-control" formControlName="birthDate">
+          <input type="date" [max]="maxDate" class="form-control" formControlName="birthDate" />
           <div *ngIf="customerFormData.get('birthDate')?.touched && customerFormData.get('birthDate')?.invalid">
             <small class="text-danger">{{ customerFormData.get('birthDate')?.errors?.['invalidBirthDate'] }}</small>
           </div>
         </div>
         <div class="col-md-6">
           <label for="country" class="form-label">Country <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" formControlName="country">
+          <input type="text" class="form-control" formControlName="country" />
           <div *ngIf="customerFormData.get('country')?.touched && customerFormData.get('country')?.invalid">
             <small class="text-danger">{{ customerFormData.get('country')?.errors?.['invalidCountry'] }}</small>
           </div>
         </div>
       </div>
 
-      <div class="row mb-3">
+      <div class="row mb-4">
         <div class="col-md-6">
           <label for="state" class="form-label">State <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" formControlName="state">
+          <input type="text" class="form-control" formControlName="state" />
           <div *ngIf="customerFormData.get('state')?.touched && customerFormData.get('state')?.invalid">
             <small class="text-danger">{{ customerFormData.get('state')?.errors?.['invalidState'] }}</small>
           </div>
         </div>
         <div class="col-md-6">
           <label for="city" class="form-label">City <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" formControlName="city">
+          <input type="text" class="form-control" formControlName="city" />
           <div *ngIf="customerFormData.get('city')?.touched && customerFormData.get('city')?.invalid">
             <small class="text-danger">{{ customerFormData.get('city')?.errors?.['invalidCity'] }}</small>
           </div>
         </div>
       </div>
 
-      <div class="row mb-3">
+      <div class="row mb-4">
         <div class="col-md-6">
           <label for="pincode" class="form-label">Pincode <span class="text-danger">*</span></label>
-          <input type="number" class="form-control" formControlName="pincode">
+          <input type="number" class="form-control" formControlName="pincode" />
           <div *ngIf="customerFormData.get('pincode')?.touched && customerFormData.get('pincode')?.errors?.['invalidPincode']">
             <small class="text-danger">{{ customerFormData.get('pincode')?.errors?.['invalidPincode'] }}</small>
           </div>
         </div>
         <div class="col-md-6">
           <label for="phoneNumber" class="form-label">Phone Number <span class="text-danger">*</span></label>
-          <input type="number" class="form-control" formControlName="phoneNumber">
+          <input type="number" class="form-control" formControlName="phoneNumber" />
           <div *ngIf="customerFormData.get('phoneNumber')?.touched && customerFormData.get('phoneNumber')?.errors?.['invalidPhoneNumber']">
             <small class="text-danger">{{ customerFormData.get('phoneNumber')?.errors?.['invalidPhoneNumber'] }}</small>
           </div>

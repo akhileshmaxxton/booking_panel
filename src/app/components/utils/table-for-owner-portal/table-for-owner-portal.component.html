@@ -1,28 +1,29 @@
-<div class="container mt-4">
-    <h3>Customer, Reservation, and Payment Details</h3>
+<div class="container">
+    <h1 class="text-center">Booking Details</h1>
     <table class="table table-bordered">
       <thead>
         <tr>
-          <th>Customer ID</th>
-          <th>First Name</th>
+          <th>Name</th>
           <th>Birth Date</th>
-          <th>Reservation ID</th>
-          <th>Location ID</th>
-          <th>Room ID</th>
-          <th>Payment ID</th>
-          <th>Amount</th>
+          <th>Check In</th>
+          <th>Check Out</th>
+          <th>Location</th>
+          <th>Room</th>
+          
+          <th>Dew Amount</th>
+          <th>Total Amount</th>
           <th>Status</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let detail of combinedDetails">
-          <td>{{ detail.customerId }}</td>
-          <td>{{ detail.firstName }}</td>
+          <td>{{ detail.name }}</td>
           <td>{{ detail.birthData | date: 'yyyy-MM-dd' }}</td>
-          <td>{{ detail.reservationId }}</td>
+          <td>{{ detail.checkIn | date: 'yyyy-MM-dd' }}</td>
+          <td>{{ detail.checkOut | date: 'yyyy-MM-dd'}}</td>
           <td>{{ detail.locationId }}</td>
           <td>{{ detail.roomId }}</td>
-          <td>{{ detail.paymentId }}</td>
+          <td>{{ detail.dueAmount }}</td>
           <td>{{ detail.amount }}</td>
           <td>
             <select [(ngModel)]="detail.status" class="form-select" (change)="updateStatus(detail)">

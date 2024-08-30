@@ -1,24 +1,24 @@
-<div class="dropdown">
-    <input
-      type="text"
-      placeholder="Select dates"
-      class="form-control dropdown-toggle"
-      id="dateRangePicker"
-      data-bs-toggle="dropdown"
-      aria-expanded="false"
-      readonly
-    />
-    <div class="dropdown-menu p-3" aria-labelledby="dateRangePicker">
-      <div class="row">
-        <div class="col-6 ">
-          <label for="checkInDate">Check-in</label>
-          <input type="date" id="checkInDate"  data-provide=datepicker class="form-control" (change)="onDateChange()" />
-        </div>
-        <div class="col-6">
-          <label for="checkOutDate">Check-out</label>
-          <input type="date" id="checkOutDate" class="form-control" (change)="onDateChange()" />
-        </div>
+<div class="dropdown border-r">
+  <input
+    type="text"
+    placeholder="Select dates"
+    class="form-control my-form-control dropdown-toggle"
+    id="dateRangePicker"
+    data-bs-toggle="dropdown"
+    aria-expanded="false"
+    [value]="selectedDateRange" 
+    readonly
+  />
+  <div class="dropdown-menu p-3" aria-labelledby="dateRangePicker">
+    <div class="row">
+      <div class="col-6">
+        <label for="checkInDate">Check-in</label>
+        <input type="date" [min]="minDate" id="checkInDate" data-provide="datepicker" class="form-control" (change)="onDateChange()" [(ngModel)]="checkInDate" />
+      </div>
+      <div class="col-6">
+        <label for="checkOutDate">Check-out</label>
+        <input type="date" [min]="minDate" id="checkOutDate" class="form-control" (change)="onDateChange()" [(ngModel)]="checkOutDate" />
       </div>
     </div>
   </div>
-  
+</div>

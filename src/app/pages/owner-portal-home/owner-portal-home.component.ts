@@ -7,10 +7,14 @@ import { FilterService } from '../../service/filterService/filter.service';
   styleUrl: './owner-portal-home.component.scss'
 })
 export class OwnerPortalHomeComponent {
+  currentStep: number = 1;
 
   constructor(private filterService: FilterService) {
     this.filterService.setIsCustomer(false);
+  }
 
-   }
+  setStep(step: number) {
+    this.currentStep = step;
+  }
 
 }

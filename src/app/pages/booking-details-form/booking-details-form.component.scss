@@ -1,28 +1,72 @@
-/* Adjust image styling */
-.img-fluid {
-    max-height: 500px; /* Adjust as needed */
-    object-fit: cover;
-    width: 80%;
-    border-radius: 8px;
-  }
+.full-screen-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-image: url("../../../../public/assets/images/sea.jpg");
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
   
-  /* Form fields to be taller and more prominent */
-  .form-control-lg {
-    height: 2rem; /* Adjust height as needed */
-    font-size: .8rem; /* Adjust font size as needed */
-  }
+}
+
+.container-fluid {
+  padding: 0;
+}
+
+.room-details {
+  max-width: 600px;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.form-control-lg {
+  height: 2rem; /* Adjust height as needed */
+  font-size: .8rem; /* Adjust font size as needed */
+}
+
+.form-label {
+  font-weight: 500;
+}
+
+.mb-4 {
+  margin-bottom: 1.5rem;
+}
+
+.btn {
+  margin-right: 10px;
+}
+
+
+.additional-info {
+  padding-top: 15px;
   
-  /* Ensure form is neatly aligned and spaced */
-  .form-label {
-    font-weight: 500;
-  }
   
-  .btn {
-    margin-right: 10px;
-  }
-  
-  /* Add some spacing around form controls */
-  .mb-4 {
-    margin-bottom: 1.5rem;
-  }
-  
+}
+
+.room-option {
+  background-color: rgba(255, 255, 255, 0.3);
+  color: #ddd;
+  // -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  // background-color: black;
+  // opacity: 0.5;
+}
+
+
+.styled-text {
+  color: #333333; /* Darker font color for contrast */
+  font-weight: bold; /* Make the text bold */
+  font-size: 1.2rem; /* Slightly larger font size */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Subtle shadow for better readability */
+  letter-spacing: 0.5px; /* Slightly increase letter spacing for clarity */
+}
+

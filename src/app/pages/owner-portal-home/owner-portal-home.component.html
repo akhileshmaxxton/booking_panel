@@ -1,1 +1,20 @@
-<app-planning-chart></app-planning-chart>
+<div class="container mt-5">
+    <div class="stepper d-flex justify-content-between align-items-center">
+      <div class="step" [class.active]="currentStep === 1" (click)="setStep(1)">
+        <i class="fas fa-chart-bar"></i>
+        <span>Planning Chart</span>
+      </div>
+      <div class="step" [class.active]="currentStep === 2" (click)="setStep(2)">
+        <i class="fas fa-table"></i>
+        <span>Table View</span>
+      </div>
+    </div>
+  
+</div>
+<div class="step-content mt-4">
+ <div class="container-fluid">
+  <app-planning-chart *ngIf="currentStep === 1"></app-planning-chart>
+  <app-table-for-owner-portal *ngIf="currentStep === 2"></app-table-for-owner-portal>
+ </div>
+</div>
+  

@@ -5,6 +5,7 @@ import { RoomDetailsApiService } from '../apiService/room-details-api.service';
 import { MergeRoomAndRoomDetails } from '../../utils/merge-room-and-room-details.pipe';
 import { LocalStorageService } from '../localStorageApi/local-storage.service';
 import { UniquePipe } from '../../utils/unique.pipe';
+import moment from 'moment';
 
 @Injectable({
   providedIn: 'root'
@@ -24,8 +25,8 @@ export class FilterService {
     price: null as number | null,
     guests: null as number | null,
     days: null as number | null,
-    checkInDate: null as string | null,
-    checkOutDate: null as string | null,
+    checkInDate: null as Date | null,
+    checkOutDate: null as Date | null,
     isCustomer: true as boolean
   };
 
@@ -63,12 +64,12 @@ export class FilterService {
     this.applyFilters();
   }
 
-  setDateRange(checkIn: string, checkOut: string) {
+  setDateRange(checkIn: Date, checkOut: Date) {
     this.filters.checkInDate = checkIn;
     this.filters.checkInDate = checkIn;
     this.filters.checkOutDate = checkOut;
-    console.log(`Check-in: ${this.filters.checkInDate}, Check-out: ${this.filters.checkOutDate}`);
-    // Add your logic to handle the selected date range
+    console.log(`Check-in service: ${this.filters.checkInDate}, Check-out: ${this.filters.checkOutDate}`);
+    this.applyFilters();
   }
 
   private applyFilters() {
@@ -76,7 +77,6 @@ export class FilterService {
       let mergedData = data;
       mergedData = this.uniquePipe.transform(mergedData, 'roomId')
       
-      // Apply filters
       if (this.filters.location !== null) {
         mergedData = mergedData.filter(room => room.locationId === this.filters.location);
       }
@@ -89,23 +89,29 @@ export class FilterService {
       if(this.filters.days !== null) {
         mergedData = mergedData.filter(room => room.minStay! <= this.filters.days! && room.maxStay! >= this.filters.days!);
       }
-
-      // Retrieve reservations from local storage
+      if (this.filters.checkInDate !== null && this.filters.checkOutDate !== null) {
+        const checkInDate = moment(this.filters.checkInDate);
+        const checkOutDate = moment(this.filters.checkOutDate);
+  
+        mergedData = mergedData.filter(room => {
+          const stayDateFrom = moment(room.stayDateFrom);
+          const stayDateTo = moment(room.stayDateTo);
+  
+          return checkInDate.isBetween(stayDateFrom, stayDateTo, 'days', '[]') && checkOutDate.isBetween(stayDateFrom, stayDateTo, 'days', '[]');
+        });
+      }
     const reservations = this.localStorageService.getAllReservationsFromLocalStorage();
 
-    // Remove booked rooms from the list
     if(this.filters.isCustomer){
       mergedData = mergedData.filter(room => {
-        // Find all reservations for the current room
         const roomReservations = reservations.filter((reservation: { roomId: number; }) => reservation.roomId === room.roomId);
       
-        // Check if there is a continuous duration available between minStay and maxStay
         let isRoomAvailable = true;
         
-        roomReservations.forEach((reservation: { checkOut: { getTime: () => number; }; checkIn: { getTime: () => number; }; }) => {
-          const stayDuration = (reservation.checkOut.getTime() - reservation.checkIn.getTime()) / (1000 * 3600 * 24);
-      
-          // Check if the stay duration fits within the room's minStay and maxStay
+        roomReservations.forEach((reservation: { checkOut: string; checkIn: string }) => {
+          const checkInDate = moment(reservation.checkIn);
+          const checkOutDate = moment(reservation.checkOut);
+          const stayDuration = checkOutDate.diff(checkInDate, 'days');
           if (stayDuration < room.minStay || stayDuration > room.maxStay) {
             isRoomAvailable = false;
           }
@@ -114,7 +120,6 @@ export class FilterService {
         return isRoomAvailable;
       });
     }
-      // Emit the filtered data
       this.roomStayDetails$.next(mergedData);
       console.log("Filtered Data:", mergedData);
     });
@@ -136,4 +141,6 @@ export class FilterService {
     };
     this.applyFilters();
   }
+
+  
 }

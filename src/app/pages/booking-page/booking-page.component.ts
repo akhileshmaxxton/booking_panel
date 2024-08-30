@@ -4,6 +4,8 @@ import { ReservationDetails } from '../../interface/reservation-details';
 import { PaymentDetails } from '../../interface/payment-details';
 import { CustomerDetails } from '../../interface/customer-details';
 import { RoomDetailsApiService } from '../../service/apiService/room-details-api.service';
+import { FilterService } from '../../service/filterService/filter.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-booking-page',
@@ -18,29 +20,39 @@ export class BookingPageComponent {
 
   public currentFormIndex: number = 0;
 
-  constructor(private roomDetailsApiService: RoomDetailsApiService) {
-    const roomId = history.state.roomId;
-    if(roomId) {
+  constructor(private roomDetailsApiService: RoomDetailsApiService, private filterService: FilterService, private route: ActivatedRoute, private router: Router) {
+    if(this.filterService.getIsCustomer()) {
+      const roomId = history.state.roomId;
       this.roomDetailsApiService.findRoomByRoomId(roomId).subscribe(room => {
         this.roomToBeBooked = room;
       })
+    }
+
+    if(!this.filterService.getIsCustomer()){
+      this.route.queryParams.subscribe(params => {
+        if(params['roomId']) {
+          this.roomDetailsApiService.findRoomByRoomId(parseInt(params['roomId'])).subscribe(data => {
+            this.roomToBeBooked = data;
+          })        
+        }
+      });
     }
   }
 
   onReservationConfirmed(reservationDetails: ReservationDetails) {
     this.reservationDetails = reservationDetails;
-    this.currentFormIndex = 1; // Show the next form
+    this.currentFormIndex = 1;
   }
 
   onCustomerDetailsSubmitted(customerDetails: CustomerDetails) {
     this.customerDetails = customerDetails;
-    this.currentFormIndex = 2; // Show the payment form
+    this.currentFormIndex = 2;
   }
 
   onPaymentDetailsSubmitted(paymentDetails: PaymentDetails) {
     this.paymentDetails = paymentDetails;
-    this.currentFormIndex = 3; // Show the success message
-    // Handle payment submission and final steps
+    this.currentFormIndex = 3; 
+    
   }
 
   onBackToBookingForm() {
@@ -51,7 +63,7 @@ export class BookingPageComponent {
     this.currentFormIndex = 1;
   }
 
-  printInvoice() {
-    window.print();
+  goToHome() {
+    this.router.navigate(['/']);
   }
 }
