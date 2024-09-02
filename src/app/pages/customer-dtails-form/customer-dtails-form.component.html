@@ -20,7 +20,7 @@
         *ngFor="let customer of customersForDropDown "
         [value]="customer.customerId"
       >
-        {{ customer.firstName + customer.middleName + customer.lastName }}
+        {{ customer.firstName + " " +  customer.middleName + " " + customer.lastName }}
       </option>
       
           </select>

@@ -111,7 +111,7 @@
               [attr.title]="isStartOfReservation(room.roomId, day) || isMiddleOfReservation(room.roomId, day) || isEndOfReservation(room.roomId, day) ? getTooltipText(room.roomId, day) : null"
               (mousedown)="onMouseDown(room.roomId, day, $event)"
               (mouseover)="onMouseOver(room.roomId, day, $event)"
-              (mouseup)="onMouseUp($event)"
+              (mouseup)="onMouseUp(room.roomId,day,$event)"
               (mouseout)="onMouseOut()"
             ></td>
           </ng-container>

@@ -105,15 +105,15 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
     });
 
     if (shouldLoadNextMonth && !shouldLoadPreviousMonth) {
-      setTimeout(() => this.loadNextMonth(), 300); // Add a delay for smoothness
+      setTimeout(() => this.loadNextMonth(), 300); 
     } else if (shouldLoadPreviousMonth && !shouldLoadNextMonth) {
-      setTimeout(() => this.loadPreviousMonth(), 300); // Add a delay for smoothness
+      setTimeout(() => this.loadPreviousMonth(), 300);
     }
   }
 
   initCurrentMonth() {
     const currentMonth = new Date();
-    this.months = []; // Clear any existing months
+    this.months = []; 
     this.addMonth(currentMonth);
   }
 
@@ -125,7 +125,7 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
     this.months.push({ month: new Date(year, month), days: daysInMonth });
 
 
-    // Trigger a reflow for smooth loading effect
+   
     setTimeout(() => {
       document.querySelector('.booking-chart-container')?.scrollTo({
         top: 0,
@@ -304,21 +304,21 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
             }
         }
     });
+    console.log("departureDaysForMouseOver",this.departureDaysForMouseOver);
 
     
 }
 
   
-  onMouseUp(event: MouseEvent) {
+  onMouseUp(roomId: number, day: Date, event: MouseEvent) {
     this.isMouseDown = false;
+    
     this.startSelectionDate = null;
     this.endSelectionDate = null;
     this.selectionRowId = null;
+    this.navigateWithSelectedData();
+    this.selectedCells.clear();
     
-    
-    if (this.selectedCells.size > 0) {
-      this.navigateWithSelectedData();
-    }
   }
   
   private updateSelection(roomId: number) {

@@ -1,0 +1,33 @@
+.container {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .table {
+    margin-bottom: 0;
+    overflow-x: auto;
+  }
+  
+  .table thead th {
+    text-align: center;
+  }
+  
+  .table tbody td {
+    vertical-align: middle;
+  }
+  
+  h1 {
+    font-weight: 300;
+    color: #343a40;
+  }
+  
+  select.form-select {
+    border-radius: 5px;
+  }
+  
+  .table-hover tbody tr:hover {
+    background-color: #e9ecef;
+  }
+  

@@ -324,6 +324,10 @@ input, .book_now_btn {
     &.selected.departure-cell {
       background-color: #B6E2A1;
     }
+
+    &.departure-cell:hover .selected:hover{
+      background-color: #FFFEC4;
+    }
   }
 }
 
