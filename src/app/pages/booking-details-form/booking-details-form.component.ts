@@ -255,7 +255,7 @@ export class BookingDetailsFormComponent {
           checkOut: checkOutDate,
           reservationDate: new Date(),
           totalAmount: this.bookingDetails.get('totalAmount')?.value,
-          status: 'Pending',
+          status: 'Confirmed',
           paidAmount: 0,
           numberOfGuests: this.bookingDetails.get('numberOfGuests')?.value,
           pricePerDayPerPerson: matchingRoom.pricePerDayPerPerson,

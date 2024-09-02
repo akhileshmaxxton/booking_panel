@@ -1,7 +1,8 @@
-<div class="container">
-    <h1 class="text-center">Booking Details</h1>
-    <table class="table table-bordered">
-      <thead>
+<div class="container mt-5">
+  <h1 class="text-center mb-4">Booking Details</h1>
+  <div class="table-responsive">
+    <table class="table table-hover table-striped align-middle">
+      <thead class="table-dark">
         <tr>
           <th>Name</th>
           <th>Birth Date</th>
@@ -9,7 +10,6 @@
           <th>Check Out</th>
           <th>Location</th>
           <th>Room</th>
-          
           <th>Dew Amount</th>
           <th>Total Amount</th>
           <th>Status</th>
@@ -23,10 +23,10 @@
           <td>{{ detail.checkOut | date: 'yyyy-MM-dd'}}</td>
           <td>{{ detail.locationId }}</td>
           <td>{{ detail.roomId }}</td>
-          <td>{{ detail.dueAmount }}</td>
-          <td>{{ detail.amount }}</td>
+          <td>{{ detail.dueAmount | currency:'USD':true }}</td>
+          <td>{{ detail.amount | currency:'USD':true }}</td>
           <td>
-            <select [(ngModel)]="detail.status" class="form-select" (change)="updateStatus(detail)">
+            <select [(ngModel)]="detail.status" class="form-select form-select-sm" (change)="updateStatus(detail)">
               <option *ngFor="let status of statuses">{{ status }}</option>
             </select>
           </td>
@@ -34,4 +34,4 @@
       </tbody>
     </table>
   </div>
-  
+</div>
