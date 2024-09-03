@@ -41,6 +41,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { TableForOwnerPortalComponent } from './components/utils/table-for-owner-portal/table-for-owner-portal.component';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
@@ -84,7 +85,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     GoogleChartsModule,
     ScrollingModule,
     TooltipModule.forRoot(),
-    MatTooltipModule
+    MatTooltipModule,
+    MatSnackBarModule
     
   ],
   providers: [RoomDetailsApiService, MergeRoomAndRoomDetails, UniquePipe, LocalStorageService, provideAnimationsAsync(), FilterService],

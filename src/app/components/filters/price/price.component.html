@@ -3,7 +3,7 @@
 type="number"
     class="nice-select"
     placeholder="Price"
-    (change)="onPriceChangeInput($event)" 
+    (ngModelChange)="onPriceChangeInput($event)" 
     [ngModel]="getPrice"
 />
 </div>

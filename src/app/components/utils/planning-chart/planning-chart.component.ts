@@ -5,6 +5,7 @@ import { LocalStorageService } from '../../../service/localStorageApi/local-stor
 import { ActivatedRoute, Router } from '@angular/router';
 import { UniquePipe } from '../../../utils/unique.pipe';
 import { FilterService } from '../../../service/filterService/filter.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import moment from 'moment';
 
 declare var bootstrap: any;
@@ -44,7 +45,7 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
 
 
 
-  constructor(private roomDetailsApiService: RoomDetailsApiService, private uniquePipe: UniquePipe, private localStorageApiService: LocalStorageService, private router: Router, private route: ActivatedRoute, private filterService: FilterService) {
+  constructor(private roomDetailsApiService: RoomDetailsApiService, private uniquePipe: UniquePipe, private localStorageApiService: LocalStorageService, private router: Router, private route: ActivatedRoute, private filterService: FilterService, private snackBar: MatSnackBar) {
     this.initCurrentMonth();
   }
 
@@ -218,6 +219,24 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
     if(this.isDateInReservation(moment(day),roomId)){
       this.getTooltipText(roomId,day);
     }
+
+    if(this.isMouseDown && this.isDateInReservation(moment(day), roomId)) {
+      this.snackBar.open('This date is already reserved.', 'Close', {
+        duration: 3000,
+        verticalPosition: 'top',
+      });
+      this.isMouseDown = false;
+      return;
+    }
+    
+    // if(this.isMouseDown && this.isNotAvailable(roomId, day)) {
+    //   this.snackBar.open('This room is not available on the selected date.', 'Close', {
+    //     duration: 3000,
+    //     verticalPosition: 'top',
+    //   });
+    //   this.isMouseDown = false;
+    //   return;
+    // }
     
    
     const today = moment().startOf('day');
@@ -235,7 +254,7 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
         }
       }
     });
-    if(this.isDateInReservation(moment(day),roomId) || this.isNotAvailable(roomId, day)) return;
+    if(this.isDateInReservation(moment(day),roomId)) return;
   
     if (this.isMouseDown && roomId === this.selectionRowId) {
       this.endSelectionDate = day;
@@ -268,57 +287,83 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
     this.selectionRowId = roomId; 
     this.startSelectionDate = day;
     this.endSelectionDate = day; 
-    if(this.isDateInReservation(moment(day),roomId) || this.isNotAvailable(roomId, day)) return;
+    
+    if(this.isDateInReservation(moment(day), roomId) && !this.isEndOfReservation(roomId, day)) {
+      this.snackBar.open('This date is already reserved.', 'Close', {
+        duration: 3000,
+        // panelClass: ['red-snackbar','login-snackbar'],
+        verticalPosition: 'top',
+      });
+      return;
+    }
+    
+    if(this.isNotAvailable(roomId, day)) {
+      this.snackBar.open('This room is not available on the selected date.', 'Close', {
+        duration: 3000,
+        verticalPosition: 'top',
+      });
+      return;
+    }
+    
     this.updateSelection(roomId);
     this.departureDaysForMouseOver.clear();
-  
-
+   
     this.roomsData?.filter(room => room.roomId === roomId)?.forEach(room => {
-        const stayDateFrom = moment(room.stayDateFrom);
-        const stayDateTo = moment(room.stayDateTo);
-        const selectedDay = moment(day);
+      const stayDateFrom = moment(room.stayDateFrom);
+      const stayDateTo = moment(room.stayDateTo);
+      const selectedDay = moment(day);
 
-        
-        if (selectedDay.isBetween(stayDateFrom, stayDateTo, 'days', '[]')) {
-            for (let date = selectedDay.clone(); date.isSameOrBefore(stayDateTo); date.add(1, 'days')) {
-              if(!this.isDateInReservation(date,roomId)){
-
-                const dayOfWeek = date.format('ddd').toUpperCase();
-                
-                if (room.departureDays.includes(dayOfWeek)) {
-                    const daysFromSelection = date.diff(selectedDay, 'days') + 1; 
-
-                    if (daysFromSelection >= room.minStay && daysFromSelection <= room.maxStay ) {
-
-                        const cellDetail: cellDetails = {
-                            roomId: room.roomId,
-                            day: date.toDate(),
-                        };
-
-                        this.departureDaysForMouseOver.set(`${roomId}_${date.format('YYYY-MM-DD')}`, cellDetail);
-                    } else {
-                        break;
-                    }
-                }
+      if (selectedDay.isBetween(stayDateFrom, stayDateTo, 'days', '[]')) {
+        for (let date = selectedDay.clone(); date.isSameOrBefore(stayDateTo); date.add(1, 'days')) {
+          if(!this.isDateInReservation(date, roomId)) {
+            const dayOfWeek = date.format('ddd').toUpperCase();
+            if (room.departureDays.includes(dayOfWeek)) {
+              const daysFromSelection = date.diff(selectedDay, 'days') + 1; 
+              if (daysFromSelection >= room.minStay && daysFromSelection <= room.maxStay) {
+                const cellDetail: cellDetails = {
+                  roomId: room.roomId,
+                  day: date.toDate(),
+                };
+                this.departureDaysForMouseOver.set(`${roomId}_${date.format('YYYY-MM-DD')}`, cellDetail);
+              } else {
+                break;
               }
             }
+          }
         }
+      }
     });
-    console.log("departureDaysForMouseOver",this.departureDaysForMouseOver);
+  console.log("departureDaysForMouseOver", this.departureDaysForMouseOver);
+  }
 
-    
-}
 
   
   onMouseUp(roomId: number, day: Date, event: MouseEvent) {
+    if (!this.isMouseDown) {
+      if (this.isDateInReservation(moment(day), roomId)) {
+        this.snackBar.open('This date is already reserved.', 'Close', {
+          duration: 3000,
+          panelClass: ['red-snackbar', 'login-snackbar'],
+          verticalPosition: 'top',
+        });
+      } else if (this.isNotAvailable(roomId, day)) {
+        this.snackBar.open('This room is not available on the selected date.', 'Close', {
+          duration: 3000,
+          verticalPosition: 'top',
+        });
+      }
+    } else {
+      this.resetSelection();
+      this.navigateWithSelectedData();
+    }
+  }
+
+  private resetSelection() {
     this.isMouseDown = false;
-    
     this.startSelectionDate = null;
     this.endSelectionDate = null;
     this.selectionRowId = null;
-    this.navigateWithSelectedData();
     this.selectedCells.clear();
-    
   }
   
   private updateSelection(roomId: number) {
@@ -347,64 +392,51 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
   }
   
   
-isEndOfMonth(day: Date): boolean {
-  const nextDay = new Date(day);
-  nextDay.setDate(day.getDate() + 1);
-  return nextDay.getDate() === 1;
-}
+  isEndOfMonth(day: Date): boolean {
+    const nextDay = new Date(day);
+    nextDay.setDate(day.getDate() + 1);
+    return nextDay.getDate() === 1;
+  }
 
 
-navigateWithSelectedData() {
-  if (this.selectedCells.size > 0) {
-    const selectedArray = Array.from(this.selectedCells.values());
+  navigateWithSelectedData() {
+    if (this.selectedCells.size > 0) {
+      const selectedArray = Array.from(this.selectedCells.values());
 
-    const startCell = selectedArray[0];
-    const endCell = selectedArray[selectedArray.length - 1];
+      const startCell = selectedArray[0];
+      const endCell = selectedArray[selectedArray.length - 1];
 
-    const roomId = startCell.roomId;
-    const checkInDate = startCell.day;
-    const checkOutDate = endCell.day;
+      const roomId = startCell.roomId;
+      const checkInDate = startCell.day;
+      const checkOutDate = endCell.day;
 
-    this.filterService.setDateRange(moment(checkInDate).toDate(), moment(checkOutDate).toDate());
+      this.filterService.setDateRange(moment(checkInDate).toDate(), moment(checkOutDate).toDate());
+      
+      this.router.navigate(['/booking'], {
+        relativeTo: this.route,
+        queryParams: { 
+          roomId: roomId 
+        }
+      });
     
-    this.router.navigate(['/booking'], {
-      relativeTo: this.route,
-      queryParams: { 
-        roomId: roomId 
-      }
-    });
-   
-  } else {
-    console.error('No cells selected.');
-  }
-}
-
-isNotAvailable(roomId: number, day: Date): boolean {
-  const roomDatasets = this.roomsData?.filter(room => room.roomId === roomId) ?? [];
-
-  if (roomDatasets.length === 0) return true; 
-
-  day.setHours(0, 0, 0, 0);
-  
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  if (day < today) {
-    return true;
-  }
-
-  for (const room of roomDatasets) {
-    const stayFrom = new Date(room.stayDateFrom);
-    const stayTo = new Date(room.stayDateTo);
-    stayFrom.setHours(0, 0, 0, 0);
-    stayTo.setHours(0, 0, 0, 0);
-
-    if (day >= stayFrom && day <= stayTo) {
-      return false;
+    } else {
+      console.error('No cells selected.');
     }
   }
 
-  return true;
-}
+  isNotAvailable(roomId: number, day: Date): boolean {
+    if (this.arrivalDaysForMouseOver.has(`${roomId}_${moment(day).format('YYYY-MM-DD')}`)) {
+      return false;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (day < today) {
+      return true;
+    }
+
+    return true;
+  }
   
 }

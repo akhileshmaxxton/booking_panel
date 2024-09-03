@@ -15,13 +15,11 @@ export class PriceComponent {
     return this.filterService.filters.price
   }
 
-  onPriceChangeInput(event: Event) {
-    const inputElement = event.target as HTMLInputElement;
-    const price = parseFloat(inputElement.value);
-    if (!isNaN(price)) {
-      this.filterService.setPriceFilter(price);
+  onPriceChangeInput(newValue: number) {
+    if (!isNaN(newValue)) {
+      this.filterService.setPriceFilter(newValue);
     }
-    if(!price){
+    if (!newValue) {
       this.filterService.setPriceFilter(null);
     }
   }

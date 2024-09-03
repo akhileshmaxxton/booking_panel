@@ -2,7 +2,7 @@
   <div class="container-fluid">
     <div class="row">
       <!-- Left Column: Room Details (8 columns) -->
-      <div class="col-md-8 d-flex align-items-center justify-content-center text-dark text-center">
+      <div class="col-8 d-flex align-items-center justify-content-center text-dark text-center">
         <div class="room-details p-4 rounded shadow-lg ">
           <p class="display-3">{{ roomToBeBooked?.[0]?.roomName }}</p>
           <h4 class="mb-3">{{ roomToBeBooked?.[0]?.locationName }}</h4>
@@ -24,7 +24,7 @@
       
 
       <!-- Right Column: Booking Form (4 columns) -->
-      <div class="col-md-3 d-flex justify-content-center align-items-center">
+      <div class="col-4 d-flex justify-content-center align-items-center pe-5">
         <div class="glass-card p-4 w-100">
           <p class="display-5 mb-4 text-center">Booking</p>
           <form [formGroup]="bookingDetails" (ngSubmit)="onSubmit()">
@@ -36,6 +36,8 @@
                   <div *ngIf="bookingDetails.get('checkIn')?.errors?.['required']">Check-in date is required</div>
                   <div *ngIf="bookingDetails.get('checkIn')?.errors?.['checkInDateValidation']">{{bookingDetails.get('checkIn')?.errors?.['checkInDateValidation']}}</div>
                   <div *ngIf="bookingDetails.get('checkIn')?.errors?.['invalidDate']">{{bookingDetails.get('checkIn')?.errors?.['invalidDate']}}</div>
+                  <div *ngIf="bookingDetails.get('checkIn')?.errors?.['minStay']">{{bookingDetails.get('checkIn')?.errors?.['minStay']}}</div>
+                  <div *ngIf="bookingDetails.get('checkIn')?.errors?.['duplicateReservation']">{{bookingDetails.get('checkIn')?.errors?.['duplicateReservation']}}</div>
                 </div>
               </div>
               <div class="col-6">
@@ -47,6 +49,7 @@
                   <div *ngIf="bookingDetails.get('checkOut')?.errors?.['invalidDate']">{{bookingDetails.get('checkOut')?.errors?.['invalidDate']}}</div>
                   <div *ngIf="bookingDetails.get('checkOut')?.errors?.['minStay']">{{bookingDetails.get('checkOut')?.errors?.['minStay']}}</div>
                   <div *ngIf="bookingDetails.get('checkOut')?.errors?.['maxStay']">{{bookingDetails.get('checkOut')?.errors?.['maxStay']}}</div>
+                  <div *ngIf="bookingDetails.get('checkOut')?.errors?.['duplicateReservation']">{{bookingDetails.get('checkOut')?.errors?.['duplicateReservation']}}</div>
                 </div>
               </div>
             </div>

@@ -6,7 +6,6 @@ import moment from 'moment';
 import { ActivatedRoute } from '@angular/router';
 import { LocalStorageService } from '../../service/localStorageApi/local-storage.service';
 import { FilterService } from '../../service/filterService/filter.service';
-import { RoomDetailsApiService } from '../../service/apiService/room-details-api.service';
 
 @Component({
   selector: 'app-booking-details-form',
@@ -19,8 +18,10 @@ export class BookingDetailsFormComponent {
   @Input() roomToBeBooked?: RoomAndRoomStayDetails[];
   @Output() reservationConfirmed = new EventEmitter<ReservationDetails>();
   @Input() reservationDetailsFromParent?: ReservationDetails;
-   checkInDateFromOwner?: Date;
-   checkOutDateFromOwner? : Date;
+
+  checkInDateFromOwner?: Date;
+  checkOutDateFromOwner? : Date;
+
   reservationDetails: ReservationDetails = {
     reservationId: '',
     locationId: 0,
@@ -41,7 +42,7 @@ export class BookingDetailsFormComponent {
 
 
 
-  constructor(private fb: FormBuilder, private route: ActivatedRoute, private localStorageService: LocalStorageService, private filterService: FilterService, private roomDetailsApiService: RoomDetailsApiService) {
+  constructor(private fb: FormBuilder, private route: ActivatedRoute, private localStorageService: LocalStorageService, private filterService: FilterService) {
     console.log("service details", this.filterService.filters.checkInDate)
     this.bookingDetails = this.fb.group({
       locationName: [''],
@@ -67,14 +68,6 @@ export class BookingDetailsFormComponent {
         numberOfGuests: this.filterService.filters?.guests ? this.filterService.filters?.guests : '',
       })
     }
-    
-    
-  }
-
-  ngOnInit() {
-    
-     
-    
   }
 
   get getCheckInDate() {
@@ -83,27 +76,27 @@ export class BookingDetailsFormComponent {
 
 
   get getCheckOutDate() {
-    console.log("checkOutDatefgggggggg", this.filterService.filters.checkOutDate)
     return this.filterService.filters?.checkOutDate ? this.filterService.filters?.checkOutDate : new Date();
   }
 
   calculateTotalPrice() {
-    const checkInDate = new Date(this.bookingDetails?.get('checkIn')?.value) ?? new Date();
-    const checkOutDate = new Date(this.bookingDetails?.get('checkOut')?.value ?? new Date());
+    const checkInDate = moment(this.bookingDetails?.get('checkIn')?.value).hours(11) ?? moment();
+    const checkOutDate = moment(this.bookingDetails?.get('checkOut')?.value).hours(10) ?? moment();
     const numberOfGuests = this.bookingDetails?.get('numberOfGuests')?.value ?? 0;
   
     const matchingRoom = this.roomToBeBooked?.find(room => {
-      const stayFromDate = new Date(room.stayDateFrom);
-      const stayToDate = new Date(room.stayDateTo);
-      return checkInDate >= stayFromDate && checkOutDate <= stayToDate;
+      const stayFromDate = moment(room.stayDateFrom).hours(11);
+      const stayToDate = moment(room.stayDateTo).hours(10);
+      return checkInDate.isSameOrAfter(stayFromDate) && checkOutDate.isSameOrBefore(stayToDate);
     });
   
     if (matchingRoom) {
       const pricePerDayPerPerson = matchingRoom.pricePerDayPerPerson;
   
       if (checkInDate && checkOutDate && pricePerDayPerPerson && numberOfGuests) {
-        const timeDifference = checkOutDate.getTime() - checkInDate.getTime();
-        const numberOfDays = Math.ceil(timeDifference / (1000 * 3600 * 24));
+        const numberOfDays = Math.ceil(checkOutDate.diff(checkInDate, 'hours')/24);
+        console.log("number of days", numberOfDays)
+        console.log("time ",checkOutDate.diff(checkInDate, 'hours')/24)
   
         this.reservationDetails.numberOfDays = numberOfDays > 0 ? numberOfDays : 0;
   
@@ -122,10 +115,10 @@ export class BookingDetailsFormComponent {
   }
   
   checkInDateValidator(control: AbstractControl): ValidationErrors | null {
-    const dateValue = moment(control.value);
+    const dateValue = moment(control.value).hours(11);
     const matchingRoom = this.roomToBeBooked?.find(room => {
-      const stayFromDate = moment(room.stayDateFrom);
-      const stayToDate = moment(room.stayDateTo);
+      const stayFromDate = moment(room.stayDateFrom).hours(11);
+      const stayToDate = moment(room.stayDateTo).hours(10);
       return dateValue.isBetween(stayFromDate, stayToDate, null, '[]');
     });
   
@@ -133,33 +126,40 @@ export class BookingDetailsFormComponent {
       return { invalidDate: 'Check-in date does not match any available booking period' };
     }
   
-    const arrivalDays: string[] = matchingRoom.arrivalDays.map(day => day.toLowerCase()) ?? [];
-    const dateDay = dateValue.format('ddd').toLowerCase();
+    const arrivalDays: string[] = matchingRoom.arrivalDays.map(day => day.toUpperCase()) ?? [];
+    const dateDay = dateValue.format('ddd').toUpperCase();
   
     if (!arrivalDays.includes(dateDay)) {
       return { checkInDateValidation: `Check-in date must be on ${arrivalDays.join(', ')}` };
     }
   
     const storedReservations = this.localStorageService.getReservationsById(matchingRoom.roomId) ?? [];
-    const overlappingReservation = storedReservations.find((reservation: ReservationDetails) => {
-      return reservation.roomId === matchingRoom.roomId && 
-             dateValue.isBetween(moment(reservation.checkIn), moment(reservation.checkOut), null, '[]');
-    });
+    let overlappingReservation = false;
   
     if (overlappingReservation) {
       return { duplicateReservation: 'This check-in date overlaps with an existing reservation for this room.' };
     }
+
+    storedReservations.forEach((reservation: ReservationDetails) => {
+      console.log("storedReservations",reservation.checkIn,reservation.checkOut)
+      const reservationCheckIn = moment(reservation.checkIn).hours(11);
+      const reservationCheckOut = moment(reservation.checkOut).hours(10);
+      if (dateValue.isBetween(reservationCheckIn, reservationCheckOut, null, '[]')) {
+        overlappingReservation = true;
+        console.log("trueeeee")
+      }
+    })
   
     return null;
   }
   
   checkOutDateValidator(control: AbstractControl): ValidationErrors | null {
-    const dateValue = moment(control.value);
-    const checkInDate = moment(this.bookingDetails?.get('checkIn')?.value);
+    const dateValue = moment(control.value).hours(10);
+    const checkInDate = moment(this.bookingDetails?.get('checkIn')?.value).hours(11);
   
     const matchingRoom = this.roomToBeBooked?.find(room => {
-      const stayFromDate = moment(room.stayDateFrom);
-      const stayToDate = moment(room.stayDateTo);
+      const stayFromDate = moment(room.stayDateFrom).hours(11);
+      const stayToDate = moment(room.stayDateTo).hours(10);
       return checkInDate.isBetween(stayFromDate, stayToDate, null, '[]') && dateValue.isBetween(stayFromDate, stayToDate, null, '[]');
     });
   
@@ -167,8 +167,8 @@ export class BookingDetailsFormComponent {
       return { invalidDate: 'Check-out date does not match any available booking period' };
     }
   
-    const departureDays: string[] = matchingRoom.departureDays.map(day => day.toLowerCase()) ?? [];
-    const dateDay = dateValue.format('ddd').toLowerCase();
+    const departureDays: string[] = matchingRoom.departureDays.map(day => day.toUpperCase()) ?? [];
+    const dateDay = dateValue.format('ddd').toUpperCase();
   
     if (!departureDays.includes(dateDay)) {
       return { checkOutDateValidation: `Check-out date must be on ${departureDays.join(', ')}` };
@@ -185,10 +185,17 @@ export class BookingDetailsFormComponent {
     }
   
     const storedReservations = this.localStorageService.getReservationsById(matchingRoom.roomId) ?? [];
-    const overlappingReservation = storedReservations.find((reservation: ReservationDetails) => {
-      return reservation.roomId === matchingRoom.roomId && 
-             dateValue.isBetween(moment(reservation.checkIn), moment(reservation.checkOut), null, '[]');
-    });
+    let overlappingReservation = false;
+    
+    storedReservations.forEach((reservation: ReservationDetails) => {
+      console.log("storedReservations",reservation.checkIn,reservation.checkOut)
+      const reservationCheckIn = moment(reservation.checkIn).hours(11);
+      const reservationCheckOut = moment(reservation.checkOut).hours(10);
+      if (dateValue.isBetween(reservationCheckIn, reservationCheckOut, null, '[]')) {
+        overlappingReservation = true;
+        console.log("trueeeee")
+      }
+    })
   
     if (overlappingReservation) {
       return { duplicateReservation: 'This check-out date overlaps with an existing reservation for this room.' };
@@ -235,14 +242,14 @@ export class BookingDetailsFormComponent {
   
   onSubmit() {
     if (this.bookingDetails.valid) {
-      const checkInDate = new Date(this.bookingDetails.get('checkIn')?.value);
-      const checkOutDate = new Date(this.bookingDetails.get('checkOut')?.value);
+      const checkInDate = moment(this.bookingDetails.get('checkIn')?.value).hours(11);
+      const checkOutDate = moment(this.bookingDetails.get('checkOut')?.value).hours(10);
+      console.log("checkIn data type",checkInDate.toDate())
   
-      // Find the matching room based on the check-in and check-out dates
       const matchingRoom = this.roomToBeBooked?.find(room => {
-        const stayFromDate = new Date(room.stayDateFrom);
-        const stayToDate = new Date(room.stayDateTo);
-        return checkInDate >= stayFromDate && checkOutDate <= stayToDate;
+        const stayFromDate = moment(room.stayDateFrom).hours(11);
+        const stayToDate = moment(room.stayDateTo).hours(11);
+        return checkInDate.isSameOrAfter(stayFromDate) && checkOutDate.isSameOrBefore(stayToDate);
       });
   
       if (matchingRoom) {
@@ -251,22 +258,21 @@ export class BookingDetailsFormComponent {
           reservationId: '',
           locationId: matchingRoom.locationId,
           roomId: matchingRoom.roomId,
-          checkIn: checkInDate,
-          checkOut: checkOutDate,
-          reservationDate: new Date(),
+          checkIn: checkInDate.toDate(),
+          checkOut: checkOutDate.toDate(), 
+          reservationDate: moment().toDate(),
           totalAmount: this.bookingDetails.get('totalAmount')?.value,
           status: 'Confirmed',
           paidAmount: 0,
           numberOfGuests: this.bookingDetails.get('numberOfGuests')?.value,
           pricePerDayPerPerson: matchingRoom.pricePerDayPerPerson,
-          numberOfDays: checkOutDate.getDate() - checkInDate.getDate() + 1,
+          numberOfDays: checkOutDate.diff(checkInDate, 'days'),
           paymentIds: [],
         };
   
         this.reservationConfirmed.emit(this.reservationDetails);
       } else {
         console.error("No matching room found for the selected dates.");
-        // Handle the case where no matching room is found, possibly by showing an error message to the user.
       }
     }
   }

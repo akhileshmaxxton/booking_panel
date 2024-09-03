@@ -6,6 +6,7 @@ import { MergeRoomAndRoomDetails } from '../../utils/merge-room-and-room-details
 import { LocalStorageService } from '../localStorageApi/local-storage.service';
 import { UniquePipe } from '../../utils/unique.pipe';
 import moment from 'moment';
+import { ReservationDetails } from '../../interface/reservation-details';
 
 @Injectable({
   providedIn: 'root'
@@ -100,15 +101,14 @@ export class FilterService {
           return checkInDate.isBetween(stayDateFrom, stayDateTo, 'days', '[]') && checkOutDate.isBetween(stayDateFrom, stayDateTo, 'days', '[]');
         });
       }
-    const reservations = this.localStorageService.getAllReservationsFromLocalStorage();
 
     if(this.filters.isCustomer){
       mergedData = mergedData.filter(room => {
-        const roomReservations = reservations.filter((reservation: { roomId: number; }) => reservation.roomId === room.roomId);
+        const roomReservations = this.localStorageService.getReservationsById(room.roomId) ?? [];
       
         let isRoomAvailable = true;
         
-        roomReservations.forEach((reservation: { checkOut: string; checkIn: string }) => {
+        roomReservations.forEach((reservation: ReservationDetails) => {
           const checkInDate = moment(reservation.checkIn);
           const checkOutDate = moment(reservation.checkOut);
           const stayDuration = checkOutDate.diff(checkInDate, 'days');
