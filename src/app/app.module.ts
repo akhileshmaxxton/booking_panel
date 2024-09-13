@@ -26,7 +26,7 @@ import { RoomViewModelComponent } from './components/utils/room-view-model/room-
 import { LocalStorageService } from './service/localStorageApi/local-storage.service';
 import { OwnerPortalHomeComponent } from './pages/owner-portal-home/owner-portal-home.component';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MAT_DIALOG_DEFAULT_OPTIONS, MatDialogModule } from '@angular/material/dialog';
 import { BookingPageComponent } from './pages/booking-page/booking-page.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CalendarModule, DateAdapter } from 'angular-calendar';
@@ -42,6 +42,17 @@ import { TableForOwnerPortalComponent } from './components/utils/table-for-owner
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { ReservationDialogNewComponent } from './components/utils/reservation-dialog-new/reservation-dialog-new.component';
+import {STEPPER_GLOBAL_OPTIONS} from '@angular/cdk/stepper';
+import {MatButtonModule} from '@angular/material/button';
+import {MatInputModule} from '@angular/material/input';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatStepperModule} from '@angular/material/stepper';
+import { MatIconModule } from '@angular/material/icon';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import {MatGridListModule} from '@angular/material/grid-list';
+import {MatSelectModule} from '@angular/material/select';
 
 @NgModule({
   declarations: [
@@ -67,6 +78,9 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     CalenderHeaderComponent,
     ErrorPageComponent,
     TableForOwnerPortalComponent,
+    ReservationDialogNewComponent,
+    
+    
   ],
   imports: [
     BrowserModule,
@@ -86,10 +100,18 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     ScrollingModule,
     TooltipModule.forRoot(),
     MatTooltipModule,
-    MatSnackBarModule
-    
+    MatSnackBarModule,
+    MatDialogModule,
+    MatStepperModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatDatepickerModule,
+    MatGridListModule,
+    MatSelectModule
   ],
-  providers: [RoomDetailsApiService, MergeRoomAndRoomDetails, UniquePipe, LocalStorageService, provideAnimationsAsync(), FilterService],
+  providers: [RoomDetailsApiService, MergeRoomAndRoomDetails, UniquePipe, LocalStorageService, provideAnimationsAsync(), FilterService, {provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: {hasBackdrop: false}}, {provide: STEPPER_GLOBAL_OPTIONS, useValue: {showError: true},}, provideNativeDateAdapter()],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

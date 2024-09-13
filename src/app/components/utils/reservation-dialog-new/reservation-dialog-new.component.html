@@ -1,0 +1,122 @@
+<mat-dialog-content>
+    <div style="position: relative; margin-bottom: 3rem;">
+        <button mat-icon-button style="position: absolute; top: 0; right: 0;" (click)="close()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    <mat-stepper #stepper>
+        <mat-step [stepControl]="dateSelectionGroup" errorMessage="Name is required.">
+          <form [formGroup]="dateSelectionGroup">
+            <ng-template matStepLabel>Select your prefered dates</ng-template>
+            <button (click)="showArrival()">Choose</button>
+            <!-- <mat-grid-list cols="3" >
+                <mat-grid-tile>
+                    <mat-form-field>
+                        <mat-label>Choose checkin date</mat-label>
+                        <input matInput [matDatepicker]="picker" formControlName="arrivalDate" [matDatepickerFilter]="isArrivalDateAvailable" (dateChange)="onArrivalDateSelection($event.value)">
+                        <mat-hint>MM/DD/YYYY</mat-hint>
+                        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
+                </mat-grid-tile>
+                <mat-grid-tile>
+                    <mat-form-field>
+                        <mat-label>Choose checkout date</mat-label>
+                        <input matInput [matDatepicker]="picker1" formControlName="departureDate" [matDatepickerFilter]="isDepartureDateAvailable" (dateChange)="onDepartureDateSelection($event.value)">
+                        <mat-hint>MM/DD/YYYY</mat-hint>
+                        <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
+                        <mat-datepicker #picker1></mat-datepicker>
+                    </mat-form-field>
+                </mat-grid-tile>
+                <mat-grid-tile>
+                    <mat-form-field>
+                        <mat-label>Number of guests</mat-label>
+                        <mat-select (selectionChange)="onGuestSelection($event.value)">
+                          @for (guest of guestsNUmbers; track guest) {
+                            <mat-option [value]="guest">{{guest}}</mat-option>
+                          }
+                        </mat-select>
+                      </mat-form-field>
+                </mat-grid-tile>
+            </mat-grid-list> -->
+            <div class="row">
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <mat-form-field>
+                        <mat-label>Choose checkin date</mat-label>
+                        <input matInput [matDatepicker]="picker" formControlName="arrivalDate" [matDatepickerFilter]="isArrivalDateAvailable" (dateChange)="onArrivalDateSelection($event.value)">
+                        <mat-hint>MM/DD/YYYY</mat-hint>
+                        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <mat-form-field>
+                        <mat-label>Choose checkout date</mat-label>
+                        <input matInput [matDatepicker]="picker1" formControlName="departureDate" [matDatepickerFilter]="isDepartureDateAvailable" (dateChange)="onDepartureDateSelection($event.value)">
+                        <mat-hint>MM/DD/YYYY</mat-hint>
+                        <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
+                        <mat-datepicker #picker1></mat-datepicker>
+                    </mat-form-field>
+                </div>
+                <div class="col-md-4 col-sm-6 col-xs-12">
+                    <mat-form-field>
+                        <mat-label>Number of guests</mat-label>
+                        <mat-select (selectionChange)="onGuestSelection($event.value)">
+                          @for (guest of guestsNUmbers; track guest) {
+                            <mat-option [value]="guest">{{guest}}</mat-option>
+                          }
+                        </mat-select>
+                      </mat-form-field>
+                </div>
+            </div>
+            <div>
+              <button mat-button matStepperNext>Next</button>
+            </div>
+          </form>
+        </mat-step>
+        <mat-step [stepControl]="secondFormGroup" errorMessage="Address is required.">
+          <form [formGroup]="secondFormGroup">
+            <ng-template matStepLabel>Fill out your address</ng-template>
+            
+            <!-- <mat-form-field>
+              <mat-label>Address</mat-label>
+              <input matInput placeholder="Ex. 1 Main St, New York, NY" formControlName="secondCtrl"required>
+              <div class="accomodation_item text-center">
+                <div class="hotel_img">
+                    <img   alt="">
+                    <a  class="btn theme_btn button_hover">Book Now</a>
+                </div>
+                <a ><h4 class="sec_h4"></h4></a>
+                <h5><small>/night/person</small></h5>
+                
+            </div>
+            </mat-form-field> -->
+            
+            <div class="row mb-3 mt-3">
+                <div class="col-lg-3 col-sm-3 text-center" *ngFor="let room of roomsData">
+                    <div class="hotel-img">
+                        <img [src]="room.imageSrc">
+                        <a  class="btn theme-btn button-hover">Book Now</a>
+                    </div>
+                    <a ><h4 class="sec_h4">{{room.roomName}}</h4></a>
+                    <h5>${{room.pricePerDayPerPerson}}<small>/night/person</small></h5>
+                </div>
+            </div>
+            <div>
+              <p>Go to a different step to see the error state</p>
+              <button mat-button matStepperPrevious>Back</button>
+              <button mat-button matStepperNext>Next</button>
+            </div>
+          </form>
+        </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>Done</ng-template>
+          <p>You are now done.</p>
+          <div>
+            <button mat-button matStepperPrevious>Back</button>
+            <button mat-button (click)="stepper.reset()">Reset</button>
+          </div>
+        </mat-step>
+      </mat-stepper>
+</mat-dialog-content>
+  

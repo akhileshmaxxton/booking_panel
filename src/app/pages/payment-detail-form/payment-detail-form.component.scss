@@ -7,13 +7,22 @@ body {
   font-family: Arial, sans-serif;
 }
 
+.card-1{
+  margin-right: 10rem;
+}
 .card {
   border-radius: 10px;
   overflow: hidden;
+  width: 23rem;
+  display: flex;
+  justify-content: flex-end;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+
+  
 }
 
 .card-header {
-  padding: 1rem;
+  padding: 1.5rem 1rem 0.5rem 1rem;  
   background-color: #007bff;
   color: white;
 }

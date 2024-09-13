@@ -1,0 +1,28 @@
+.mat-mdc-form-field {
+  margin-top: 16px;
+}
+
+.hotel-img {
+  position: relative;
+  margin-bottom: 0.62rem;
+  overflow: hidden;
+  border-radius: 0.62rem;
+  img {
+    transition: all 0.4s linear;
+  }
+  .theme-btn {
+    position: absolute;
+    bottom: 1.2rem;
+    left: 50%;
+    transform: translate(-50%);
+    padding: 0.4rem 1.2rem;
+    max-width: 18rem;
+  }
+  &:hover {
+    img {
+      transform: scale(1.19);
+    }
+  }
+}
+
+

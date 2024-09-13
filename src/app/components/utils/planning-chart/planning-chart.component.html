@@ -1,73 +1,19 @@
 
-  <!-- <div class="container-fluid">
-    <div class="container justify-content-center align-items-center">
-      <section class="row no-gutters justify-content-center align-items-center d-flex">
-        <div class="col-md-3 section-title">
-          <h2>
-            Book<br />
-            Your Room
-          </h2>
-        </div>
-        <div class="col-md-9">
-          <div class="row app-row">
-            <div class="col-md-3 app-col">
-              <app-location-name [roomDetailsForFilter]="roomDetailsForFilter"></app-location-name>
-            </div>
-            <div class="col-md-3 app-col">
-              <app-price></app-price>
-            </div>
-            <div class="col-md-3 app-col">
-              <app-date-range></app-date-range>
-            </div>
-          </div>
-          <div class="row app-row">
-            <div class="col-md-3 app-col">
-              <app-number-of-days></app-number-of-days>
-            </div>
-            <div class="col-md-3 app-col">
-              <app-number-of-guests></app-number-of-guests>
-            </div>
-            <div class="col-md-3 app-col">
-              <a class="book_now_btn button_hover" (click)="clearFilter()">Clear Filter</a>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-  
-
-  <div class="container-fluid mx-5 px-5 bordered">
-    
-  </div>
-</div> -->
 
 
 <div class="container-fluid justify-content-center align-items-center">
   
 <h1 class="text-center display-1">Planning Chart</h1>
 
-<!-- <div class="container">
-  <div class="row">
-    <div class="col-4 filter-container">
-      <app-location-name [roomDetailsForFilter]="roomDetailsForFilter"></app-location-name>
-    </div>
-    <div class="col-4">
-      <app-price></app-price>
-    </div>
-    <div class="col-4">
-      <app-date-range></app-date-range>
-    </div>
-  </div>
-</div> -->
-
-<div class="booking-chart-container">
+<div class="overflow-auto flex-column position-relative bg-white rounded shadow mt-4 booking-chart-container">
+  <!-- <div class="overlay-div"></div> -->
   <table class="table table-bordered">
     <!-- <div #scrollSentinelPrev observeVisibility (visible)="loadPreviousMonth()"></div> -->
     <thead class="sticky-top">
-      <tr class="month-header-wrapper">
-        <th class="room-names" rowspan="3">Room ID</th>
+      <tr class="bg-white z-index-10">
+        <th class="room-name-title" rowspan="3">Room ID</th>
         <ng-container *ngFor="let month of months">
-          <th [attr.colspan]="month.days.length" class="month-header">
+          <th [attr.colspan]="month.days.length" class="text-center align-middle bg-dark-subtle">
             {{ month.month | date : "MMMM yyyy" }}
           </th>
         </ng-container>
@@ -111,9 +57,16 @@
               [attr.title]="isStartOfReservation(room.roomId, day) || isMiddleOfReservation(room.roomId, day) || isEndOfReservation(room.roomId, day) ? getTooltipText(room.roomId, day) : null"
               (mousedown)="onMouseDown(room.roomId, day, $event)"
               (mouseover)="onMouseOver(room.roomId, day, $event)"
+              (mousemove)="onMouseMove(room.roomId, day, $event)"
               (mouseup)="onMouseUp(room.roomId,day,$event)"
               (mouseout)="onMouseOut()"
-            ></td>
+            >
+            <span
+            *ngIf="isStartOfReservation(room.roomId, day)"
+            class="reservation-marker"
+            [ngStyle]="{ width: getReservationWidth(room.roomId, day) }"
+          >
+          </span></td>
           </ng-container>
         </ng-container>
       </tr>

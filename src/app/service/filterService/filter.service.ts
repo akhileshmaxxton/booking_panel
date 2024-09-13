@@ -31,6 +31,8 @@ export class FilterService {
     isCustomer: true as boolean
   };
 
+  isFromTable: boolean = false;
+
   setIsCustomer(isCustomer: boolean) {
     this.filters.isCustomer = isCustomer;
     this.applyFilters();
