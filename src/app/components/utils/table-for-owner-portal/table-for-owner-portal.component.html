@@ -1,5 +1,6 @@
 <div class="container mt-5">
   <h1 class="text-center mb-4">Booking Details</h1>
+  <button  mat-button (click)="openDialog()">Create Reservation</button>
   <div class="table-responsive">
     <table class="table table-hover table-striped align-middle">
       <thead class="table-dark">
@@ -16,15 +17,15 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let detail of combinedDetails">
-          <td>{{ detail.name }}</td>
-          <td>{{ detail.birthData | date: 'yyyy-MM-dd' }}</td>
-          <td>{{ detail.checkIn | date: 'yyyy-MM-dd' }}</td>
-          <td>{{ detail.checkOut | date: 'yyyy-MM-dd'}}</td>
-          <td>{{ detail.locationId }}</td>
-          <td>{{ detail.roomId }}</td>
-          <td>{{ detail.dueAmount | currency:'USD':true }}</td>
-          <td>{{ detail.amount | currency:'USD':true }}</td>
+        <tr *ngFor="let detail of combinedDetails; let i = index" class="table-row" [ngStyle]="{ '--animation-delay': i * 0.1 + 's'}">
+          <td (click)="openModalForBookedDetais(detail)">{{ detail.name }}</td>
+          <td (click)="openModalForBookedDetais(detail)">{{ detail.birthData | date: 'yyyy-MM-dd' }}</td>
+          <td (click)="openModalForBookedDetais(detail)">{{ detail.checkIn | date: 'yyyy-MM-dd' }}</td>
+          <td (click)="openModalForBookedDetais(detail)">{{ detail.checkOut | date: 'yyyy-MM-dd'}}</td>
+          <td (click)="openModalForBookedDetais(detail)">{{ detail.locationId }}</td>
+          <td (click)="openModalForBookedDetais(detail)">{{ detail.roomId }}</td>
+          <td (click)="openModalForBookedDetais(detail)">{{ detail.dueAmount | currency:'USD':true }}</td>
+          <td (click)="openModalForBookedDetais(detail)">{{ detail.amount | currency:'USD':true }}</td>
           <td>
             <select [(ngModel)]="detail.status" class="form-select form-select-sm" (change)="updateStatus(detail)">
               <option *ngFor="let status of statuses">{{ status }}</option>
@@ -35,3 +36,33 @@
     </table>
   </div>
 </div>
+
+
+ <!-- Modal for Booked Details -->
+ <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Detail Information</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Name:</strong> {{ selectedDetail?.name }}</p>
+        <p><strong>Birth Date:</strong> {{ selectedDetail?.birthData | date: 'yyyy-MM-dd' }}</p>
+        <p><strong>Check In:</strong> {{ selectedDetail?.checkIn | date: 'yyyy-MM-dd' }}</p>
+        <p><strong>Check Out:</strong> {{ selectedDetail?.checkOut | date: 'yyyy-MM-dd' }}</p>
+        <p><strong>Location:</strong> {{ selectedDetail?.locationId }}</p>
+        <p><strong>Room:</strong> {{ selectedDetail?.roomId }}</p>
+        <p><strong>Due Amount:</strong> {{ selectedDetail?.dueAmount | currency:'USD':true }}</p>
+        <p><strong>Total Amount:</strong> {{ selectedDetail?.amount | currency:'USD':true }}</p>
+        <p><strong>Status:</strong> {{ selectedDetail?.status }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+ 

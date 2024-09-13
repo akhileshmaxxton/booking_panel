@@ -1,0 +1,37 @@
+<div class="form-group position-relative">
+    <label for="customDatePicker" class="form-label">Select Date</label>
+    <input
+      type="text"
+      class="form-control"
+      id="customDatePicker"
+      placeholder="Select Date"
+      [(ngModel)]="selectedDate"
+      readonly
+      (click)="toggleCalendar()"
+    />
+    <div
+      class="calendar-popup p-3 rounded shadow-sm bg-white"
+      *ngIf="isCalendarVisible"
+    >
+      <div class="d-flex justify-content-between mb-2">
+        <button class="btn btn-outline-primary btn-sm" (click)="prevMonth()">«</button>
+        <span>{{ monthNames[currentMonth] }} {{ currentYear }}</span>
+        <button class="btn btn-outline-primary btn-sm" (click)="nextMonth()">»</button>
+      </div>
+      <div class="d-flex justify-content-around font-weight-bold">
+        <span *ngFor="let day of weekDays">{{ day }}</span>
+      </div>
+      <div class="d-flex flex-wrap">
+        <div
+          *ngFor="let day of daysInMonth"
+          class="day p-2 text-center"
+          [class.disabled]="!day"
+          [class.active]="isSelected(day)"
+          (click)="onDateSelect(day)"
+        >
+          {{ day || '' }}
+        </div>
+      </div>
+    </div>
+  </div>
+  

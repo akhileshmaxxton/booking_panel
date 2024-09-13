@@ -1,389 +1,72 @@
 .booking-chart-container {
-    display: flex;
-    flex-direction: column; // Adjusted to allow scrolling
-    overflow-x: auto;
-    overflow-y: auto;
-    position: relative;
-    max-height: 80vh;
-  }
-  
-  .room-names {
-    flex: 0 0 15vw;
-    background-color: #EEEDEB;
-    border-right: 1px solid #ddd;
-    position: sticky;
-    left: 0;
-    z-index: 20;
-    text-align: center;
-    vertical-align: middle;
-  }
-  
-  .room-name {
-    padding: 1rem;
-    border-bottom: 0.1rem solid #787d85;
-    text-align: left;
-    font-size: 1rem;
-    white-space: nowrap;
-    position: sticky;
-    left: 0;
-    z-index: 10;
-    background-color: #B4B4B8;
-    color: white;
-  }
-  
-  .booking-grid {
-    flex: 1;
-    overflow-x: auto;
-  }
-  
-  .date-row, .booking-row {
-    display: flex;
-  }
-  
-  .date-cell {
-    min-width: 6vw;
-    padding: 1rem;
-    text-align: center;
-    border-bottom: 0.1rem solid #ddd;
-    background-color: #B5C0D0;
-    white-space: nowrap;
-    color: white;
-    // position: sticky;
-    // top: 0;
-    z-index: 10;
-  }
-  
-  .booking-cell {
-    min-width: 4vw;
-    height: 5vh;
-    border: 0.1rem solid #ddd;
-    text-align: center;
-    cursor: pointer;
-    white-space: nowrap;
-    position: relative;
-    background-color: transparent;
-    box-sizing: border-box; 
-  }
-  
-  .middle-of-reservation::before,
-  .start-of-reservation::before,
-  .end-of-reservation::before {
-    content: '';
-    position: absolute;
-    top: 0.5rem;
-    bottom: 0.5rem;
-    background-color: coral;
-    z-index: 1; 
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
-  }
-  
-  .start-of-reservation::before {
-    left: 60% !important;
-    right: 0% !important;
-    border-top-left-radius: 5px; 
-    border-bottom-left-radius: 5px; 
-  }
-  
-  .middle-of-reservation::before {
-    left: 0;
-    right: 0; /* Cover the full cell */
-  }
-  
-  .end-of-reservation::before {
-    left: 0;
-    right: 60%; /* Cover the right half of the cell */
-    border-top-right-radius: 5px; /* Optional: Round the top right corner */
-    border-bottom-right-radius: 5px; /* Optional: Round the bottom right corner */
-    
-  }
-  
-  /* Optional: Remove borders between reservation cells */
-  .middle-of-reservation,
-  .start-of-reservation,
-  .end-of-reservation {
-    border-left: none;
-    border-right: none;
-  }
-  
-  .start-of-reservation {
-    border-right: none;
-  }
-  
-  .end-of-reservation {
-    border-left: none;
-  }
-
-  .selected {
-    background-color: #79edbb;
-    border-color: #79edbb;
-  }
-
-  .month-navigation {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
-  }
-  
-  .month-header{
-    text-align: center; /* Horizontally center the text */
-    vertical-align: middle; /* Vertically center the text */
-    background-color: #FFEEF4;
-  
-  }
-
-  .month-header-wrapper {
-    // position: sticky; /* Fixes the position of the header */
-    // top: 0; /* Keeps it at the top of the container */
-    background: white; /* Ensures background covers table content */
-    z-index: 10; /* Ensures it stays above other content */
-  }
-  
-  
-
-  #scrollSentinel {
-    height: 1px; // Invisible element to trigger infinite scroll
-  }
-
-.scroll-container {
-  display: flex;
-  overflow-x: auto;
-  // scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
+  max-height: 80vh;
 }
 
-.month-container {
-  flex: 0 0 auto;
-  scroll-snap-align: start;
-  padding: 10px;
-}
-
-.cusrsor-disabled{
-  cursor: not-allowed;
-  // background-color: darkgray;
-  // border-color: darkgray;
-}
-
-.available-rooms{
-  background-color: #eefdec;
   
-}
-
-.arrival-cell{
-  background-color: #eefdec;  
-    
-}
-
-.departure-days{
-  background-color: #E0DECA;
-}
-
-
-
-
-
-
-
-.container-fluid {
-  padding: 20px;
-}
-
-.section-title h2 {
-  font-weight: bold;
-  font-size: 2rem;
-  line-height: 1.2;
-  margin: 0;
-}
-
-.row.no-gutters {
-  margin: 0;
-}
-
-.app-row {
-  margin-bottom: 10px;
-}
-
-// .app-col {
-//   padding: 5px;
-// }
-
-.book_now_btn {
-  display: block;
-  width: 10rem; /* Make the button the same width as the inputs */
-  padding: 10px;
-  background-color: #0056b3; /* Darker background */
-  color: white;
-  text-align: center;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  text-decoration: none;
-}
-
-.book_now_btn:hover {
-  background-color: #00408f; /* Slightly darker on hover */
-}
-
-input, .book_now_btn {
-  height: 38px; /* Matching the height for consistency */
-}
-
-.bordered {
+.room-name-title {
+  flex: 0 0 15vw;
+  background-color: #EEEDEB;
   border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  margin-top: 40px;
-  background-color: #f9f9f9;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  left: 0;
+  z-index: 20;
+  text-align: center;
+  vertical-align: middle;
 }
 
-.booking-chart-container {
-  overflow-x: auto;
-  margin-top: 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.table-bordered {
-  width: 100%;
-  background-color: white;
-
-  th,
-  td {
-    text-align: center;
-    vertical-align: middle;
-  }
-
-  .room-names {
-    background-color: #f7f7f7;
-    font-weight: bold;
-    text-transform: uppercase;
-  }
-
-  .date-cell {
-   
-    z-index: 10; /* Ensure it stays above other content */
-    background-color: #f7f7f7; /* Ensures background covers table content */
-  }
-
-
-  
-  .booking-cell {
-
-    &.cursor-disabled {
-      color: white;
-      cursor: not-allowed;
-    }
-
-    &.arrival-cell {
-      border-left: 0.25rem solid #4caf50;
-    }
-
-    &.arrival-cell.selected {
-      display: none; /* Hide when selected */
-    }
-
-    &.arrival-cell:hover {
-      border-left: 0.25rem solid #4caf50;
-      background-color: #B6E2A1;
-    }
-
-    &:hover {
-      background-color: lightgray;
-      cursor: pointer;
-    }
-
-    &.cursor-disabled:hover {
-      background-color: lightgray; 
-      cursor: not-allowed;
-    }
-
-    &.start-of-reservation:hover,
-    &.end-of-reservation:hover,
-    &.middle-of-reservation:hover {
-      background-color: white;
-      cursor: pointer;
-    }
-
-    &.selected{
-      background-color: #B6E2A1;
-    }
-
-    &.departure-cell {
-      border-right: 0.5rem solid #FFCF96;
-      background-color: #FFFEC4;
-      
-    }
-  
-    &.selected.departure-cell {
-      background-color: #B6E2A1;
-    }
-
-    &.departure-cell:hover .selected:hover{
-      background-color: #FFFEC4;
-    }
-  }
-}
-
-
-.middle-of-reservation::before,
-.start-of-reservation::before,
-.end-of-reservation::before {
-  content: '';
-  position: absolute;
-  top: 0.5rem;
-  bottom: 0.5rem;
-  background-color: coral;
-  z-index: 1; 
+.date-cell {
+  min-width: 6vw;
+  padding: 0.8rem;
+  text-align: center;
+  border: 0.1rem solid #ddd;
+  background-color: #f7f7f7;
+  white-space: nowrap;
   color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  
+  z-index: 10;
 }
 
-.start-of-reservation::before {
-  left: 60% !important;
-  right: 0% !important;
-  border-top-left-radius: 5px; 
-  border-bottom-left-radius: 5px; 
-}
-
-.middle-of-reservation::before {
+.room-name {
+  padding: 1rem;
+  text-align: left;
+  font-size: 1rem;
+  white-space: nowrap;
+  position: sticky;
   left: 0;
-  right: 0; /* Cover the full cell */
-}
-
-.end-of-reservation::before {
-  left: 0;
-  right: 60%; /* Cover the right half of the cell */
-  border-top-right-radius: 5px; /* Optional: Round the top right corner */
-  border-bottom-right-radius: 5px; /* Optional: Round the bottom right corner */
-  
-}
-
-/* Optional: Remove borders between reservation cells */
-.middle-of-reservation,
-.start-of-reservation,
-.end-of-reservation {
-  border-left: none;
-  border-right: none;
-}
-
-.start-of-reservation {
-  border-right: none;
-}
-
-.end-of-reservation {
-  border-left: none;
+  z-index: 10;
+  background-color: #B4B4B8;
+  color: white;
 }
 
 
+.booking-cell {
+  min-width: 4vw;
+  height: 5vh;
+  border: 0.1rem solid #cecbcb;
+  text-align: center;
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+  background-color: transparent;
+  box-sizing: border-box; 
+}
 
+.selected {
+  background-color: #79edbb;
+  border-color: #79edbb;
+}
+
+#scrollSentinel {
+  height: 1px;
+}
+
+
+.reservation-marker {
+  position: absolute;
+  // top: 0.8rem; 
+  height: 2rem; 
+  background-color: coral; 
+  border-radius: 2px; 
+  display: inline-block; 
+  z-index: 5;
+}
 

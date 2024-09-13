@@ -67,13 +67,18 @@ export class LocalStorageService {
     return localStorage.getItem('customers')? JSON.parse(localStorage.getItem('customers')!) : [];
   }
 
-  getReservationsById(roomId: number){
+  getReservationsById(roomId: number | undefined){
     const reservations = localStorage.getItem('reservations')? JSON.parse(localStorage.getItem('reservations')!) : [];
     return reservations.filter((reservation: ReservationDetails) => reservation.roomId === roomId);
   }
 
   setReservations(reservations: ReservationDetails[]){
     localStorage.setItem('reservations', JSON.stringify(reservations));
+  }
+
+  getReservationByRoomId(roomId: number | undefined){
+    const reservations = localStorage.getItem('reservations')? JSON.parse(localStorage.getItem('reservations')!) : [];
+    return reservations.filter((reservation: ReservationDetails) => reservation.roomId === roomId);
   }
   
 }

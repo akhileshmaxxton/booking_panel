@@ -1,0 +1,40 @@
+.form-group {
+    position: relative;
+    width: 100%;
+  }
+  
+  .calendar-popup {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    z-index: 1000;
+    display: block;
+    width: 280px;
+    border: 1px solid #ddd;
+  }
+  
+  .day {
+    width: calc(100% / 7);
+    cursor: pointer;
+  }
+  
+  .day.disabled {
+    color: #ccc;
+    pointer-events: none;
+  }
+  
+  .day.active {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  input[readonly] {
+    background-color: white;
+    cursor: pointer;
+  }
+  
+  .d-flex {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
