@@ -3,26 +3,12 @@
     <div class="form-header-group header-large">
       <div class="header-text">
         <h2 class="form-header text-dark">Customer Registration Form</h2>
-        <div class="form-subHeader text-dark my-2">
-          Please fill out the form below to register as a customer.
-        </div>
+        <div class="form-subHeader text-dark my-2">Please fill out the form below to register as a customer.</div>
         <ng-container class="row" *ngIf="!getIsCustomerFromService()">
           <label class="form-label">Select Customer</label>
-          <select
-            name="customer"
-            id="customer"
-            #customer
-            class="form-control"
-            (change)="onCustomerSelect(customer.value)"
-          >
-      <option value="null">New Customer</option>
-      <option
-        *ngFor="let customer of customersForDropDown "
-        [value]="customer.customerId"
-      >
-        {{ customer.firstName + " " +  customer.middleName + " " + customer.lastName }}
-      </option>
-      
+          <select name="customer" id="customer" #customer class="form-control" (change)="onCustomerSelect(customer.value)">
+            <option value="null">New Customer</option>
+            <option *ngFor="let customer of customersForDropDown " [value]="customer.customerId">{{ customer.firstName + " " +  customer.middleName + " " + customer.lastName }}</option>
           </select>
         </ng-container>
       </div>
@@ -31,7 +17,7 @@
     <form [formGroup]="customerFormData" (ngSubmit)="onSubmit()">
       <div class="row mb-4">
         <div class="col-md-4">
-          <label for="firstName" class="form-label ">First Name <span class="text-danger">*</span></label>
+          <label for="firstName" class="form-label ">First Name<span class="text-danger">*</span></label>
           <input type="text" class="form-control" formControlName="firstName" />
           <div *ngIf="customerFormData.get('firstName')?.touched && customerFormData.get('firstName')?.invalid">
             <small class="text-danger">{{ customerFormData.get('firstName')?.errors?.['invalidName'] }}</small>

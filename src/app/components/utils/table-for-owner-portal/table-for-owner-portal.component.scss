@@ -48,3 +48,7 @@
   animation-delay: var(--animation-delay, 0s);
 }
 
+
+.custom-button:hover {
+  text-decoration: none !important;
+}

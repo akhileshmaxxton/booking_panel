@@ -18,3 +18,15 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   height: 80vh !important;
   max-height: 80vh !important;
 }
+
+// .mat-mdc-dialog-component-host{
+//   z-index: 9999 !important;
+
+// }
+
+// .cdk-overlay-pane {z-index: 9999 !important;}
+
+
+.modal__content,dialog-layout,mat-dialog-container,.mat-dialog-container,#cdk-overlay-0,.cdk-overlay-pane {
+  z-index: 9999 !important;
+}

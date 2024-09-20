@@ -57,15 +57,17 @@
               [attr.title]="isStartOfReservation(room.roomId, day) || isMiddleOfReservation(room.roomId, day) || isEndOfReservation(room.roomId, day) ? getTooltipText(room.roomId, day) : null"
               (mousedown)="onMouseDown(room.roomId, day, $event)"
               (mouseover)="onMouseOver(room.roomId, day, $event)"
-              (mousemove)="onMouseMove(room.roomId, day, $event)"
+              
               (mouseup)="onMouseUp(room.roomId,day,$event)"
               (mouseout)="onMouseOut()"
             >
             <span
             *ngIf="isStartOfReservation(room.roomId, day)"
-            class="reservation-marker"
-            [ngStyle]="{ width: getReservationWidth(room.roomId, day) }"
+            class="reservation-marker text-start ps-2"
+            [ngStyle]="getReservationWidthandStatus(room.roomId, day)"
+            (click)="openAlert()"
           >
+            {{ getCustomerNameForReservation(room.roomId, day) }}
           </span></td>
           </ng-container>
         </ng-container>

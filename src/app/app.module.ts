@@ -43,16 +43,16 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { ReservationDialogNewComponent } from './components/utils/reservation-dialog-new/reservation-dialog-new.component';
-import {STEPPER_GLOBAL_OPTIONS} from '@angular/cdk/stepper';
-import {MatButtonModule} from '@angular/material/button';
-import {MatInputModule} from '@angular/material/input';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatStepperModule} from '@angular/material/stepper';
+import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatStepperModule } from '@angular/material/stepper';
 import { MatIconModule } from '@angular/material/icon';
-import {MatDatepickerModule} from '@angular/material/datepicker';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import {MatGridListModule} from '@angular/material/grid-list';
-import {MatSelectModule} from '@angular/material/select';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   declarations: [
@@ -111,7 +111,17 @@ import {MatSelectModule} from '@angular/material/select';
     MatGridListModule,
     MatSelectModule
   ],
-  providers: [RoomDetailsApiService, MergeRoomAndRoomDetails, UniquePipe, LocalStorageService, provideAnimationsAsync(), FilterService, {provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: {hasBackdrop: false}}, {provide: STEPPER_GLOBAL_OPTIONS, useValue: {showError: true},}, provideNativeDateAdapter()],
+  providers: [
+    RoomDetailsApiService, 
+    MergeRoomAndRoomDetails, 
+    UniquePipe, 
+    LocalStorageService, 
+    provideAnimationsAsync(), 
+    FilterService, 
+    {provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: {hasBackdrop: true}}, 
+    {provide: STEPPER_GLOBAL_OPTIONS, useValue: {showError: true},}, 
+    provideNativeDateAdapter()
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

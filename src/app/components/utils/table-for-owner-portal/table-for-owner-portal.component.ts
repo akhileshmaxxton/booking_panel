@@ -5,6 +5,9 @@ import { RoomAndRoomStayDetails } from '../../../interface/room-and-room-stay-de
 import { FilterService } from '../../../service/filterService/filter.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ReservationDialogNewComponent } from '../reservation-dialog-new/reservation-dialog-new.component';
+import { CustomerDetails } from '../../../interface/customer-details';
+import { ReservationDetails } from '../../../interface/reservation-details';
+import { PaymentDetails } from '../../../interface/payment-details';
 
 declare var bootstrap: any; // To access Bootstrap's JavaScript methods
 
@@ -14,9 +17,9 @@ declare var bootstrap: any; // To access Bootstrap's JavaScript methods
   styleUrl: './table-for-owner-portal.component.scss'
 })
 export class TableForOwnerPortalComponent {
-  customers: any[] = [];
-  reservations: any[] = [];
-  paymentDetails: any[] = [];
+  customers: CustomerDetails[] = [];
+  reservations: ReservationDetails[] = [];
+  paymentDetails: PaymentDetails[] = [];
   combinedDetails: any[] = [];
   statuses: string[] = ['Confirmed', 'Check-In', 'Check-Out'];
   roomsData: RoomAndRoomStayDetails[] = [];
@@ -30,19 +33,18 @@ export class TableForOwnerPortalComponent {
   }
 
   ngOnInit() {
-    this.customers = this.localStorageService.getAllCustomersFromLocalStorage();
     this.reservations = this.localStorageService.getAllReservationsFromLocalStorage();
+    this.customers = this.localStorageService.getAllCustomersFromLocalStorage();
     this.paymentDetails = this.localStorageService.getAllPaymentsFromLocalStorage();
 
-    this.combinedDetails = this.customers.map(customer => {
-      const reservation = this.reservations.find(res => res.customerId === customer.customerId) || {};
-      const payment = this.paymentDetails.find(pay => pay.customerId === customer.customerId) || {};
-      const roomData = this.roomsData.find(room => room.roomId === reservation.roomId) || {};
-    
+    this.combinedDetails = this.reservations.map(reservation => {
+      const customerForCombinedData = this.customers.find(res => res.customerId === reservation.customerId);
+      const paymentForCombinedData = this.paymentDetails.find(pay => reservation.paymentIds.includes(pay.paymentId));
+      
       return {
-        customerId: customer.customerId,
-        name: `${customer.firstName} ${customer.middleName} ${customer.lastName}`,
-        birthData: customer.birthData,
+        customerId: customerForCombinedData?.customerId,
+        name: `${customerForCombinedData?.firstName} ${customerForCombinedData?.middleName} ${customerForCombinedData?.lastName}`,
+        birthData: customerForCombinedData?.birthData,
         reservationId: reservation.reservationId || '',
         locationId: reservation.locationId || '',
         roomId: reservation.roomId || '',
@@ -54,11 +56,11 @@ export class TableForOwnerPortalComponent {
         pricePerDayPerPerson: reservation.pricePerDayPerPerson || '',
         numberOfDays: reservation.numberOfDays || '',
         paymentIds: reservation.paymentIds || [],
-        locationName: reservation.locationName || '',
-        roomName: reservation.roomName || '',
-        dueAmount: payment.paymentDue || 0,
-        amount: payment.paymentAmount || '',
-        status: customer.status || reservation.status || payment.status || this.statuses[0]
+        // locationName: reservation?.locationName || '',
+        // roomName: reservation?.roomName || '',
+        dueAmount: paymentForCombinedData?.paymentDue || 0,
+        amount: paymentForCombinedData?.paymentAmount || 0,
+        status: reservation.status
       };
     });
     console.log("combinedDetails",this.combinedDetails);
@@ -79,9 +81,11 @@ export class TableForOwnerPortalComponent {
   }
 
   openDialog() {
-    const dialogRef = this.dialog.open(ReservationDialogNewComponent, {panelClass: 'my-outlined-dialog'});
+    const dialogRef = this.dialog.open(ReservationDialogNewComponent, {data: { roomId: null },panelClass: 'my-outlined-dialog'});
 
     dialogRef.afterClosed().subscribe(result => {
+      this.filterService.resetFilters();
+      this.filterService.setSubmitted(false);
       console.log(`Dialog result: ${result}`);
     });
   }

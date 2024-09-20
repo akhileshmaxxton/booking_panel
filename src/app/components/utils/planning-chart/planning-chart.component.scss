@@ -4,7 +4,7 @@
 
   
 .room-name-title {
-  flex: 0 0 15vw;
+  flex: 0 0 10vw;
   background-color: #EEEDEB;
   border: 1px solid #ddd;
   position: sticky;
@@ -15,7 +15,8 @@
 }
 
 .date-cell {
-  min-width: 6vw;
+  min-width: 4rem;
+  min-height: 4rem;
   padding: 0.8rem;
   text-align: center;
   border: 0.1rem solid #ddd;
@@ -37,6 +38,9 @@
   color: white;
 }
 
+.sticky-top{
+  z-index: 20;
+}
 
 .booking-cell {
   min-width: 4vw;
@@ -48,12 +52,50 @@
   position: relative;
   background-color: transparent;
   box-sizing: border-box; 
+
+  &.start-of-reservation{
+    border-right: none;
+  }
+
+  &.middle-of-reservation{
+    border: none;
+  }
+
+  &.end-of-reservation{
+    border-left: none;
+  }
+
+  &.arrival-cell {
+    border-left: 0.25rem solid #68a969;
+    background-color: #a4e2b7;
+  }
+
+  &.arrival-cell:hover {
+    border-left: 0.25rem solid #4caf50;
+    background-color: #82fd8b;
+  }
+
+  &.departure-cell {
+    border-right: 0.5rem solid #FFCF96;
+    background-color: #FFFEC4;
+    
+  }
+
+  &.departure-cell:hover{
+    background-color: #FFFEC4;
+  }
+
+  &.selected{
+    background-color: #B6E2A1;
+  }
 }
 
-.selected {
-  background-color: #79edbb;
-  border-color: #79edbb;
-}
+// .selected {
+//   background-color: #79edbb;
+//   border-color: #79edbb;
+// }
+
+
 
 #scrollSentinel {
   height: 1px;
@@ -62,11 +104,12 @@
 
 .reservation-marker {
   position: absolute;
-  // top: 0.8rem; 
-  height: 2rem; 
+  height: 70%; 
   background-color: coral; 
   border-radius: 2px; 
   display: inline-block; 
   z-index: 5;
+  padding-top: 10%;
+  overflow: hidden;
 }
 
