@@ -1,6 +1,6 @@
 <div class="container mt-5">
   <h1 class="text-center mb-4">Booking Details</h1>
-  <button  mat-button (click)="openDialog()">Create Reservation</button>
+  <button mat-button class="mb-4 fs-5 text-decoration-underline custom-button"  (click)="openDialog()">Create Reservation</button>
   <div class="table-responsive">
     <table class="table table-hover table-striped align-middle">
       <thead class="table-dark">
@@ -17,7 +17,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let detail of combinedDetails; let i = index" class="table-row" [ngStyle]="{ '--animation-delay': i * 0.1 + 's'}">
+        <tr *ngFor="let detail of combinedDetails; let i = index" class="table-row " [ngStyle]="{ '--animation-delay': i * 0.1 + 's'}">
           <td (click)="openModalForBookedDetais(detail)">{{ detail.name }}</td>
           <td (click)="openModalForBookedDetais(detail)">{{ detail.birthData | date: 'yyyy-MM-dd' }}</td>
           <td (click)="openModalForBookedDetais(detail)">{{ detail.checkIn | date: 'yyyy-MM-dd' }}</td>

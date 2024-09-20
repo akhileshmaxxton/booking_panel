@@ -7,6 +7,8 @@ import { UniquePipe } from '../../../utils/unique.pipe';
 import { FilterService } from '../../../service/filterService/filter.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import moment from 'moment';
+import { MatDialog } from '@angular/material/dialog';
+import { ReservationDialogNewComponent } from '../reservation-dialog-new/reservation-dialog-new.component';
 
 declare var bootstrap: any;
 
@@ -42,7 +44,8 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
   private endSelectionDate: Date | null = null;
   private selectionRowId: number | null = null;
 
-  constructor(private roomDetailsApiService: RoomDetailsApiService, private uniquePipe: UniquePipe, private localStorageApiService: LocalStorageService, private router: Router, private route: ActivatedRoute, private filterService: FilterService, private snackBar: MatSnackBar) {
+  constructor(private roomDetailsApiService: RoomDetailsApiService, private uniquePipe: UniquePipe, private localStorageApiService: LocalStorageService, private router: Router, private route: ActivatedRoute, private filterService: FilterService, private snackBar: MatSnackBar, public dialog: MatDialog) {
+    localStorageApiService.setReservationStatus();
     this.initCurrentMonth();
   }
 
@@ -58,10 +61,8 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
     this.roomDetailsApiService.fetchAllDataForCustomerPortal().subscribe((mergedData) => {
       this.roomDetailsForFilter = mergedData;
       this.roomsData = mergedData;
-      this.filterService.getFilteredRoomStayDetails().subscribe((data) => {
-        this.rooms = data;
+      this.rooms = mergedData;
         this.rooms = this.uniquePipe.transform(this.rooms, 'roomId');
-      });
     });
   }
 
@@ -128,7 +129,6 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
     }, 100);
   }
 
-  
   loadNextMonth() {
     const lastMonth = this.months[this.months.length - 1].month;
     const nextMonth = new Date(lastMonth.getFullYear(), lastMonth.getMonth() + 1, 1);
@@ -187,59 +187,55 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
   onMouseOut() {
     this.arrivalDaysForMouseOver.clear();
     this.departureDaysForMouseOver.clear();
+    this.selectedCells.clear();
   }
 
   onMouseDown(roomId: number, day: Date, event: MouseEvent) {
     event.preventDefault();
 
-    if(!this.isMouseDown) {
-      if(this.isMiddleOfReservation(roomId, day) || this.isStartOfReservation(roomId, day)) {
-        this.openSnackBar('This date is already reserved.', 'Close');
-        this.isMouseDown = false;
-        this.departureDaysForMouseOver.clear();
-        this.selectedCells.clear();
-        return;
-      }
-      this.isMouseDown = true;
-      this.selectionRowId = roomId; 
-      this.startSelectionDate = day;
-      this.endSelectionDate = day; 
-      
-      this.selectedCells.clear();
-      this.updateSelection(roomId);
+    // Setting mouse down status immediately and checking reservation conditions later
+    this.isMouseDown = true;
+    this.selectionRowId = roomId;
+    this.startSelectionDate = day;
+    this.endSelectionDate = day;
+
+    if (this.isMiddleOfReservation(roomId, day) || this.isStartOfReservation(roomId, day)) {
+      this.openSnackBar('This date is already reserved.', 'Close');
+      this.isMouseDown = false;
       this.departureDaysForMouseOver.clear();
-     
-      this.findDepartureDates(roomId, day);
-      console.log("departureDaysForMouseOver",[...this.departureDaysForMouseOver]);
-      if(this.departureDaysForMouseOver.size > 0 && this.isMouseDown) {
-        this.arrivalDaysForMouseOver.clear();
-      }
+      this.selectedCells.clear();
+      return;
     }
 
+    // Clearing the previous selection and updating the selection
+    this.selectedCells.clear();
+    this.updateSelection(roomId);
+    this.departureDaysForMouseOver.clear();
+
+    this.findDepartureDates(roomId, day);
+    if (this.departureDaysForMouseOver.size > 0 && this.isMouseDown) {
+      this.arrivalDaysForMouseOver.clear();
+    }
   }
 
   onMouseOver(roomId: number, day: Date, event: MouseEvent) {
     if(!this.isMouseDown) {
       this.arrivalDaysForMouseOver.clear();
       this.findArrivalDates(roomId);
-
+      
       //-----adjust later for the tooltip-----
       if(this.isDateInReservation(moment(day),roomId)){
         this.getTooltipText(roomId,day);
       }
     }
-   
-  }
-
-  onMouseMove(roomId: number, day: Date, event: MouseEvent) {
     if (this.isMouseDown) {
       this.endSelectionDate = day;
       this.updateSelection(roomId);
     }
-  
   }
   
   onMouseUp(roomId: number, day: Date, event: MouseEvent) {
+    // this.openDialog();
     console.log("selected cell",this.selectedCells);
     this.isMouseDown = false;
     if(!this.isMouseDown){
@@ -249,29 +245,30 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
 
   //----------EVENT HANDLERS - END ------------------
   getTooltipText(roomId: number, day: Date): string {
-    const booking = this.localStorageApiService.getReservationsById(roomId);
-    if(booking){
-      return `Booked on ${moment(booking[0].reservationDate).format('DD-MM-YYYY')} \nFrom ${moment(booking[0].checkIn).format('DD-MM-YYYY')} to ${moment(booking[0].checkOut).format('DD-MM-YYYY')} \nFor ${booking[0].numberOfGuests} guests.`;
+    const reservation = this.localStorageApiService.getReservationByRoomId(roomId).find((reservation: { checkIn: moment.MomentInput; }) => moment(reservation.checkIn).isSame(day, 'day'));
+    const customer  = this.localStorageApiService.getAllCustomersFromLocalStorage().find((customer: { customerId: string; }) => customer.customerId === reservation?.customerId);
+    if(reservation){
+      return `Booked on ${moment(reservation.reservationDate).format('DD-MM-YYYY')} \nFrom ${moment(reservation.checkIn).format('DD-MM-YYYY')} to ${moment(reservation.checkOut).format('DD-MM-YYYY')} \nFor ${customer?.firstName} ${customer?.lastName}.`;
     }
     return '';
   }
   
-  private updateSelection(roomId: number) {
-    const startCell = moment(this.startSelectionDate);
-    const endCell = moment(this.endSelectionDate);
-  
+  updateSelection(roomId: number) {
+    // Clear the previous selection to avoid visual issues
     this.selectedCells.clear();
-  
-    this.months.forEach(month => {
-      month.days.forEach(day => {
-        const dayMoment = moment(day);
-  
-        if (dayMoment.isBetween(startCell, endCell, undefined, '[]')) {
-          const key = `${this.selectionRowId ?? 0}_${dayMoment.format('YYYY-MM-DD')}`;
-          this.selectedCells.set(key, { roomId: this.selectionRowId ?? 0, day: dayMoment.toDate() });
-        }
-      });
-    });
+
+    // Logic to iterate over the range of dates and select the corresponding cells
+    const startDate = moment(this.startSelectionDate);
+    const endDate = moment(this.endSelectionDate);
+
+    if (startDate.isSameOrBefore(endDate)) {
+      let currentDate = startDate.clone();
+      while (currentDate.isSameOrBefore(endDate)) {
+        const dateKey = `${roomId}_${currentDate.format('YYYY-MM-DD')}`;
+        this.selectedCells.set(dateKey, { roomId, day: currentDate.toDate() });
+        currentDate.add(1, 'days');
+      }
+    }
   }
   
   isSelected(roomId: number, day: Date): boolean {
@@ -342,61 +339,188 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
     });
   }
 
-  findArrivalDates(roomId: number) {
-    const today = moment().startOf('day');
-    this.roomsData?.filter(room => room.roomId === roomId)?.forEach(room => {
-      const stayDateFrom = moment(room.stayDateFrom);
-      const stayDateTo = moment(room.stayDateTo);
-    
-      for (let date = stayDateFrom; date <= stayDateTo; date = date.add(1, 'days')) {
-        if (date.isAfter(today) && room.arrivalDays.includes(date.format('ddd').toUpperCase()) && !this.isMiddleOfReservation(roomId, date.toDate()) && !this.isStartOfReservation(roomId, date.toDate())) {
-          const key = `${roomId}_${date.format('YYYY-MM-DD')}`;
-          this.arrivalDaysForMouseOver.set(key, { roomId, day: date.toDate() });
-        }
-      }
-    });
-  }
 
-  findDepartureDates(roomId: number, day: Date) {
-    this.roomsData?.filter(room => room.roomId === roomId)?.forEach(room => {
-      const stayDateFrom = moment(room.stayDateFrom);
-      const stayDateTo = moment(room.stayDateTo);
-      const selectedDay = moment(day);
-
-      if (selectedDay.isBetween(stayDateFrom, stayDateTo, 'days', '[]')) {
-        for (let date = selectedDay.clone(); date.isSameOrBefore(stayDateTo); date.add(1, 'days')) {
-          if(!this.isDateInReservation(date, roomId)) {
-            const dayOfWeek = date.format('ddd').toUpperCase();
-            if (room.departureDays.includes(dayOfWeek)) {
-              const daysFromSelection = date.diff(selectedDay, 'days') + 1; 
-              if (daysFromSelection >= room.minStay && daysFromSelection <= room.maxStay) {
-                const cellDetail: cellDetails = {
-                  roomId: room.roomId,
-                  day: date.toDate(),
-                };
-                this.departureDaysForMouseOver.set(`${roomId}_${date.format('YYYY-MM-DD')}`, cellDetail);
-                
-              } else {
-                break;
+  findArrivalDates(roomId: number){
+    const bookedReservationFromLocalStorage = this.localStorageApiService.getAllReservationsFromLocalStorage();
+      this.arrivalDaysForMouseOver.clear();
+  
+      this.roomDetailsApiService.fetchAllDataForCustomerPortal().subscribe(data => {
+  
+  
+        data.forEach(room => {
+          const bookDateFrom = room?.bookDateFrom ? moment(room.bookDateFrom).startOf('day') : moment(new Date()).startOf('day');
+          const bookDateTo = room?.bookDateTo ? moment(room.bookDateTo).startOf('day') : moment(room.stayDateTo).subtract(room.minStay + (room.minDeviation ? room.minDeviation : 0), 'days').startOf('day');
+          const stayDateFrom = moment(room.stayDateFrom).startOf('day');
+          const stayDateTo = moment(room.stayDateTo).startOf('day');
+          const arrivalDays = room?.arrivalDays.map(item => item.toUpperCase());
+          const bookedRooomsByRoomId = bookedReservationFromLocalStorage?.filter((reservation: { roomId: number; }) => reservation.roomId === room.roomId);
+  
+          if(moment(new Date()).isBetween(bookDateFrom, bookDateTo, 'day', '[]')){
+  
+            for(let i = stayDateFrom.clone(); i <= stayDateTo.clone().subtract(room.minStay, 'days'); i = i.add(1, 'days')) {
+              let isOverlapping = false;
+              bookedRooomsByRoomId.forEach((reservation: { checkIn: Date; checkOut: Date; }) => {
+                if(i.isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '[]') || i.clone().add(room.minStay, 'days').isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '[]')) {
+                  isOverlapping = true;
+                }
+              })
+              const isOnArrivalDays = arrivalDays.length > 0 ? arrivalDays.includes(i.format('ddd').toUpperCase()) : true;
+              const isValidForMinDeviation = i.isSameOrAfter(moment(new Date()).add(room.minDeviation, 'days').startOf('day'));
+              const isValidForMaxDeviation = i.isSameOrBefore(moment(new Date()).add(room.maxDeviation, 'days').startOf('day'));
+  
+              if(isOnArrivalDays && isValidForMinDeviation && isValidForMaxDeviation && !isOverlapping && room.roomId === roomId) {
+                const key = `${roomId}_${i.format('YYYY-MM-DD')}`;
+                this.arrivalDaysForMouseOver.set(key, { roomId, day: i.toDate() });
               }
             }
           }
-        }
-      }
-    });
+        })  
+      })
   }
 
-  getReservationWidth(roomId: number, startDay: Date): string {
-    const reservationLength = this.getReservationLength(roomId, startDay) + 1;
-    const cellWidth = 4; 
-  
-    return `calc(${reservationLength} * ${cellWidth}vw)`;
+
+
+  // findArrivalDates(roomId: number) {
+  //   const today = moment().startOf('day');
+  //   this.roomsData?.filter(room => room.roomId === roomId)?.forEach(room => {
+  //     const stayDateFrom = moment(room.stayDateFrom);
+  //     const stayDateTo = moment(room.stayDateTo);
+    
+  //     for (let date = stayDateFrom; date <= stayDateTo; date = date.add(1, 'days')) {
+  //       if (date.isAfter(today) && room.arrivalDays.includes(date.format('ddd').toUpperCase()) && !this.isMiddleOfReservation(roomId, date.toDate()) && !this.isStartOfReservation(roomId, date.toDate())) {
+  //         const key = `${roomId}_${date.format('YYYY-MM-DD')}`;
+  //         this.arrivalDaysForMouseOver.set(key, { roomId, day: date.toDate() });
+  //       }
+  //     }
+  //   });
+  // }
+
+  // findDepartureDates(roomId: number, day: Date) {
+  //   this.roomsData?.filter(room => room.roomId === roomId)?.forEach(room => {
+  //     const stayDateFrom = moment(room.stayDateFrom);
+  //     const stayDateTo = moment(room.stayDateTo);
+  //     const selectedDay = moment(day);
+
+  //     if (selectedDay.isBetween(stayDateFrom, stayDateTo, 'days', '[]')) {
+  //       for (let date = selectedDay.clone(); date.isSameOrBefore(stayDateTo); date.add(1, 'days')) {
+  //         if(!this.isDateInReservation(date, roomId)) {
+  //           const dayOfWeek = date.format('ddd').toUpperCase();
+  //           if (room.departureDays.includes(dayOfWeek)) {
+  //             const daysFromSelection = date.diff(selectedDay, 'days') + 1; 
+  //             if (daysFromSelection >= room.minStay && daysFromSelection <= room.maxStay) {
+  //               const cellDetail: cellDetails = {
+  //                 roomId: room.roomId,
+  //                 day: date.toDate(),
+  //               };
+  //               this.departureDaysForMouseOver.set(`${roomId}_${date.format('YYYY-MM-DD')}`, cellDetail);
+  //             } else {
+  //               break;
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
+  //   });
+  // }
+
+  findDepartureDates(roomId: number, day: Date){
+    const arrivalDate = moment(day).startOf('day');
+
+    const bookedReservationFromLocalStorage = this.localStorageApiService.getAllReservationsFromLocalStorage();
+
+
+    this.roomDetailsApiService.fetchAllDataForCustomerPortal().subscribe(data => {
+      data.forEach(room => {
+        const bookDateFrom = room?.bookDateFrom ? moment(room.bookDateFrom).startOf('day') : moment(new Date()).startOf('day');
+        const bookDateTo = room?.bookDateTo ? moment(room.bookDateTo).startOf('day') : moment(room.stayDateTo).subtract(room.minStay + (room.minDeviation ? room.minDeviation : 0), 'days').startOf('day');
+        const stayDateFrom = moment(room.stayDateFrom).startOf('day');
+        const stayDateTo = moment(room.stayDateTo).startOf('day');
+        const arrivalDays = room?.arrivalDays.map(item => item.toUpperCase());
+        const departureDays = room?.departureDays.map(item => item.toUpperCase());
+
+        const isOnArrivalDays = arrivalDays.length > 0 ? arrivalDays.includes(arrivalDate.format('ddd').toUpperCase()) : true;
+        const isBetweenBookFromAndToDate = arrivalDate.isBetween(bookDateFrom, bookDateTo, 'day', '[]');
+        const isBetweenStayFromAndToDate = arrivalDate.isBetween(stayDateFrom, stayDateTo, 'day', '[]');
+        const isValidForMinDeviation = arrivalDate.isSameOrAfter(moment(new Date()).add(room.minDeviation, 'days').startOf('day'));
+        const isValidForMaxDeviation = arrivalDate.isSameOrBefore(moment(new Date()).add(room.maxDeviation, 'days').startOf('day'));
+        const bookedRooomsByRoomId = bookedReservationFromLocalStorage?.filter((reservation: { roomId: number; }) => reservation.roomId === room.roomId);
+
+
+        if(isOnArrivalDays && isBetweenStayFromAndToDate && isBetweenBookFromAndToDate && isValidForMinDeviation && isValidForMaxDeviation) {
+          for(let i = arrivalDate.clone(); i <= stayDateTo.clone().subtract(room.minStay, 'days'); i = i.add(1, 'days')) {
+            let isOverlapping = false;
+            bookedRooomsByRoomId.forEach((reservation: { checkIn: Date; checkOut: Date; }) => {
+              if(i.isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '[]') || i.clone().add(room.minStay, 'days').isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '[]') || i.clone().add(room.maxStay, 'days').isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '[]')) {
+                isOverlapping = true;
+              }
+            })
+            const isValidForMinStay = i.isSameOrAfter(arrivalDate.clone().add(room.minStay, 'days').startOf('day'), 'day');
+            const isValidForMaxStay = i.isSameOrBefore(arrivalDate.clone().add(room.maxStay, 'days').startOf('day'), 'day');
+            const isOnDepartureDays = (departureDays.length > 0 ? departureDays.includes(i.format('ddd').toUpperCase()) : true);
+
+            if(isValidForMinStay && isValidForMaxStay && isOnDepartureDays && !isOverlapping && room.roomId === roomId) {
+              const cellDetail: cellDetails = {
+                roomId: room.roomId,
+                day: i.toDate(),
+              };
+              this.departureDaysForMouseOver.set(`${roomId}_${i.format('YYYY-MM-DD')}`, cellDetail);
+            
+              // departureDateSet.add(i.format('YYYY-MM-DD'));
+            }
+          }
+        }
+      })
+      // this.departureDates = Array.from(departureDateSet).map(dateString => moment(dateString, 'YYYY-MM-DD').toDate());
+    })
+    // console.log("deprtureeeee",this.departureDaysForMouseOver)
   }
+  getReservationWidthandStatus(roomId: number, startDay: Date) {
+    const reservation = this.localStorageApiService.getReservationByRoomId(roomId).find((reservation: { checkIn: moment.MomentInput; }) => moment(reservation.checkIn).isSame(startDay, 'day'));
+    const reservationLength = reservation ? reservation.numberOfDays : 1;
+    const spanWidth = reservationLength*100;
+    
+    let backgroundColor = '';
+    if (reservation) {
+      switch (reservation.status) {
+        case 'Confirmed':
+          backgroundColor = 'coral';
+          break;
+        case 'Check-In':
+          backgroundColor = 'lightgreen';
+          break;
+        case 'Check-Out':
+          backgroundColor = 'lightblue';
+          break;
+        default:
+          backgroundColor = 'gray';
+          break;
+      }
+    }
   
-  getReservationLength(roomId: number, startDay: Date): number {
-    const reservation = this.localStorageApiService.getReservationByRoomId(roomId).find((reservation: { checkIn: moment.MomentInput; }) => moment(reservation.checkIn).isSame(startDay, 'day')); // Your logic to get the reservation
-    return reservation ? reservation.numberOfDays : 1;
+    return {
+      width: `${spanWidth}%`,
+      backgroundColor: backgroundColor
+    };
   }
-  
-  
+
+  getCustomerNameForReservation(roomId: number, startDay: Date) {
+    const reservation = this.localStorageApiService.getReservationByRoomId(roomId).find((reservation: { checkIn: moment.MomentInput; }) => moment(reservation.checkIn).isSame(startDay, 'day'));
+    const customer  = this.localStorageApiService.getAllCustomersFromLocalStorage().find((customer: { customerId: string; }) => customer.customerId === reservation?.customerId);
+    return `${customer?.firstName} ${customer?.lastName}`;
+  }
+
+  openAlert() {
+    alert("working");
+  }
+
+  openDialog() {
+    const dialogRef = this.dialog.open(ReservationDialogNewComponent, {data: { roomId: this.selectionRowId }, panelClass: 'my-outlined-dialog'});
+
+    dialogRef.afterClosed().subscribe(result => {
+      this.filterService.resetFilters();
+      this.filterService.setSubmitted(false);
+      console.log("closed",this.filterService.filters)
+      console.log(`Dialog result: ${result}`);
+    });
+  }
 }

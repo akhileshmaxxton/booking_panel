@@ -12,12 +12,12 @@ export class LocalStorageService {
   constructor() { }
 
   setLocalStorage(customerDetails: CustomerDetails, reservationDetails: ReservationDetails, paymentDetails: PaymentDetails) {
-    const customer = localStorage.getItem('customers')? JSON.parse(localStorage.getItem('customers')!) : [];
-    const reservation = localStorage.getItem('reservations')? JSON.parse(localStorage.getItem('reservations')!) : [];
-    const payment = localStorage.getItem('payments')? JSON.parse(localStorage.getItem('payments')!) : [];
+    const customer = localStorage.getItem('customers') ? JSON.parse(localStorage.getItem('customers')!) : [];
+    const reservation = localStorage.getItem('reservations') ? JSON.parse(localStorage.getItem('reservations')!) : [];
+    const payment = localStorage.getItem('payments') ? JSON.parse(localStorage.getItem('payments')!) : [];
     if(customerDetails?.customerId === customer?.find((customer: CustomerDetails) => customer.customerId === customerDetails.customerId)?.customerId){
       console.log("Customer ID:", customerDetails.customerId);
-      customer?.find((customer: CustomerDetails) => customer.customerId === customerDetails.customerId)?.reservationId.push(reservationDetails.reservationId);
+      customer?.find((customer: CustomerDetails) => customer.customerId === customerDetails.customerId)?.reservationIds.push(reservationDetails.reservationId);
     }
     else{
       console.log("came here for else")
@@ -80,5 +80,27 @@ export class LocalStorageService {
     const reservations = localStorage.getItem('reservations')? JSON.parse(localStorage.getItem('reservations')!) : [];
     return reservations.filter((reservation: ReservationDetails) => reservation.roomId === roomId);
   }
+
+  setReservationStatus() {
+    const reservations: ReservationDetails[] = localStorage.getItem('reservations') ? JSON.parse(localStorage.getItem('reservations')!) : [];
+    
+    const currentDate = new Date();
+  
+    reservations.forEach(reservation => {
+      const checkInDate = new Date(reservation.checkIn);
+      const checkOutDate = new Date(reservation.checkOut);
+  
+      if (currentDate < checkInDate) {
+        reservation.status = 'Confirmed';
+      } else if (currentDate >= checkInDate && currentDate <= checkOutDate) {
+        reservation.status = 'Check-In';
+      } else if (currentDate > checkOutDate) {
+        reservation.status = 'Check-Out';
+      }
+    });
+  
+    localStorage.setItem('reservations', JSON.stringify(reservations));
+  }
+  
   
 }

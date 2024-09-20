@@ -110,6 +110,7 @@ export class BookingDetailsFormComponent {
 
       this.reservationDetails.numberOfDays = numberOfDays > 0 ? numberOfDays : 0;
       const totalPrice = numberOfDays * numberOfGuests * pricePerDayPerPerson;
+      this.reservationDetails.totalAmount = totalPrice > 0 ? totalPrice : 0;
 
       this.bookingDetails.patchValue({
         totalAmount: totalPrice > 0 ? totalPrice : 0,

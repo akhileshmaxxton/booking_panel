@@ -32,6 +32,12 @@ export class FilterService {
   };
 
   isFromTable: boolean = false;
+  private submittedSubject = new BehaviorSubject<boolean>(false);
+  isSubmitted$ = this.submittedSubject.asObservable();
+
+  setSubmitted(submitted: boolean) {
+    this.submittedSubject.next(submitted);
+  }
 
   setIsCustomer(isCustomer: boolean) {
     this.filters.isCustomer = isCustomer;
