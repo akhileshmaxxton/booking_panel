@@ -30,3 +30,8 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .modal__content,dialog-layout,mat-dialog-container,.mat-dialog-container,#cdk-overlay-0,.cdk-overlay-pane {
   z-index: 9999 !important;
 }
+
+.mat-mdc-form-field-type-mat-select:not(.mat-form-field-disabled) .mat-mdc-text-field-wrapper {
+  cursor: pointer;
+  width: 241px; /* You can adjust this value if needed */
+}

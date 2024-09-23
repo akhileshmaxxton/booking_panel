@@ -8,7 +8,7 @@ import { LocalStorageService } from '../../service/localStorageApi/local-storage
 })
 export class HomeComponent {
   constructor(private localStorageApiService: LocalStorageService) {
-    localStorageApiService.setReservationStatus();
+    // localStorageApiService.setReservationStatus();
    }
 
 }

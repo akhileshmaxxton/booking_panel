@@ -18,7 +18,7 @@
             <div class="form-col">
               <mat-form-field class="input-fields">
                 <mat-label>Choose checkin date</mat-label>
-                <input matInput [matDatepicker]="picker" formControlName="arrivalDate" [matDatepickerFilter]="isArrivalDateAvailable" (dateChange)="onArrivalDateSelection($event.value)">
+                <input matInput [matDatepicker]="picker" formControlName="arrivalDate" [matDatepickerFilter]="isArrivalDateAvailable" (dateChange)="onArrivalDateSelection($event.value)" [readonly]="isSubmitted">
                 <mat-hint>MM/DD/YYYY</mat-hint>
                 <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
                 <mat-datepicker #picker></mat-datepicker>
@@ -27,7 +27,7 @@
             <div class="form-col">
               <mat-form-field>
                 <mat-label>Choose checkout date</mat-label>
-                <input matInput [matDatepicker]="picker1" formControlName="departureDate" [matDatepickerFilter]="isDepartureDateAvailable" (dateChange)="onDepartureDateSelection($event.value)">
+                <input matInput [matDatepicker]="picker1" formControlName="departureDate" [matDatepickerFilter]="isDepartureDateAvailable" (dateChange)="onDepartureDateSelection($event.value)" [readonly]="isSubmitted">
                 <mat-hint>MM/DD/YYYY</mat-hint>
                 <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
                 <mat-datepicker #picker1></mat-datepicker>
@@ -36,7 +36,7 @@
             <div class="form-col">
               <mat-form-field>
                 <mat-label>Number of guests</mat-label>
-                <mat-select (selectionChange)="onGuestSelection($event.value)" formControlName="guests">
+                <mat-select (selectionChange)="onGuestSelection($event.value)" formControlName="guests" [disabled]="isSubmitted">
                   @for (guest of guestsNUmbers; track guest) {
                     <mat-option [value]="guest">{{guest}}</mat-option>
                   }
@@ -58,12 +58,12 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let room of roomsData; let i = index" class="table-row" [ngStyle]="{ '--animation-delay': i * 0.1 + 's'}"  [ngClass]="{'selected-room': selectedRoom === room}">
+                <tr *ngFor="let room of roomsData | unique: 'roomId'; let i = index" class="table-row" [ngStyle]="{ '--animation-delay': i * 0.1 + 's'}"  [ngClass]="{'selected-room': selectedRoom === room}">
                   <td>{{ room.roomName }}</td>
                   <td>{{ room.locationName }}</td>
                   <td>{{ room.pricePerDayPerPerson }}</td>
                   <td>
-                    <button mat-button (click)="selectRoom(room); stepper.next()" >Book Now</button>
+                    <button mat-button (click)="selectRoom(room); stepper.next()" [disabled]="isSubmitted" >Book Now</button>
                   </td>
                 </tr>
               </tbody>
@@ -82,7 +82,7 @@
         <ng-template matStepLabel>Fill out customer details</ng-template>
         <div class="row mb-4">
           <label class="form-label">Select Customer</label>
-          <select name="customer" id="customer" #customer class="form-control" (change)="onCustomerSelect(customer.value)">
+          <select name="customer" id="customer" #customer class="form-control" (change)="onCustomerSelect(customer.value)" [disabled]="isSubmitted">
             <option value="null">New Customer</option>
             <option *ngFor="let customer of customersForDropDown " [value]="customer.customerId">{{ customer.firstName + " " +  customer.middleName + " " + customer.lastName }}</option>
           </select>
@@ -90,21 +90,21 @@
         <div class="row mb-4">
           <div class="col-md-4">
             <label for="firstName" class="form-label ">First Name<span class="text-danger">*</span></label>
-            <input type="text" class="form-control" formControlName="firstName" />
+            <input type="text" class="form-control" formControlName="firstName" [readonly]="isSubmitted"/>
             <div *ngIf="customerDetailsFormGroup.get('firstName')?.touched && customerDetailsFormGroup.get('firstName')?.invalid">
               <small class="text-danger">{{ customerDetailsFormGroup.get('firstName')?.errors?.['invalidName'] }}</small>
             </div>
           </div>
           <div class="col-md-4">
             <label for="middleName" class="form-label">Middle Name</label>
-            <input type="text" class="form-control" formControlName="middleName" />
+            <input type="text" class="form-control" formControlName="middleName" [readonly]="isSubmitted"/>
             <div *ngIf="customerDetailsFormGroup.get('middleName')?.touched && customerDetailsFormGroup.get('middleName')?.invalid">
               <small class="text-danger">{{ customerDetailsFormGroup.get('middleName')?.errors?.['invalidName'] }}</small>
             </div>
           </div>
           <div class="col-md-4">
             <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" formControlName="lastName" />
+            <input type="text" class="form-control" formControlName="lastName" [readonly]="isSubmitted"/>
             <div *ngIf="customerDetailsFormGroup.get('lastName')?.touched && customerDetailsFormGroup.get('lastName')?.invalid">
               <small class="text-danger">{{ customerDetailsFormGroup.get('lastName')?.errors?.['invalidName'] }}</small>
             </div>
@@ -114,14 +114,14 @@
         <div class="row mb-4">
           <div class="col-md-6">
             <label for="birthDate" class="form-label">Birth Date <span class="text-danger">*</span></label>
-            <input type="date" [max]="maxDate" class="form-control" formControlName="birthDate" />       
+            <input type="date" [max]="maxDate" class="form-control" formControlName="birthDate" [readonly]="isSubmitted"/>       
             <div *ngIf="customerDetailsFormGroup.get('birthDate')?.touched && customerDetailsFormGroup.get('birthDate')?.invalid">
               <small class="text-danger">{{ customerDetailsFormGroup.get('birthDate')?.errors?.['invalidBirthDate'] }}</small>
             </div>
           </div>
           <div class="col-md-6">
             <label for="country" class="form-label">Country <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" formControlName="country" />
+            <input type="text" class="form-control" formControlName="country" [readonly]="isSubmitted"/>
             <div *ngIf="customerDetailsFormGroup.get('country')?.touched && customerDetailsFormGroup.get('country')?.invalid">
               <small class="text-danger">{{ customerDetailsFormGroup.get('country')?.errors?.['invalidCountry'] }}</small>
             </div>
@@ -131,14 +131,14 @@
         <div class="row mb-4">
           <div class="col-md-6">
             <label for="state" class="form-label">State <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" formControlName="state" />
+            <input type="text" class="form-control" formControlName="state" [readonly]="isSubmitted"/>
             <div *ngIf="customerDetailsFormGroup.get('state')?.touched && customerDetailsFormGroup.get('state')?.invalid">
               <small class="text-danger">{{ customerDetailsFormGroup.get('state')?.errors?.['invalidState'] }}</small>
             </div>
           </div>
           <div class="col-md-6">
             <label for="city" class="form-label">City <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" formControlName="city" />
+            <input type="text" class="form-control" formControlName="city" [readonly]="isSubmitted"/>
             <div *ngIf="customerDetailsFormGroup.get('city')?.touched && customerDetailsFormGroup.get('city')?.invalid">
               <small class="text-danger">{{ customerDetailsFormGroup.get('city')?.errors?.['invalidCity'] }}</small>
             </div>
@@ -148,14 +148,14 @@
         <div class="row mb-4">
           <div class="col-md-6">
             <label for="pincode" class="form-label">Pincode <span class="text-danger">*</span></label>
-            <input type="number" class="form-control" formControlName="pincode" />
+            <input type="number" class="form-control" formControlName="pincode" [readonly]="isSubmitted"/>
             <div *ngIf="customerDetailsFormGroup.get('pincode')?.touched && customerDetailsFormGroup.get('pincode')?.errors?.['invalidPincode']">
               <small class="text-danger">{{ customerDetailsFormGroup.get('pincode')?.errors?.['invalidPincode'] }}</small>
             </div>
           </div>
           <div class="col-md-6">
             <label for="phoneNumber" class="form-label">Phone Number <span class="text-danger">*</span></label>
-            <input type="number" class="form-control" formControlName="phoneNumber" />
+            <input type="number" class="form-control" formControlName="phoneNumber" [readonly]="isSubmitted"/>
             <div *ngIf="customerDetailsFormGroup.get('phoneNumber')?.touched && customerDetailsFormGroup.get('phoneNumber')?.errors?.['invalidPhoneNumber']">
               <small class="text-danger">{{ customerDetailsFormGroup.get('phoneNumber')?.errors?.['invalidPhoneNumber'] }}</small>
             </div>
@@ -194,31 +194,63 @@
         </div>
        </ng-container>
 
-        <form [formGroup]="paymentDetailsFormGroup" class="custom-form needs-validation" novalidate >
-          <div class="container-fluid">
-            <div class="row">
-              <!-- Payment Mode -->
-              <div class="col-md-6 mb-3">
-                <label for="paymentMode" class="form-label">Payment Mode</label>
-                <select id="paymentMode" class="form-select" formControlName="paymentMode">
-                  <option value="debitcard">Debit Card</option>
-                  <option value="upi">UPI</option>
-                  <option value="cash">Cash</option>
-                </select>
+       <form [formGroup]="paymentDetailsFormGroup" class="custom-form needs-validation" novalidate>
+        <div class="container-fluid">
+          <div class="row">
+            <!-- Payment Mode -->
+            <div class="col-md-6 mb-3">
+              <label for="paymentMode" class="form-label">Payment Mode</label>
+              <select id="paymentMode" class="form-select" formControlName="paymentMode" [disabled]="isSubmitted">
+                <option value="" disabled>Select Payment Mode</option>
+                <option value="debitcard">Debit Card</option>
+                <option value="upi">UPI</option>
+                <option value="cash">Cash</option>
+              </select>
+              <div *ngIf="paymentDetailsFormGroup.get('paymentMode')?.invalid && paymentDetailsFormGroup.get('paymentMode')?.touched" class="text-danger">
+                Payment Mode is required.
               </div>
-              <!-- Paid Amount -->
-              <div class="col-md-3 mb-3">
-                <label for="paidAmount" class="form-label">Paid Amount</label>
-                <input type="number" min="0" class="form-control" id="paidAmount" formControlName="paymentAmount" />
+            </div>
+      
+            <!-- Paid Amount -->
+            <div class="col-md-3 mb-3">
+              <label for="paidAmount" class="form-label">Paid Amount</label>
+              <input
+                type="number"
+                class="form-control"
+                id="paidAmount"
+                formControlName="paymentAmount"
+                min="0"
+                (change)="calculateDue()"
+                [readonly]="isSubmitted"
+              />
+              <div *ngIf="paymentDetailsFormGroup.get('paymentAmount')?.invalid && paymentDetailsFormGroup.get('paymentAmount')?.touched" class="text-danger">
+                <span *ngIf="paymentDetailsFormGroup.get('paymentAmount')?.errors?.['required']">Payment Amount is required.</span>
+                <span *ngIf="paymentDetailsFormGroup.get('paymentAmount')?.errors?.['min']">Amount should be at least 10% of the total.</span>
+                <span *ngIf="paymentDetailsFormGroup.get('paymentAmount')?.errors?.['max']">Amount cannot exceed the total.</span>
               </div>
-              <!-- Due -->
-              <div class="col-md-3 mb-3">
-                <label for="due" class="form-label">Due</label>
-                <input type="number" min="0" class="form-control" id="due" formControlName="paymentDue" />
+            </div>
+      
+            <!-- Due -->
+            <div class="col-md-3 mb-3">
+              <label for="due" class="form-label">Due</label>
+              <input
+                type="number"
+                class="form-control"
+                id="due"
+                formControlName="paymentDue"
+                [readonly]="true"
+              />
+              <div *ngIf="paymentDetailsFormGroup.get('paymentDue')?.invalid && paymentDetailsFormGroup.get('paymentDue')?.touched" class="text-danger">
+                Due amount is required.
               </div>
             </div>
           </div>
-        </form>
+        </div>
+      </form>
+      
+      
+      
+      
       
          <ng-container *ngIf="!isSubmitted">
           <div>
@@ -230,7 +262,7 @@
         
       
           <ng-container *ngIf="isSubmitted">
-            <div class="container mt-5">
+            <div class="container mt-5" id="booking-preview">
               <div class="row justify-content-center">
                 <div class="col-md-8">
                   <div class="card">
@@ -249,6 +281,7 @@
             
                       <div class="mb-3">
                         <h6>Booking Details:</h6>
+                        <p><strong>Booking ID:</strong> {{ reservationDetails.reservationId }}</p>
                         <p><strong>Check-In:</strong> {{ reservationDetails.checkIn | date }}</p>
                         <p><strong>Check-Out:</strong> {{ reservationDetails.checkOut | date }}</p>
                         <p><strong>Number of Nights:</strong> {{ reservationDetails.numberOfDays }}</p>
@@ -257,14 +290,15 @@
                       </div>
             
                       <div class="mb-3">
-                        <h6>Payment Details:</h6>
+                        <h6>Payment Details:</h6>                        
+                        <p><strong>Payment Id:</strong> {{ paymentDetails.paymentId }}</p>
                         <p><strong>Payment Date:</strong> {{ paymentDetails.paymentDate | date }}</p>
                         <p><strong>Payment Mode:</strong> {{ paymentDetails.paymentMode }}</p>
                         <p><strong>Payment ID:</strong> {{ paymentDetails.paymentId }}</p>
                       </div>
             
                       <div class="text-center">
-                        <!-- <button class="btn btn-primary"></button> Home</button> -->
+                        <button class="btn btn-primary" (click)="printInvoice()">Download</button>
                       </div>
                     </div>
                   </div>
@@ -272,14 +306,8 @@
               </div>
             </div>
           </ng-container>
+         
           
-  
-
-
-
-        
-            
-        
     </mat-step>
   </mat-stepper>
 </mat-dialog-content>
