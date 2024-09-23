@@ -39,7 +39,8 @@ export class TableForOwnerPortalComponent {
 
     this.combinedDetails = this.reservations.map(reservation => {
       const customerForCombinedData = this.customers.find(res => res.customerId === reservation.customerId);
-      const paymentForCombinedData = this.paymentDetails.find(pay => reservation.paymentIds.includes(pay.paymentId));
+      const paymentForCombinedData = this.paymentDetails.find(pay => reservation.paymentIds.includes(pay.paymentId)); 
+      const  roomData = this.roomsData.find(room => reservation.roomId === room.roomId)
       
       return {
         customerId: customerForCombinedData?.customerId,
@@ -56,8 +57,8 @@ export class TableForOwnerPortalComponent {
         pricePerDayPerPerson: reservation.pricePerDayPerPerson || '',
         numberOfDays: reservation.numberOfDays || '',
         paymentIds: reservation.paymentIds || [],
-        // locationName: reservation?.locationName || '',
-        // roomName: reservation?.roomName || '',
+        locationName: roomData?.locationName || '',
+        roomName: roomData?.roomName || '',
         dueAmount: paymentForCombinedData?.paymentDue || 0,
         amount: paymentForCombinedData?.paymentAmount || 0,
         status: reservation.status
@@ -81,11 +82,9 @@ export class TableForOwnerPortalComponent {
   }
 
   openDialog() {
-    const dialogRef = this.dialog.open(ReservationDialogNewComponent, {data: { roomId: null },panelClass: 'my-outlined-dialog'});
+    const dialogRef = this.dialog.open(ReservationDialogNewComponent, {data: { roomId: null, checkInDate : null, checkOutDate: null },panelClass: 'my-outlined-dialog'});
 
     dialogRef.afterClosed().subscribe(result => {
-      this.filterService.resetFilters();
-      this.filterService.setSubmitted(false);
       console.log(`Dialog result: ${result}`);
     });
   }

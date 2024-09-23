@@ -81,12 +81,17 @@
     
   }
 
-  &.departure-cell:hover{
-    background-color: #FFFEC4;
-  }
+  // &.departure-cell:hover{
+  //   background-color: #FFFEC4;
+  // }
 
   &.selected{
     background-color: #B6E2A1;
+  }
+
+  &.selected.departure-cell{
+    background-color: #B6E2A1;
+    border: none;
   }
 }
 
