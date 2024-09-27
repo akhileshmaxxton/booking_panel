@@ -1,51 +1,55 @@
 <mat-dialog-content>
   <!-- Header Section  -->
   <div class="d-flex justify-content-between align-items-center">
-    <h2 mat-dialog-title>Hi</h2>
+    <p class="display-6">Find Rooms</p>
     <button mat-icon-button (click)="close()">
       <mat-icon>close</mat-icon>
     </button>
   </div>
-  <hr/>
+  <hr class="bold-hr"/>
   <mat-stepper #stepper>
     <!-- Date Selection Step -->
-    <mat-step [stepControl]="dateSelectionGroup" errorMessage="Name is required.">
+    <mat-step [stepControl]="dateSelectionGroup" errorMessage="All fields are required.">
       <form [formGroup]="dateSelectionGroup">
-        <ng-template matStepLabel>Select your prefered dates</ng-template>
-        <button (click)="showArrival()">Choose</button>
-        <div class="form-container">
-          <!-- <div class="form-row"> -->
-            <div class="form-col">
-              <mat-form-field class="input-fields">
-                <mat-label>Choose checkin date</mat-label>
-                <input matInput [matDatepicker]="picker" formControlName="arrivalDate" [matDatepickerFilter]="isArrivalDateAvailable" (dateChange)="onArrivalDateSelection($event.value)" [readonly]="isSubmitted">
-                <mat-hint>MM/DD/YYYY</mat-hint>
-                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker #picker></mat-datepicker>
-              </mat-form-field>
-            </div>
-            <div class="form-col">
-              <mat-form-field>
-                <mat-label>Choose checkout date</mat-label>
-                <input matInput [matDatepicker]="picker1" formControlName="departureDate" [matDatepickerFilter]="isDepartureDateAvailable" (dateChange)="onDepartureDateSelection($event.value)" [readonly]="isSubmitted">
-                <mat-hint>MM/DD/YYYY</mat-hint>
-                <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
-                <mat-datepicker #picker1></mat-datepicker>
-              </mat-form-field>
-            </div>
-            <div class="form-col">
-              <mat-form-field>
-                <mat-label>Number of guests</mat-label>
-                <mat-select (selectionChange)="onGuestSelection($event.value)" formControlName="guests" [disabled]="isSubmitted">
-                  @for (guest of guestsNUmbers; track guest) {
-                    <mat-option [value]="guest">{{guest}}</mat-option>
-                  }
-                </mat-select>
-              </mat-form-field>
+        <ng-template matStepLabel>Select your preferred dates</ng-template>
+        
+        <!-- Conditionally display form if form is invalid or user clicked "Back to Form" -->
+        <div *ngIf="!dateSelectionGroup.valid || isEditingRequirements">
+          <button (click)="showArrival()">Choose</button>
+          <div class="form-container">
+            <div class="form-row">
+              <div class="form-col">
+                <mat-form-field class="input-fields">
+                  <mat-label>Choose checkin date</mat-label>
+                  <input matInput [matDatepicker]="picker" formControlName="arrivalDate" [matDatepickerFilter]="isArrivalDateAvailable" (dateChange)="onArrivalDateSelection($event.value)" [readonly]="isSubmitted">
+                  <mat-hint>MM/DD/YYYY</mat-hint>
+                  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+              </div>
+              <div class="form-col">
+                <mat-form-field>
+                  <mat-label>Choose checkout date</mat-label>
+                  <input matInput [matDatepicker]="picker1" formControlName="departureDate" [matDatepickerFilter]="isDepartureDateAvailable" (dateChange)="onDepartureDateSelection($event.value)" [readonly]="isSubmitted">
+                  <mat-hint>MM/DD/YYYY</mat-hint>
+                  <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
+                  <mat-datepicker #picker1></mat-datepicker>
+                </mat-form-field>
+              </div>
+              <div class="form-col">
+                <mat-form-field>
+                  <mat-label>Number of guests</mat-label>
+                  <mat-select (selectionChange)="onGuestSelection($event.value)" formControlName="guests" [disabled]="isSubmitted">
+                    <mat-option *ngFor="let guest of guestsNumbers" [value]="guest">{{ guest }}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
             </div>
           </div>
-        <!-- </div> -->
-        <ng-container *ngIf="roomsData.length > 0 && selectedGuestsNumber > 0">
+        </div>
+    
+        <!-- Conditionally display table when form is valid and user is not editing -->
+        <ng-container *ngIf="dateSelectionGroup.valid && !isEditingRequirements">
           <h3 class="text-center mb-4">Rooms Available</h3>
           <div class="table-responsive">
             <table class="table table-hover align-middle">
@@ -53,28 +57,32 @@
                 <tr>
                   <th>Name</th>
                   <th>Location</th>
-                  <th>Price per night/person</th>
+                  <th>Price per person</th>
+                  <th>Total Price</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let room of roomsData | unique: 'roomId'; let i = index" class="table-row" [ngStyle]="{ '--animation-delay': i * 0.1 + 's'}"  [ngClass]="{'selected-room': selectedRoom === room}">
+                <tr *ngFor="let room of roomToBeDisplayed | unique: 'roomId'; let i = index" class="table-row" [ngStyle]="{ '--animation-delay': i * 0.1 + 's'}" [ngClass]="{'selected-room': selectedRoom === room}">
                   <td>{{ room.roomName }}</td>
                   <td>{{ room.locationName }}</td>
-                  <td>{{ room.pricePerDayPerPerson }}</td>
+                  <td>{{ room.pricePerDayPerPerson }}/night</td>
+                  <td>{{ calculateTotalPrice(room) }}</td>
                   <td>
-                    <button mat-button (click)="selectRoom(room); stepper.next()" [disabled]="isSubmitted" >Book Now</button>
+                    <button mat-button (click)="selectRoom(room); stepper.next()" [disabled]="isSubmitted">Book Now</button>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
+          <!-- Back to Form Button -->
+          <div class="d-flex justify-content-end">
+            <button mat-button (click)="editRequirements()">Edit Requirements</button>
+          </div>
         </ng-container>
-        <!-- <div class="d-flex justify-content-end fs-5">
-          <button mat-button matStepperNext [disabled]="dateSelectionGroup.invalid || selectedRoom === null" >Next</button>
-        </div> -->
       </form>
     </mat-step>
+    
 
     <!-- Customer Details Step-->
     <mat-step [stepControl]="customerDetailsFormGroup" errorMessage="All fields are required.">
@@ -168,147 +176,175 @@
         </div>
       </form>
     </mat-step>
-    <mat-step [stepControl]="paymentDetailsFormGroup" >
-        <ng-template matStepLabel>Payment</ng-template>
-        <p>Please Confirm Your Booking</p>
-        <!-- Selected Room Details Section -->
-       <ng-container *ngIf="selectedRoom">
-        <div class="card mb-4">
-          <div class="row g-0">
-            <div class="col-md-4">
-              <img [src]="selectedRoom.imageSrc" class="img-fluid rounded-start" alt="{{ selectedRoom.roomName }}" />
-            </div>
-            <div class="col-md-8">
+    <mat-step [stepControl]="paymentDetailsFormGroup">
+      <ng-template matStepLabel>Payment</ng-template>
+      <!-- <p>Please Confirm Your Booking</p> -->
+    
+      <!-- Layout for Room Details and Payment Form -->
+      <div class="row">
+        <!-- Selected Room Details Section (Left Column) -->
+        <div class="col-md-6">
+          <ng-container *ngIf="selectedRoom; else selectRoomMessage">
+            <div class="room-details-card mb-4">
               <div class="card-body">
-                <h5 class="card-title">{{ selectedRoom.roomName }}</h5>
-                <p class="card-text"><strong>Location:</strong> {{ selectedRoom.locationName }}</p>
-                <p class="card-text"><strong>Price per day per person:</strong> ₹{{ selectedRoom.pricePerDayPerPerson }}</p>
-                <p class="card-text"><strong>Number of guest:</strong> {{ selectedGuestsNumber }}</p>
-                <p class="card-text"><strong>Check-In Date:</strong> {{ selectedArrivalDate | date: 'dd/MM/yyyy' }}</p>
-                <p class="card-text"><strong>Check-Out Date:</strong> {{ selectedDepartureDate | date: 'dd/MM/yyyy' }}</p>
-                <p class="card-text"><strong>Stay Duration: {{reservationDetails.numberOfDays}}</strong>  - </p>
-                <p class="card-text"><small class="text-muted">Total Price :${{ reservationDetails.totalAmount }}</small></p>
-              </div>
-            </div>
-          </div>
-        </div>
-       </ng-container>
-
-       <form [formGroup]="paymentDetailsFormGroup" class="custom-form needs-validation" novalidate>
-        <div class="container-fluid">
-          <div class="row">
-            <!-- Payment Mode -->
-            <div class="col-md-6 mb-3">
-              <label for="paymentMode" class="form-label">Payment Mode</label>
-              <select id="paymentMode" class="form-select" formControlName="paymentMode" [disabled]="isSubmitted">
-                <option value="" disabled>Select Payment Mode</option>
-                <option value="debitcard">Debit Card</option>
-                <option value="upi">UPI</option>
-                <option value="cash">Cash</option>
-              </select>
-              <div *ngIf="paymentDetailsFormGroup.get('paymentMode')?.invalid && paymentDetailsFormGroup.get('paymentMode')?.touched" class="text-danger">
-                Payment Mode is required.
-              </div>
-            </div>
-      
-            <!-- Paid Amount -->
-            <div class="col-md-3 mb-3">
-              <label for="paidAmount" class="form-label">Paid Amount</label>
-              <input
-                type="number"
-                class="form-control"
-                id="paidAmount"
-                formControlName="paymentAmount"
-                min="0"
-                (change)="calculateDue()"
-                [readonly]="isSubmitted"
-              />
-              <div *ngIf="paymentDetailsFormGroup.get('paymentAmount')?.invalid && paymentDetailsFormGroup.get('paymentAmount')?.touched" class="text-danger">
-                <span *ngIf="paymentDetailsFormGroup.get('paymentAmount')?.errors?.['required']">Payment Amount is required.</span>
-                <span *ngIf="paymentDetailsFormGroup.get('paymentAmount')?.errors?.['min']">Amount should be at least 10% of the total.</span>
-                <span *ngIf="paymentDetailsFormGroup.get('paymentAmount')?.errors?.['max']">Amount cannot exceed the total.</span>
-              </div>
-            </div>
-      
-            <!-- Due -->
-            <div class="col-md-3 mb-3">
-              <label for="due" class="form-label">Due</label>
-              <input
-                type="number"
-                class="form-control"
-                id="due"
-                formControlName="paymentDue"
-                [readonly]="true"
-              />
-              <div *ngIf="paymentDetailsFormGroup.get('paymentDue')?.invalid && paymentDetailsFormGroup.get('paymentDue')?.touched" class="text-danger">
-                Due amount is required.
-              </div>
-            </div>
-          </div>
-        </div>
-      </form>
-      
-      
-      
-      
-      
-         <ng-container *ngIf="!isSubmitted">
-          <div>
-            <button mat-button matStepperPrevious>Back</button>
-            <button mat-button (click)="stepper.reset()">Reset</button>
-            <button mat-button (click)="submit()">Submit</button>
-          </div>
-         </ng-container>
-        
-      
-          <ng-container *ngIf="isSubmitted">
-            <div class="container mt-5" id="booking-preview">
-              <div class="row justify-content-center">
-                <div class="col-md-8">
-                  <div class="card">
-                    <div class="card-header text-center">
-                      <h4>Booking Confirmation</h4>
-                    </div>
-                    <div class="card-body">
-                      <h5 class="mb-4">Invoice Details</h5>
-                      
-                      <div class="mb-3">
-                        <h6>Customer Details:</h6>
-                        <p><strong>Name:</strong> {{ customerDetails.firstName }}</p>
-                        <p><strong>Phone:</strong> {{ customerDetails.phoneNumber }}</p>
-                        
-                      </div>
+                <p class="mb-4 display-6">{{ selectedRoom.roomName }}</p>
             
-                      <div class="mb-3">
-                        <h6>Booking Details:</h6>
-                        <p><strong>Booking ID:</strong> {{ reservationDetails.reservationId }}</p>
-                        <p><strong>Check-In:</strong> {{ reservationDetails.checkIn | date }}</p>
-                        <p><strong>Check-Out:</strong> {{ reservationDetails.checkOut | date }}</p>
-                        <p><strong>Number of Nights:</strong> {{ reservationDetails.numberOfDays }}</p>
-                        <p><strong>Total Amount Paid:</strong> {{ paymentDetails.paymentAmount | currency }}</p>
-                        <p><strong>Total Amount Duw:</strong> {{ paymentDetails.paymentDue | currency }}</p>
-                      </div>
-            
-                      <div class="mb-3">
-                        <h6>Payment Details:</h6>                        
-                        <p><strong>Payment Id:</strong> {{ paymentDetails.paymentId }}</p>
-                        <p><strong>Payment Date:</strong> {{ paymentDetails.paymentDate | date }}</p>
-                        <p><strong>Payment Mode:</strong> {{ paymentDetails.paymentMode }}</p>
-                        <p><strong>Payment ID:</strong> {{ paymentDetails.paymentId }}</p>
-                      </div>
-            
-                      <div class="text-center">
-                        <button class="btn btn-primary" (click)="printInvoice()">Download</button>
-                      </div>
-                    </div>
+                <div class="row">
+                  <div class="detail-item mb-3 col-lg-6">
+                    <label class="detail-label">Location:</label>
+                    <p class="detail-value">{{ selectedRoom.locationName }}</p>
                   </div>
+  
+                  <div class="detail-item mb-3 col-lg-6">
+                    <label class="detail-label">Number of guests:</label>
+                    <p class="detail-value">{{ selectedGuestsNumber }}</p>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="detail-item mb-3 col-lg-6">
+                    <label class="detail-label">Price per day per person:</label>
+                    <p class="detail-value">₹{{ selectedRoom.pricePerDayPerPerson }}</p>
+                  </div>
+
+                  <div class="detail-item mb-3 col-lg-6">
+                    <label class="detail-label">Stay Duration:</label>
+                    <p class="detail-value">{{ reservationDetails.numberOfDays }} Nights</p>
+                  </div>
+                </div>
+            
+               <div class="row">
+                <div class="detail-item mb-3 col-lg-6">
+                  <label class="detail-label">Check-In Date:</label>
+                  <p class="detail-value">{{ selectedArrivalDate | date: 'd MMMM y' }}</p>
+                </div>
+            
+                <div class="detail-item mb-3 col-lg-6">
+                  <label class="detail-label">Check-Out Date:</label>
+                  <p class="detail-value">{{ selectedDepartureDate | date: 'd MMMM y' }}</p>
+                </div>
+               </div>
+          
+                <div class="detail-item mb-3">
+                  <label class="detail-label">Total Price:</label>
+                  <p class="detail-value">₹{{ reservationDetails.totalAmount }}</p>
                 </div>
               </div>
             </div>
+            
           </ng-container>
-         
+    
+          <!-- Message to Show if No Room is Selected -->
+          <ng-template #selectRoomMessage class="text-center my-auto">
+            <p class="text-muted">Please select a room to see the details.</p>
+          </ng-template>
+        </div>
+
+        <!-- Payment Form Section (Right Column) -->
+        <div class="col-md-6">
+          <form [formGroup]="paymentDetailsFormGroup" class="custom-form needs-validation" novalidate>
+            <div class="container-fluid">
+              <!-- Payment Mode -->
+              <div class="row mb-3">
+                <label for="paymentMode" class="form-label">Payment Mode</label>
+                <select id="paymentMode" class="form-select" formControlName="paymentMode" [disabled]="isSubmitted">
+                  <option value="" disabled>Select Payment Mode</option>
+                  <option value="debitcard">Debit Card</option>
+                  <option value="upi">UPI</option>
+                  <option value="cash">Cash</option>
+                </select>
+                <div *ngIf="paymentDetailsFormGroup.get('paymentMode')?.invalid && paymentDetailsFormGroup.get('paymentMode')?.touched" class="text-danger">
+                  Payment Mode is required.
+                </div>
+              </div>
           
+              <!-- Paid Amount -->
+              <div class="row mb-3">
+                <label for="paidAmount" class="form-label">Pay</label>
+                <input type="number" class="form-control" id="paidAmount" formControlName="paymentAmount" min="0" (change)="paymentAmountValidator(paymentDetailsFormGroup.get('paymentAmount')?.value)"  [readonly]="isSubmitted" />
+                <div *ngIf="paymentDetailsFormGroup.get('paymentAmount')?.invalid && paymentDetailsFormGroup.get('paymentAmount')?.touched" class="text-danger">
+                  <span *ngIf="paymentDetailsFormGroup.get('paymentAmount')?.errors?.['required']">Payment Amount is required.</span>
+                  <span *ngIf="paymentDetailsFormGroup.get('paymentAmount')?.errors?.['minAmount']">Amount should be at least 10% of the total.</span>
+                  <span *ngIf="paymentDetailsFormGroup.get('paymentAmount')?.errors?.['maxAmount']">Amount cannot exceed the total.</span>
+                </div>
+              </div>
+          
+              <!-- Due Amount -->
+              <!-- <div class="row mb-3">
+                <label for="due" class="form-label">Due</label>
+                <input type="number" class="form-control" id="due" formControlName="paymentDue" [readonly]="true" />
+                <div *ngIf="paymentDetailsFormGroup.get('paymentDue')?.invalid && paymentDetailsFormGroup.get('paymentDue')?.touched" class="text-danger">
+                  Due amount is required.
+                </div>
+              </div> -->
+            </div>
+          </form>
+          
+          
+          <ng-container *ngIf="!isSubmitted">
+            <div>
+              <button mat-button matStepperPrevious>Back</button>
+              <button mat-button (click)="stepper.reset()">Reset</button>
+              <button mat-button (click)="submit()">Submit</button>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    
+      <!-- Action Buttons -->
+      <!-- <ng-container *ngIf="!isSubmitted">
+        <div>
+          <button mat-button matStepperPrevious>Back</button>
+          <button mat-button (click)="stepper.reset()">Reset</button>
+          <button mat-button (click)="submit()">Submit</button>
+        </div>
+      </ng-container> -->
+    
+      <!-- Invoice Section (Displayed after submission) -->
+      <ng-container *ngIf="isSubmitted">
+        <div class="container mt-5" id="booking-preview">
+          <div class="row justify-content-center">
+            <div class="col-md-8">
+              <div class="card shadow-lg border-0 rounded-3">
+               
+                <div class="card-body p-5">
+                  <h5 class="mb-4 text-primary">Invoice Details</h5>
+                  <div class="mb-3">
+                    <h6 class="text-secondary">Customer Details:</h6>
+                    <p><strong>Name:</strong> {{ customerDetails.firstName }}</p>
+                    <p><strong>Phone:</strong> {{ customerDetails.phoneNumber }}</p>
+                  </div>
+                  <hr />
+                  <div class="mb-3">
+                    <h6 class="text-secondary">Booking Details:</h6>
+                    <p><strong>Booking ID:</strong> {{ reservationDetails.reservationId }}</p>
+                    <p><strong>Check-In:</strong> {{ reservationDetails.checkIn | date: 'd MMMM y' }}</p>
+                    <p><strong>Check-Out:</strong> {{ reservationDetails.checkOut | date: 'd MMMM y' }}</p>
+                    <p><strong>Number of Nights:</strong> {{ reservationDetails.numberOfDays }}</p>
+                    <p><strong>Total Amount Paid:</strong> <span class="text-success">{{ paymentDetails.paymentAmount | currency }}</span></p>
+                    <p><strong>Total Amount Due:</strong> <span class="text-danger">{{ paymentDetails.paymentDue | currency }}</span></p>
+                  </div>
+                  <hr />
+                  <div class="mb-3">
+                    <h6 class="text-secondary">Payment Details:</h6>
+                    <p><strong>Payment ID:</strong> {{ paymentDetails.paymentId }}</p>
+                    <p><strong>Payment Date:</strong> {{ paymentDetails.paymentDate | date: 'd MMMM y' }}</p>
+                    <p><strong>Payment Mode:</strong> {{ paymentDetails.paymentMode }}</p>
+                  </div>
+                  <div class="text-center mt-4">
+                    <button class="btn btn-outline-primary px-5 py-2" (click)="printInvoice()">Download Invoice</button>
+                  </div>
+                </div>
+                <div class="card-footer text-muted text-center py-3">
+                  <p>Thank you for choosing our service!</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
     </mat-step>
+    
   </mat-stepper>
 </mat-dialog-content>
   

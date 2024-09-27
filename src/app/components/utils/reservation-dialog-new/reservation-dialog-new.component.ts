@@ -1,19 +1,20 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Renderer2, Component, Inject, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { RoomDetailsApiService } from '../../../service/apiService/room-details-api.service';
 import { RoomAndRoomStayDetails } from '../../../interface/room-and-room-stay-details';
-import moment, { Moment } from 'moment';
+import moment from 'moment';
 import { LocalStorageService } from '../../../service/localStorageApi/local-storage.service';
 import { CustomerDetails } from '../../../interface/customer-details';
 import { PaymentDetails } from '../../../interface/payment-details';
 import { ReservationDetails } from '../../../interface/reservation-details';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import ShortUniqueId from 'short-unique-id';
-import { FilterService } from '../../../service/filterService/filter.service';
 import {MAT_DIALOG_DATA} from '@angular/material/dialog';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { BookingServiceService } from '../../../service/bookingService/booking-service.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -31,9 +32,10 @@ export class ReservationDialogNewComponent {
   selectedDepartureDate: Date | null = null;
   arrivalDates: Date[] = [];
   departureDates: Date[] = [];
-  guestsNUmbers: number[] = [];
+  guestsNumbers: number[] = [];
   selectedGuestsNumber: number = 0;
   selectedRoom: RoomAndRoomStayDetails | null = null;
+  roomToBeDisplayed: RoomAndRoomStayDetails[] = [];
   customersForDropDown?: CustomerDetails[] = [];
   dateSelectionGroup!: FormGroup;
   reservationDetails: ReservationDetails = {
@@ -77,16 +79,17 @@ export class ReservationDialogNewComponent {
     paymentDue: 0,
   };
   isSubmitted: boolean = false;
-  isDataLoaded: boolean = false;
+  arrivalDateRooms: RoomAndRoomStayDetails[] = [];
+  isEditingRequirements = false;
   
   
   
   private _formBuilder = inject(FormBuilder);
 
-  constructor( public dialogRef: MatDialogRef<ReservationDialogNewComponent>,private roomDetailsApiService: RoomDetailsApiService, private localStorageService: LocalStorageService, private snackBar: MatSnackBar, private filterService: FilterService, @Inject(MAT_DIALOG_DATA) public data: {roomId: number,  checkInDate : Date, checkOutDate: Date}) {
+  constructor( public dialogRef: MatDialogRef<ReservationDialogNewComponent>,private roomDetailsApiService: RoomDetailsApiService, private localStorageService: LocalStorageService, private snackBar: MatSnackBar, @Inject(MAT_DIALOG_DATA) public data: {roomId: number}, private bookingService: BookingServiceService, private router: Router, private renderer: Renderer2) { 
     this.dateSelectionGroup = this._formBuilder.group({
-      arrivalDate: [this.data.checkInDate ? moment(this.data.checkInDate).format('YYYY-MM-DD') : '', Validators.required],
-      departureDate: [this.data.checkOutDate ? moment(this.data.checkOutDate).format('YYYY-MM-DD') : '', Validators.required],
+      arrivalDate: ['', [Validators.required,this.arrivalDateValidator.bind(this)]],
+      departureDate: ['', [Validators.required, this.departireDateValidator.bind(this)]],
       guests: ['', Validators.required],
     });
 
@@ -107,31 +110,72 @@ export class ReservationDialogNewComponent {
     this.paymentDetailsFormGroup = this._formBuilder.group({
       paymentMode: ['', Validators.required],
       paymentDate: [new Date().toISOString().split('T')[0], Validators.required],
-      paymentAmount: ['',[ Validators.required,
-        Validators.min(this.reservationDetails.totalAmount * 0.1), 
-        Validators.max(this.reservationDetails.totalAmount)]],
-        paymentDue: [{ value: '', disabled: true }, Validators.required] ,
+      paymentAmount: ['',[ Validators.required]],
     })
 
-    this.paymentDetailsFormGroup.get('paymentAmount')?.valueChanges.subscribe(amount => {
-      this.updateDueAmount(amount);
+    this.paymentDetailsFormGroup.get('paymentAmount')?.valueChanges.subscribe(value => {
+      this.paymentAmountValidator(value);
     });
+   
+  }
 
-    this.paymentDetailsFormGroup.setValidators(this.validatePaymentAmount());
+  arrivalDateValidator(control: AbstractControl): ValidationErrors | null {
+    const value = control.value;
+    if(!this.isArrivalDateAvailable(value)){
+      return { invalidArrivalDate: true };
+    }
+    return null;
+  }
+
+  departireDateValidator(control: AbstractControl): ValidationErrors | null {
+    const value = control.value;
+    if(!this.isDepartureDateAvailable(value)){
+      return { invalidDepartureDate: true };
+    }
+    return null;
+  } 
+
+  paymentAmountValidator(value:number): void {
+    
+    const minAmount = this.reservationDetails.totalAmount * 0.1; // 10% of total amount
+    const maxAmount = this.reservationDetails.totalAmount;
+
+    // Reset previous errors
+    this.paymentDetailsFormGroup.get('paymentAmount')?.setErrors(null);
+
+    if (value < minAmount) {
+      this.paymentDetailsFormGroup.get('paymentAmount')?.setErrors({ minAmount: true });
+    } else if (value > maxAmount) {
+      this.paymentDetailsFormGroup.get('paymentAmount')?.setErrors({ maxAmount: true });
+    }
   }
 
   ngOnInit() {
-    if(this.data.roomId === null){
+    this.bookingService.arrivalDate$.subscribe(date => {
+      
+      if (date) {
+        const formattedDate = moment(date).format('YYYY-MM-DD');
+        this.dateSelectionGroup.patchValue({ arrivalDate: formattedDate });
+      }
+    });
+
+    this.bookingService.departureDate$.subscribe(date => {
+      if (date) {
+        const formattedDate = moment(date).format('YYYY-MM-DD');
+        this.dateSelectionGroup.patchValue({ departureDate: formattedDate });
+      }
+    });
+
+    if(this.data.roomId){
       this.fetchArrivalDates();
-     }
-     else{
-       this.fetchArrivalDates();
-       console.log("arriva days", this.arrivalDates);
-       this.onArrivalDateSelection(this.data.checkInDate);
-       this.onDepartureDateSelection(this.data.checkOutDate);
-       this.isDataLoaded = true;
-     }
+      this.onArrivalDateSelection(this.dateSelectionGroup.get('arrivalDate')?.value);
+      this.onDepartureDateSelection(this.dateSelectionGroup.get('departureDate')?.value);
+    }
+    else{
+      this.fetchArrivalDates();
+    }
   }
+  
 
   fetchArrivalDates() {
     const bookedReservationFromLocalStorage = this.localStorageService.getAllReservationsFromLocalStorage();
@@ -140,7 +184,6 @@ export class ReservationDialogNewComponent {
       let arrivalDatesSet: Set<string> = new Set();
       
       (this.data.roomId ? data.filter(room => room.roomId === this.data.roomId) : data ).forEach(room => {
-        this.data.roomId ? console.log("came  here from roomId",this.data.roomId,data) : console.log("came here rfom thr non roomId",this.data.roomId);
         const bookDateFrom = room?.bookDateFrom ? moment(room.bookDateFrom).startOf('day') : moment(new Date()).startOf('day');
         const bookDateTo = room?.bookDateTo ? moment(room.bookDateTo).startOf('day') : moment(room.stayDateTo).subtract(room.minStay + (room.minDeviation ? room.minDeviation : 0), 'days').startOf('day');
         const stayDateFrom = moment(room.stayDateFrom).startOf('day');
@@ -153,7 +196,7 @@ export class ReservationDialogNewComponent {
           for(let i = stayDateFrom.clone(); i <= stayDateTo.clone().subtract(room.minStay, 'days'); i = i.add(1, 'days')) {
             let isOverlapping = false;
             bookedRooomsByRoomId.forEach((reservation: { checkIn: Date; checkOut: Date; }) => {
-              if(i.isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '[]') || i.clone().add(room.minStay, 'days').isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '[]')) {
+              if(i.isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '()') || i.clone().add(room.minStay, 'days').isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '[]')) {
                 isOverlapping = true;
               }
             })
@@ -162,6 +205,7 @@ export class ReservationDialogNewComponent {
             const isValidForMaxDeviation = i.isSameOrBefore(moment(new Date()).add(room.maxDeviation, 'days').startOf('day'));
 
             if(isOnArrivalDays && isValidForMinDeviation && isValidForMaxDeviation && !isOverlapping) {
+              this.arrivalDateRooms.push(room);
               arrivalDatesSet.add(i.format('YYYY-MM-DD'));
             }
           }
@@ -190,19 +234,19 @@ export class ReservationDialogNewComponent {
   onArrivalDateSelection(selectedDate: Date | null) {
     
     if (!selectedDate) {
-      this.dateSelectionGroup.get('departureDate')?.setValue(null);
+      // this.dateSelectionGroup.get('departureDate')?.setValue(null);
       this.dateSelectionGroup.get('guests')?.setValue(null);
       return;
     }
 
-   if(!this.isDataLoaded){
-    this.dateSelectionGroup.get('departureDate')?.setValue(null);
+  
+    // this.dateSelectionGroup.get('departureDate')?.setValue(null);
     this.dateSelectionGroup.get('guests')?.setValue(null);
     this.departureDates = [];
     this.selectedGuestsNumber = 0;
     this.selectedRoom = null;
     this.selectedArrivalDate = selectedDate;
-  }
+
   let departureDateSet: Set<string> = new Set();
 
     const arrivalDate = moment(selectedDate).startOf('day');
@@ -231,7 +275,7 @@ export class ReservationDialogNewComponent {
           for(let i = arrivalDate.clone(); i <= stayDateTo.clone().subtract(room.minStay, 'days'); i = i.add(1, 'days')) {
             let isOverlapping = false;
             bookedRooomsByRoomId.forEach((reservation: { checkIn: Date; checkOut: Date; }) => {
-              if(i.isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '[]') || i.clone().add(room.minStay, 'days').isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '[]') || i.clone().add(room.maxStay, 'days').isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '[]')) {
+              if(i.isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '()') || i.clone().add(room.minStay, 'days').isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '[]') || i.clone().add(room.maxStay, 'days').isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '[]')) {
                 isOverlapping = true;
               }
             })
@@ -248,16 +292,19 @@ export class ReservationDialogNewComponent {
       this.departureDates = Array.from(departureDateSet).map(dateString => moment(dateString, 'YYYY-MM-DD').toDate());
     })
 
+    this.bookingService.setArrivalDate(selectedDate);
+
   }
+
 
   onDepartureDateSelection(selectedDate: Date | null) {
     if (!selectedDate) return;
     
     this.selectedDepartureDate = selectedDate;
-    if(!this.isDataLoaded){
+    
       this.selectedGuestsNumber = 0;
       this.selectedRoom = null;
-    }
+
 
     this.roomDetailsApiService.fetchAllDataForCustomerPortal().subscribe(data => {
 
@@ -283,7 +330,7 @@ export class ReservationDialogNewComponent {
         let isOverlapping = false;
         
         bookedRoomsByRoomId.forEach((reservation: { checkIn: Date; checkOut: Date }) => {
-          if(arrivalDay.isBetween(moment(reservation.checkIn),moment(reservation.checkOut),'day','[]') || departureDay.isBetween(moment(reservation.checkIn),moment(reservation.checkOut),'day','[]') ){
+          if(arrivalDay.isBetween(moment(reservation.checkIn),moment(reservation.checkOut),'day','()') || departureDay.isBetween(moment(reservation.checkIn),moment(reservation.checkOut),'day','[]') ){
             isOverlapping = true;
           }
         })
@@ -292,20 +339,22 @@ export class ReservationDialogNewComponent {
         }
       })
       if(this.selectedArrivalDate && this.selectedDepartureDate && this.roomsData.length > 0){
-        this.guestsNUmbers = [];
+        this.guestsNumbers = [];
         const maxGuest = Math.max(...this.roomsData.map(room => room.guestCapacity));
         for (let i = 1; i <= maxGuest; i++) {
-          this.guestsNUmbers.push(i);
+          this.guestsNumbers.push(i);
         }
       }
-      console.log(this.guestsNUmbers)
     })
-    this.isDataLoaded = false;
+
+    this.bookingService.setDepartureDate(selectedDate);
+    this.isEditingRequirements = false;
   }
 
   onGuestSelection(guests: number) {
     this.selectedGuestsNumber = guests;  
-
+    this.roomToBeDisplayed = this.roomsData.filter(room => room.guestCapacity >= guests);
+    this.isEditingRequirements = false;
   }
 
   selectRoom(room: RoomAndRoomStayDetails) {
@@ -324,12 +373,12 @@ export class ReservationDialogNewComponent {
       this.paymentDetailsFormGroup.patchValue({
           paymentAmount: totalPrice > 0 ? totalPrice : 0,
       });
-  } else {
-      console.log("No matching room found for the selected dates.");
-      this.paymentDetailsFormGroup.patchValue({
-          paymentAmount: 0,
-      });
-  }
+    } else {
+        console.log("No matching room found for the selected dates.");
+        this.paymentDetailsFormGroup.patchValue({
+            paymentAmount: 0,
+        });
+    }
 
     this.reservationDetails = {
       ...this.reservationDetails,
@@ -348,6 +397,19 @@ export class ReservationDialogNewComponent {
       paymentIds: []
     }
     console.log("Reservation Details: ", this.reservationDetails);
+  }
+  editRequirements() {
+    this.isEditingRequirements = true;
+  }
+
+  calculateTotalPrice(room: RoomAndRoomStayDetails): number {
+    const numberOfGuests = this.dateSelectionGroup?.get('guests')?.value ?? 0;
+    const arrivalDate = moment(this.selectedArrivalDate)?.hours(11) ?? moment();
+    const departureDate = moment(this.selectedDepartureDate)?.hours(10) ?? moment();
+    const numberOfDays = Math.ceil(departureDate.diff(arrivalDate, 'hours') / 24);
+    const pricePerDayPerPerson = room.pricePerDayPerPerson;
+
+    return numberOfGuests*pricePerDayPerPerson*numberOfDays;
   }
 
   nameValidator(control: AbstractControl): ValidationErrors | null {
@@ -393,7 +455,7 @@ export class ReservationDialogNewComponent {
       this.customerDetails = customer;
       this.customerDetailsFormGroup.patchValue({
         firstName: customer.firstName,
-        middleName: customer.middleName,
+        middleName: customer.middleName ?? '',
         lastName: customer.lastName,
         birthDate:  new Date(customer.birthData).toISOString().split('T')[0],
         country: customer.country,
@@ -423,38 +485,10 @@ export class ReservationDialogNewComponent {
     }
   }
 
-  updateDueAmount(paymentAmount: number) {
-    const totalAmount = this.reservationDetails.totalAmount;
-    const due = totalAmount - paymentAmount;
-    this.paymentDetailsFormGroup.get('paymentDue')?.setValue(due >= 0 ? due : 0, { emitEvent: false });
-  }
-  
-  validatePaymentAmount(): ValidatorFn {
-    return (control: AbstractControl): { [key: string]: any } | null => {
-      const group = control as FormGroup;
-      const paymentAmount = group.get('paymentAmount')?.value;
-      const totalAmount = this.reservationDetails.totalAmount;
-  
-      if (paymentAmount < totalAmount * 0.1) {
-        return { min: true };
-      } else if (paymentAmount > totalAmount) {
-        return { max: true }; 
-      }
-      return null;
-    };
-  }
+ 
 
-  calculateDue(): void {
-    const paymentAmountControl = this.paymentDetailsFormGroup.get('paymentAmount');
-    const totalAmount = this.reservationDetails?.totalAmount;
-  
-    if (paymentAmountControl && paymentAmountControl.value !== null && totalAmount !== undefined) {
-      const due = totalAmount - paymentAmountControl.value;
-      this.paymentDetailsFormGroup.get('paymentDue')?.setValue(due);
-    }
-    
-    this.paymentDetailsFormGroup.updateValueAndValidity();
-  }
+
+ 
 
   onCustomerFormSubmit() {
     if(this.customerDetailsFormGroup.valid) {
@@ -529,11 +563,12 @@ export class ReservationDialogNewComponent {
     console.log("selectedDepartureDate",this.selectedDepartureDate);
     console.log("roomData",this.roomsData);
     console.log("selectedRoom",this.selectedRoom);
+    console.log("arrivalDateRooms",this.arrivalDateRooms)
   }
 
   printInvoice(): void {
     const data = document.getElementById('booking-preview');
-    const downloadButton = document.querySelector('.btn-primary') as HTMLElement; // Cast to HTMLElement
+    const downloadButton = document.querySelector('.btn-outline-primary') as HTMLElement;
   
     if (data) {
       if (downloadButton) {
@@ -577,5 +612,25 @@ export class ReservationDialogNewComponent {
 
   close() {
     this.dialogRef.close();
+    this.bookingService.setArrivalDate(null);
+    this.bookingService.setDepartureDate(null);
+
+    if(this.isSubmitted){
+      console.log("navigate to owner")
+      window.location.reload();
+    }
+    const backdrops = document.querySelectorAll('.modal-backdrop.show');
+    backdrops.forEach((backdrop) => {
+      this.renderer.setStyle(backdrop, 'opacity', '0');
+    });
+  }
+
+  ngOnDestroy() {
+    // Cleanup logic here
+    console.log('CustomerDetailsComponent destroyed');
+    const backdrops = document.querySelectorAll('.modal-backdrop.show');
+    backdrops.forEach((backdrop) => {
+      this.renderer.setStyle(backdrop, 'opacity', '0');
+    });
   }
 }

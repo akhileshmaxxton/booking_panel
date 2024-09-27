@@ -81,26 +81,26 @@ export class LocalStorageService {
     return reservations.filter((reservation: ReservationDetails) => reservation.roomId === roomId);
   }
 
-  setReservationStatus() {
-    const reservations: ReservationDetails[] = localStorage.getItem('reservations') ? JSON.parse(localStorage.getItem('reservations')!) : [];
+  // setReservationStatus() {
+  //   const reservations: ReservationDetails[] = localStorage.getItem('reservations') ? JSON.parse(localStorage.getItem('reservations')!) : [];
     
-    const currentDate = new Date();
+  //   const currentDate = new Date();
   
-    reservations.forEach(reservation => {
-      const checkInDate = new Date(reservation.checkIn);
-      const checkOutDate = new Date(reservation.checkOut);
+  //   reservations.forEach(reservation => {
+  //     const checkInDate = new Date(reservation.checkIn);
+  //     const checkOutDate = new Date(reservation.checkOut);
   
-      if (currentDate < checkInDate) {
-        reservation.status = 'Confirmed';
-      } else if (currentDate >= checkInDate && currentDate <= checkOutDate) {
-        reservation.status = 'Check-In';
-      } else if (currentDate > checkOutDate) {
-        reservation.status = 'Check-Out';
-      }
-    });
+  //     if (currentDate < checkInDate) {
+  //       reservation.status = 'Confirmed';
+  //     } else if (currentDate >= checkInDate && currentDate <= checkOutDate) {
+  //       reservation.status = 'Check-In';
+  //     } else if (currentDate > checkOutDate) {
+  //       reservation.status = 'Check-Out';
+  //     }
+  //   });
   
-    localStorage.setItem('reservations', JSON.stringify(reservations));
-  }
+  //   localStorage.setItem('reservations', JSON.stringify(reservations));
+  // }
 
   getCustomerById(customerId: string){
     const customers = localStorage.getItem('customers')? JSON.parse(localStorage.getItem('customers')!) : [];

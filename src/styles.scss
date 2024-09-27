@@ -15,9 +15,12 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .my-outlined-dialog {
   width:65vw !important;
   max-width: 65vw !important;
-  height: 80vh !important;
-  max-height: 80vh !important;
+  // min-height: 80vh !important;
+  // height: 100vh !important;
+  // max-height: 100vh !important;
 }
+
+
 
 // .mat-mdc-dialog-component-host{
 //   z-index: 9999 !important;
@@ -27,11 +30,28 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 // .cdk-overlay-pane {z-index: 9999 !important;}
 
 
-.modal__content,dialog-layout,mat-dialog-container,.mat-dialog-container,#cdk-overlay-0,.cdk-overlay-pane {
-  z-index: 9999 !important;
-}
+// .modal__content,dialog-layout,mat-dialog-container,.mat-dialog-container,#cdk-overlay-0,.cdk-overlay-pane {
+//   z-index: 9999 !important;
+// }
 
 .mat-mdc-form-field-type-mat-select:not(.mat-form-field-disabled) .mat-mdc-text-field-wrapper {
   cursor: pointer;
   width: 241px; /* You can adjust this value if needed */
+}
+
+
+app-root {
+  display: flex;
+  min-height: 100vh; 
+  flex-direction: column;
+  background-color: #f9f9f9; 
+}
+
+.mat-mdc-dialog-surface{
+  height: max-content !important;
+  overflow-y: hidden !important;
+}
+
+.mat-mdc-dialog-content{
+  max-height: 90vh !important;
 }

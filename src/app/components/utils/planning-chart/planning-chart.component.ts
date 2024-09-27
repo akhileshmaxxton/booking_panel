@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { RoomAndRoomStayDetails } from '../../../interface/room-and-room-stay-details';
 import { RoomDetailsApiService } from '../../../service/apiService/room-details-api.service';
 import { LocalStorageService } from '../../../service/localStorageApi/local-storage.service';
@@ -9,6 +9,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import moment from 'moment';
 import { MatDialog } from '@angular/material/dialog';
 import { ReservationDialogNewComponent } from '../reservation-dialog-new/reservation-dialog-new.component';
+import { BookingServiceService } from '../../../service/bookingService/booking-service.service';
 
 declare var bootstrap: any;
 
@@ -45,7 +46,7 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
   private selectionRowId: number | null = null;
   selectedDetail: any = null;
 
-  constructor(private roomDetailsApiService: RoomDetailsApiService, private uniquePipe: UniquePipe, private localStorageApiService: LocalStorageService, private router: Router, private route: ActivatedRoute, private filterService: FilterService, private snackBar: MatSnackBar, public dialog: MatDialog) {
+  constructor(private roomDetailsApiService: RoomDetailsApiService, private uniquePipe: UniquePipe, private localStorageApiService: LocalStorageService, private router: Router, private route: ActivatedRoute, private filterService: FilterService, private snackBar: MatSnackBar, public dialog: MatDialog, private bookingService: BookingServiceService,private elementRef: ElementRef, private renderer: Renderer2) {
     // localStorageApiService.setReservationStatus();
     this.initCurrentMonth();
   }
@@ -189,6 +190,7 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
     this.arrivalDaysForMouseOver.clear();
   }
 
+
   checkReservation(roomId: number, day: Date, event: MouseEvent) {
     let reservation: any;
     let customer: any;
@@ -210,6 +212,10 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
       const room = this.roomsData?.find((room: { roomId: number; }) => room.roomId === roomId);
       this.openModalForBookedDetais(reservation, customer, payment, room);
     }
+    const backdrops = document.querySelectorAll('.modal-backdrop.show');
+    backdrops.forEach((backdrop) => {
+      this.renderer.setStyle(backdrop, 'display', 'none',);
+    });
   }
 
   onMouseDown(roomId: number, day: Date, event: MouseEvent) {
@@ -282,6 +288,8 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
       this.openSnackBar('Booking cannot be made on dates that are already reserved.', 'Close');
       return;
     }
+    this.bookingService.setArrivalDate(this.startSelectionDate);
+    this.bookingService.setDepartureDate(this.endSelectionDate);
 
     this.openDialog();
   }
@@ -360,8 +368,7 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
     this.arrivalDaysForMouseOver.clear();
 
     this.roomDetailsApiService.fetchAllDataForCustomerPortal().subscribe(data => {
-  
-      data.filter(room => room.roomId === roomId).forEach(room => {
+      (roomId ? data.filter(room => room.roomId === roomId) : data ).filter(room => room.roomId === roomId).forEach(room => {
         const bookDateFrom = room?.bookDateFrom ? moment(room.bookDateFrom).startOf('day') : moment(new Date()).startOf('day');
         const bookDateTo = room?.bookDateTo ? moment(room.bookDateTo).startOf('day') : moment(room.stayDateTo).subtract(room.minStay + (room.minDeviation ? room.minDeviation : 0), 'days').startOf('day');
         const stayDateFrom = moment(room.stayDateFrom).startOf('day');
@@ -373,7 +380,7 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
           for(let i = stayDateFrom.clone(); i <= stayDateTo.clone().subtract(room.minStay, 'days'); i = i.add(1, 'days')) {
             let isOverlapping = false;
             bookedRooomsByRoomId.forEach((reservation: { checkIn: Date; checkOut: Date; }) => {
-              if(i.isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '[]') || i.clone().add(room.minStay, 'days').isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '[]')) {
+              if(i.isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '()') || i.clone().add(room.minStay, 'days').isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '[]')) {
                 isOverlapping = true;
               }
             })
@@ -390,55 +397,14 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
       })  
     })
   }
-  // findArrivalDates(roomId: number) {
-  //   const today = moment().startOf('day');
-  //   this.roomsData?.filter(room => room.roomId === roomId)?.forEach(room => {
-  //     const stayDateFrom = moment(room.stayDateFrom);
-  //     const stayDateTo = moment(room.stayDateTo);
-    
-  //     for (let date = stayDateFrom; date <= stayDateTo; date = date.add(1, 'days')) {
-  //       if (date.isAfter(today) && room.arrivalDays.includes(date.format('ddd').toUpperCase()) && !this.isMiddleOfReservation(roomId, date.toDate()) && !this.isStartOfReservation(roomId, date.toDate())) {
-  //         const key = `${roomId}_${date.format('YYYY-MM-DD')}`;
-  //         this.arrivalDaysForMouseOver.set(key, { roomId, day: date.toDate() });
-  //       }
-  //     }
-  //   });
-  // }
 
-  // findDepartureDates(roomId: number, day: Date) {
-  //   this.roomsData?.filter(room => room.roomId === roomId)?.forEach(room => {
-  //     const stayDateFrom = moment(room.stayDateFrom);
-  //     const stayDateTo = moment(room.stayDateTo);
-  //     const selectedDay = moment(day);
-
-  //     if (selectedDay.isBetween(stayDateFrom, stayDateTo, 'days', '[]')) {
-  //       for (let date = selectedDay.clone(); date.isSameOrBefore(stayDateTo); date.add(1, 'days')) {
-  //         if(!this.isDateInReservation(date, roomId)) {
-  //           const dayOfWeek = date.format('ddd').toUpperCase();
-  //           if (room.departureDays.includes(dayOfWeek)) {
-  //             const daysFromSelection = date.diff(selectedDay, 'days') + 1; 
-  //             if (daysFromSelection >= room.minStay && daysFromSelection <= room.maxStay) {
-  //               const cellDetail: cellDetails = {
-  //                 roomId: room.roomId,
-  //                 day: date.toDate(),
-  //               };
-  //               this.departureDaysForMouseOver.set(`${roomId}_${date.format('YYYY-MM-DD')}`, cellDetail);
-  //             } else {
-  //               break;
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-  //   });
-  // }
   findDepartureDates(roomId: number, day: Date){
     const arrivalDate = moment(day).startOf('day');
 
     const bookedReservationFromLocalStorage = this.localStorageApiService.getAllReservationsFromLocalStorage();
 
     this.roomDetailsApiService.fetchAllDataForCustomerPortal().subscribe(data => {
-      data.filter(room => room.roomId === roomId).forEach(room => {
+      (roomId ? data.filter(room => room.roomId === roomId) : data ).filter(room => room.roomId === roomId).forEach(room => {
         const bookDateFrom = room?.bookDateFrom ? moment(room.bookDateFrom).startOf('day') : moment(new Date()).startOf('day');
         const bookDateTo = room?.bookDateTo ? moment(room.bookDateTo).startOf('day') : moment(room.stayDateTo).subtract(room.minStay + (room.minDeviation ? room.minDeviation : 0), 'days').startOf('day');
         const stayDateFrom = moment(room.stayDateFrom).startOf('day');
@@ -457,7 +423,7 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
           for(let i = arrivalDate.clone(); i <= stayDateTo.clone().subtract(room.minStay, 'days'); i = i.add(1, 'days')) {
             let isOverlapping = false;
             bookedRooomsByRoomId.forEach((reservation: { checkIn: Date; checkOut: Date; }) => {
-              if(i.isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '[]') || i.clone().add(room.minStay, 'days').isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '[]') || i.clone().add(room.maxStay, 'days').isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '[]')) {
+              if(i.isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '()') || i.clone().add(room.minStay, 'days').isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '[]') || i.clone().add(room.maxStay, 'days').isBetween(moment(reservation.checkIn), moment(reservation.checkOut), 'day', '[]')) {
                 isOverlapping = true;
               }
             })
@@ -477,10 +443,11 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
       })
     })
   }
+
   getReservationWidthandStatus(roomId: number, startDay: Date) {
     const reservation = this.localStorageApiService.getReservationByRoomId(roomId).find((reservation: { checkIn: moment.MomentInput; }) => moment(reservation.checkIn).isSame(startDay, 'day'));
     const reservationLength = reservation ? reservation.numberOfDays : 1;
-    const spanWidth = reservationLength*100;
+    const spanWidth = reservationLength*100 - reservationLength*0.5;
     
     let backgroundColor = '';
     if (reservation) {
@@ -513,9 +480,11 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
   }
   
   openDialog() {
-    const dialogRef = this.dialog.open(ReservationDialogNewComponent, {data: { roomId: this.selectionRowId, checkInDate : this.startSelectionDate, checkOutDate: this.endSelectionDate }, panelClass: 'my-outlined-dialog'});
+    const dialogRef = this.dialog.open(ReservationDialogNewComponent, {data: { roomId: this.selectionRowId }, panelClass: 'my-outlined-dialog'});
 
     dialogRef.afterClosed().subscribe(result => {
+      this.bookingService.setArrivalDate(null);
+      this.bookingService.setDepartureDate(null);
       this.selectedCells.clear();
       this.departureDaysForMouseOver.clear();
       this.arrivalDaysForMouseOver.clear();
@@ -529,12 +498,14 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
     modal.show();
   }
 
-  updateStatus(detail: any) {
-    const resservation = this.localStorageApiService.getAllReservationsFromLocalStorage()
-    const reservationIndex = resservation.findIndex((res: { customerId: any; }) => res.customerId === detail.customer.customerId);
+
+  updateStatus(event: any, detail: any) {
+    const resservations = this.localStorageApiService.getAllReservationsFromLocalStorage()
+    const reservationIndex = resservations.findIndex((res: { reservationId: any; }) => res.reservationId === detail.reservation.reservationId);
+    console.log("reservationIndex", reservationIndex);
     if (reservationIndex !== -1) {
-      resservation[reservationIndex].status = detail.status;
+      resservations[reservationIndex].status = event.target.value;
     }
-    this.localStorageApiService.setReservations(resservation);
+    this.localStorageApiService.setReservations(resservations);
   }
 }
