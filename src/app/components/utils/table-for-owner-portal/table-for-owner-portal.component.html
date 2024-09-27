@@ -1,19 +1,21 @@
-<div class="container mt-5">
+<div class="container-fluid">
   <h1 class="text-center mb-4">Booking Details</h1>
-  <button mat-button class="mb-4 fs-5 text-decoration-underline custom-button"  (click)="openDialog()">Create Reservation</button>
-  <div class="table-responsive">
+  <button mat-button class="mb-4 fs-5 text-decoration-underline custom-button" style="margin-right: 300px;" (click)="openDialog()">Create Reservation</button>
+  <!-- <div class="ms-2">
+  </div> -->
+  <div class="table-responsive align-middle mx-auto">
     <table class="table table-hover table-striped align-middle">
       <thead class="table-dark">
         <tr>
-          <th>Name</th>
-          <th>Birth Date</th>
-          <th>Check In</th>
-          <th>Check Out</th>
-          <th>Location</th>
-          <th>Room</th>
-          <th>Dew Amount</th>
-          <th>Total Amount</th>
-          <th>Status</th>
+          <th class="text-start">Name</th>
+          <th class="text-start">Birth Date</th>
+          <th class="text-start">Check In</th>
+          <th class="text-start">Check Out</th>
+          <th class="text-start">Location</th>
+          <th class="text-start">Room</th>
+          <th class="text-start">Deu Amount</th>
+          <th class="text-start">Total Amount</th>
+          <th class="text-start">Status</th>
         </tr>
       </thead>
       <tbody>
@@ -27,7 +29,7 @@
           <td (click)="openModalForBookedDetais(detail)">{{ detail.dueAmount | currency:'USD':true }}</td>
           <td (click)="openModalForBookedDetais(detail)">{{ detail.amount | currency:'USD':true }}</td>
           <td>
-            <select [(ngModel)]="detail.status" class="form-select form-select-sm" (change)="updateStatus(detail)">
+            <select [(ngModel)]="detail.status" class="form-select form-select-sm" (change)="updateStatus(detail.reservation)">
               <option *ngFor="let status of statuses">{{ status }}</option>
             </select>
           </td>

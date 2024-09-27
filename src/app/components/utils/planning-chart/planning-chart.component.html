@@ -3,9 +3,9 @@
 
 <div class="container-fluid justify-content-center align-items-center">
   
-<h1 class="text-center display-1">Planning Chart</h1>
+<!-- <p class="text-center display-3">Planning Chart</p> -->
 
-<div class="overflow-auto flex-column position-relative bg-white rounded shadow mt-4 booking-chart-container">
+<div class="overflow-auto flex-column position-relative bg-white mt-4 booking-chart-container">
   <!-- <div class="overlay-div"></div> -->
   <table class="table table-bordered">
     <!-- <div #scrollSentinelPrev observeVisibility (visible)="loadPreviousMonth()"></div> -->
@@ -64,7 +64,7 @@
             <span
             *ngIf="isStartOfReservation(room.roomId, day)"
             (dblclick)="checkReservation(room.roomId, day, $event)"
-            class="reservation-marker text-start ps-2"
+            class="reservation-marker text-start"
             [ngStyle]="getReservationWidthandStatus(room.roomId, day)"
             
           >
@@ -89,45 +89,72 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="container-fluid">
-        <div class="row">
-          <div class="col-md-6">
-            <h6><strong>Customer Information</strong></h6>
-            <p><strong>Name:</strong> {{ selectedDetail?.customer.firstName }} {{ selectedDetail?.customer.middleName }} {{ selectedDetail?.customer.lastName }}</p>
-            <p><strong>Birth Date:</strong> {{ selectedDetail?.customer.birthData | date: 'yyyy-MM-dd' }}</p>
-            <p><strong>Phone Number:</strong> {{ selectedDetail?.customer.phoneNumber }}</p>
-            <p><strong>Location:</strong> {{ selectedDetail?.customer.city }}, {{ selectedDetail?.customer.state }}, {{ selectedDetail?.customer.country }}</p>
-            <p><strong>Pincode:</strong> {{ selectedDetail?.customer.pincode }}</p>
-          </div>
-          <div class="col-md-6">
-            <h6><strong>Reservation Information</strong></h6>
-            <p><strong>Check In:</strong> {{ selectedDetail?.reservation.checkIn | date: 'yyyy-MM-dd' }}</p>
-            <p><strong>Check Out:</strong> {{ selectedDetail?.reservation.checkOut | date: 'yyyy-MM-dd' }}</p>
-            <p><strong>Number of Guests:</strong> {{ selectedDetail?.reservation.numberOfGuests }}</p>
-            <p><strong>Total Amount:</strong> {{ selectedDetail?.reservation.totalAmount | currency:'USD' }}</p>
-            <p><strong>Amount paid:</strong> {{ selectedDetail?.reservation.paidAmount | currency:'USD' }}</p>
-            <p><strong>Due Amount:</strong> {{ selectedDetail?.reservation.dueAmount ? selectedDetail?.reservation.totalAmount - selectedDetail?.reservation.paidAmount : selectedDetail?.reservation.totalAmount | currency:'USD' }}</p>
-          </div>
-        </div>
-        <div class="row mt-3">
-          <div class="col-md-6">
-            <h6><strong>Payment Information</strong></h6>
-            <p><strong>Payment Mode:</strong> {{ selectedDetail?.payment.paymentMode }}</p>
-            <p><strong>Payment Date:</strong> {{ selectedDetail?.payment.paymentDate | date: 'yyyy-MM-dd' }}</p>
-            <p><strong>Paid Amount:</strong> {{ selectedDetail?.payment.paymentAmount | currency:'USD' }}</p>
-          </div>
-          <div class="col-md-6">
+        <div class="row mb-3">
+          <div class="">
             <h6><strong>Status</strong></h6>
             <p>
-              <strong>Reservation Status:</strong>
-              <select class="form-select" (change)="updateStatus(selectedDetail)">
+              <select class="form-select" [(ngModel)]="selectedDetail?.reservation.status" (change)="updateStatus($event, selectedDetail)">
                 <option value="Confirmed">Confirmed</option>
                 <option value="Check-In">Check-In</option>
-                <option value="Checked-Out">Checked-Out</option>
+                <option value="Check-Out">Check-Out</option>
               </select>
             </p>
           </div>
         </div>
+      
+        <div class="accordion" id="bookingDetailsAccordion">
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingReservation">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseReservation" aria-expanded="true" aria-controls="collapseReservation">
+                Reservation Details
+              </button>
+            </h2>
+            <div id="collapseReservation" class="accordion-collapse collapse show" aria-labelledby="headingReservation" data-bs-parent="#bookingDetailsAccordion">
+              <div class="accordion-body">
+                <p><strong>Check In:</strong> {{ selectedDetail?.reservation.checkIn | date: 'yyyy-MM-dd' }}</p>
+                <p><strong>Check Out:</strong> {{ selectedDetail?.reservation.checkOut | date: 'yyyy-MM-dd' }}</p>
+                <p><strong>Number of Guests:</strong> {{ selectedDetail?.reservation.numberOfGuests }}</p>
+                <p><strong>Total Amount:</strong> {{ selectedDetail?.reservation.totalAmount | currency:'USD' }}</p>
+                <p><strong>Amount Paid:</strong> {{ selectedDetail?.reservation.paidAmount | currency:'USD' }}</p>
+                <p><strong>Due Amount:</strong> {{ selectedDetail?.reservation.totalAmount - selectedDetail?.reservation.paidAmount | currency:'USD' }}</p>
+              </div>
+            </div>
+          </div>
+      
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingCustomer">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCustomer" aria-expanded="false" aria-controls="collapseCustomer">
+                Customer Details
+              </button>
+            </h2>
+            <div id="collapseCustomer" class="accordion-collapse collapse" aria-labelledby="headingCustomer" data-bs-parent="#bookingDetailsAccordion">
+              <div class="accordion-body">
+                <p><strong>Name:</strong> {{ selectedDetail?.customer.firstName }} {{ selectedDetail?.customer.middleName }} {{ selectedDetail?.customer.lastName }}</p>
+                <p><strong>Birth Date:</strong> {{ selectedDetail?.customer.birthData | date: 'yyyy-MM-dd' }}</p>
+                <p><strong>Phone Number:</strong> {{ selectedDetail?.customer.phoneNumber }}</p>
+                <p><strong>Location:</strong> {{ selectedDetail?.customer.city }}, {{ selectedDetail?.customer.state }}, {{ selectedDetail?.customer.country }}</p>
+                <p><strong>Pincode:</strong> {{ selectedDetail?.customer.pincode }}</p>
+              </div>
+            </div>
+          </div>
+      
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingPayment">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePayment" aria-expanded="false" aria-controls="collapsePayment">
+                Payment Details
+              </button>
+            </h2>
+            <div id="collapsePayment" class="accordion-collapse collapse" aria-labelledby="headingPayment" data-bs-parent="#bookingDetailsAccordion">
+              <div class="accordion-body">
+                <p><strong>Payment Mode:</strong> {{ selectedDetail?.payment.paymentMode }}</p>
+                <p><strong>Payment Date:</strong> {{ selectedDetail?.payment.paymentDate | date: 'yyyy-MM-dd' }}</p>
+                <p><strong>Paid Amount:</strong> {{ selectedDetail?.payment.paymentAmount | currency:'USD' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+      
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>

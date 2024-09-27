@@ -1,5 +1,7 @@
 .booking-chart-container {
   max-height: 80vh;
+  border-radius: 0.5rem;
+  border: #333 solid 2.3px;
 }
 
   
@@ -118,3 +120,11 @@
   overflow: hidden;
 }
 
+
+
+#detailModal {
+  z-index: 1060 !important; /* Ensure the modal has a higher z-index than most other elements */
+}
+.modal-backdrop {
+  z-index: 1055 !important; /* Ensure the backdrop also stays below the modal but above the rest */
+}

@@ -66,14 +66,16 @@ export class TableForOwnerPortalComponent {
     });
     console.log("combinedDetails",this.combinedDetails);
   }
+  
 
   updateStatus(detail: any) {
-    const reservationIndex = this.reservations.findIndex(res => res.customerId === detail.customerId);
+    const reservationIndex = this.reservations.findIndex(res => res?.customerId === detail?.customerId);
     if (reservationIndex !== -1) {
       this.reservations[reservationIndex].status = detail.status;
     }
     this.localStorageService.setReservations(this.reservations);
   }
+
 
   openModalForBookedDetais(detail: any) {
     this.selectedDetail = detail;
@@ -82,7 +84,7 @@ export class TableForOwnerPortalComponent {
   }
 
   openDialog() {
-    const dialogRef = this.dialog.open(ReservationDialogNewComponent, {data: { roomId: null, checkInDate : null, checkOutDate: null },panelClass: 'my-outlined-dialog'});
+    const dialogRef = this.dialog.open(ReservationDialogNewComponent, {data: { roomId: null},panelClass: 'my-outlined-dialog'});
 
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Dialog result: ${result}`);

@@ -48,7 +48,17 @@
   animation-delay: var(--animation-delay, 0s);
 }
 
-
 .custom-button:hover {
   text-decoration: none !important;
+}
+
+
+
+.table-responsive {
+  -webkit-overflow-scrolling: hidden !important;
+  width: 100%;
+}
+
+.button-content{
+  margin-left: 3rem;
 }
