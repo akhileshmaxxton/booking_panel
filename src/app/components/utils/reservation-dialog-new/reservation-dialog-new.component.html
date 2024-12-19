@@ -11,10 +11,9 @@
     <!-- Date Selection Step -->
     <mat-step [stepControl]="dateSelectionGroup" errorMessage="All fields are required.">
       <form [formGroup]="dateSelectionGroup">
-        <ng-template matStepLabel>Select your preferred dates</ng-template>
-        
-        <!-- Conditionally display form if form is invalid or user clicked "Back to Form" -->
-        <div *ngIf="!dateSelectionGroup.valid || isEditingRequirements">
+        <ng-template matStepLabel disableRipple>Select your preferred dates</ng-template>
+        <!-- Input fields section -->
+        <div>
           <button (click)="showArrival()">Choose</button>
           <div class="form-container">
             <div class="form-row">
@@ -48,11 +47,11 @@
           </div>
         </div>
     
-        <!-- Conditionally display table when form is valid and user is not editing -->
-        <ng-container *ngIf="dateSelectionGroup.valid && !isEditingRequirements">
+        <!-- Display rooms table once rooms are available -->
+        <div *ngIf="roomToBeDisplayed.length > 0">
           <h3 class="text-center mb-4">Rooms Available</h3>
           <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover table-striped">
               <thead class="table-dark">
                 <tr>
                   <th>Name</th>
@@ -63,25 +62,23 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let room of roomToBeDisplayed | unique: 'roomId'; let i = index" class="table-row" [ngStyle]="{ '--animation-delay': i * 0.1 + 's'}" [ngClass]="{'selected-room': selectedRoom === room}">
-                  <td>{{ room.roomName }}</td>
-                  <td>{{ room.locationName }}</td>
-                  <td>{{ room.pricePerDayPerPerson }}/night</td>
-                  <td>{{ calculateTotalPrice(room) }}</td>
-                  <td>
+                <tr *ngFor="let room of roomToBeDisplayed | unique: 'roomId'; let i = index" class="table-row" [ngStyle]="{ '--animation-delay': i * 0.1 + 's'}">
+                  <td [ngStyle]="{ 'background-color': isSelectedRoom(room) ? '#FF8343' : '', 'color': isSelectedRoom(room) ? 'white' : 'black'}">{{ room.roomName }}</td>
+                  <td [ngStyle]="{ 'background-color': isSelectedRoom(room) ? 'red' : ''}">{{ room.locationName }}</td>
+                  <td [ngStyle]="{ 'background-color': isSelectedRoom(room) ? 'red' : ''}">{{ room.pricePerDayPerPerson }}/night</td>
+                  <td [ngStyle]="{ 'background-color': isSelectedRoom(room) ? 'red' : ''}">{{ calculateTotalPrice(room) }}</td>
+                  <td [ngStyle]="{ 'background-color': isSelectedRoom(room) ? 'red' : ''}">
                     <button mat-button (click)="selectRoom(room); stepper.next()" [disabled]="isSubmitted">Book Now</button>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <!-- Back to Form Button -->
-          <div class="d-flex justify-content-end">
-            <button mat-button (click)="editRequirements()">Edit Requirements</button>
-          </div>
-        </ng-container>
+        </div>
+    
       </form>
     </mat-step>
+    
     
 
     <!-- Customer Details Step-->
@@ -178,11 +175,8 @@
     </mat-step>
     <mat-step [stepControl]="paymentDetailsFormGroup">
       <ng-template matStepLabel>Payment</ng-template>
-      <!-- <p>Please Confirm Your Booking</p> -->
     
-      <!-- Layout for Room Details and Payment Form -->
       <div class="row">
-        <!-- Selected Room Details Section (Left Column) -->
         <div class="col-md-6">
           <ng-container *ngIf="selectedRoom; else selectRoomMessage">
             <div class="room-details-card mb-4">
@@ -268,15 +262,6 @@
                   <span *ngIf="paymentDetailsFormGroup.get('paymentAmount')?.errors?.['maxAmount']">Amount cannot exceed the total.</span>
                 </div>
               </div>
-          
-              <!-- Due Amount -->
-              <!-- <div class="row mb-3">
-                <label for="due" class="form-label">Due</label>
-                <input type="number" class="form-control" id="due" formControlName="paymentDue" [readonly]="true" />
-                <div *ngIf="paymentDetailsFormGroup.get('paymentDue')?.invalid && paymentDetailsFormGroup.get('paymentDue')?.touched" class="text-danger">
-                  Due amount is required.
-                </div>
-              </div> -->
             </div>
           </form>
           
@@ -284,23 +269,12 @@
           <ng-container *ngIf="!isSubmitted">
             <div>
               <button mat-button matStepperPrevious>Back</button>
-              <button mat-button (click)="stepper.reset()">Reset</button>
+              <!-- <button mat-button (click)="stepper.reset()">Reset</button> -->
               <button mat-button (click)="submit()">Submit</button>
             </div>
           </ng-container>
         </div>
       </div>
-    
-      <!-- Action Buttons -->
-      <!-- <ng-container *ngIf="!isSubmitted">
-        <div>
-          <button mat-button matStepperPrevious>Back</button>
-          <button mat-button (click)="stepper.reset()">Reset</button>
-          <button mat-button (click)="submit()">Submit</button>
-        </div>
-      </ng-container> -->
-    
-      <!-- Invoice Section (Displayed after submission) -->
       <ng-container *ngIf="isSubmitted">
         <div class="container mt-5" id="booking-preview">
           <div class="row justify-content-center">

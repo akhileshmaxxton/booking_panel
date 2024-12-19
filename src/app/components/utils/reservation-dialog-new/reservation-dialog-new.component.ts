@@ -79,11 +79,9 @@ export class ReservationDialogNewComponent {
     paymentDue: 0,
   };
   isSubmitted: boolean = false;
+  
   arrivalDateRooms: RoomAndRoomStayDetails[] = [];
-  isEditingRequirements = false;
-  
-  
-  
+
   private _formBuilder = inject(FormBuilder);
 
   constructor( public dialogRef: MatDialogRef<ReservationDialogNewComponent>,private roomDetailsApiService: RoomDetailsApiService, private localStorageService: LocalStorageService, private snackBar: MatSnackBar, @Inject(MAT_DIALOG_DATA) public data: {roomId: number}, private bookingService: BookingServiceService, private router: Router, private renderer: Renderer2) { 
@@ -136,23 +134,19 @@ export class ReservationDialogNewComponent {
   } 
 
   paymentAmountValidator(value:number): void {
-    
-    const minAmount = this.reservationDetails.totalAmount * 0.1; // 10% of total amount
+    const minAmount = this.reservationDetails.totalAmount * 0.1;
     const maxAmount = this.reservationDetails.totalAmount;
-
-    // Reset previous errors
     this.paymentDetailsFormGroup.get('paymentAmount')?.setErrors(null);
-
     if (value < minAmount) {
       this.paymentDetailsFormGroup.get('paymentAmount')?.setErrors({ minAmount: true });
-    } else if (value > maxAmount) {
+    }
+    else if (value > maxAmount) {
       this.paymentDetailsFormGroup.get('paymentAmount')?.setErrors({ maxAmount: true });
     }
   }
 
   ngOnInit() {
     this.bookingService.arrivalDate$.subscribe(date => {
-      
       if (date) {
         const formattedDate = moment(date).format('YYYY-MM-DD');
         this.dateSelectionGroup.patchValue({ arrivalDate: formattedDate });
@@ -218,7 +212,6 @@ export class ReservationDialogNewComponent {
 
   isArrivalDateAvailable = (d: Date | null): boolean => {
     if (!d) return false;
-    
     const availableDates = this.arrivalDates.map(date => moment(date).startOf('day').format('YYYY-MM-DD'));
     return availableDates.includes(moment(d).startOf('day').format('YYYY-MM-DD'));
   }
@@ -234,20 +227,16 @@ export class ReservationDialogNewComponent {
   onArrivalDateSelection(selectedDate: Date | null) {
     
     if (!selectedDate) {
-      // this.dateSelectionGroup.get('departureDate')?.setValue(null);
       this.dateSelectionGroup.get('guests')?.setValue(null);
       return;
     }
-
-  
-    // this.dateSelectionGroup.get('departureDate')?.setValue(null);
     this.dateSelectionGroup.get('guests')?.setValue(null);
     this.departureDates = [];
     this.selectedGuestsNumber = 0;
     this.selectedRoom = null;
     this.selectedArrivalDate = selectedDate;
 
-  let departureDateSet: Set<string> = new Set();
+    let departureDateSet: Set<string> = new Set();
 
     const arrivalDate = moment(selectedDate).startOf('day');
 
@@ -302,9 +291,8 @@ export class ReservationDialogNewComponent {
     
     this.selectedDepartureDate = selectedDate;
     
-      this.selectedGuestsNumber = 0;
-      this.selectedRoom = null;
-
+    this.selectedGuestsNumber = 0;
+    this.selectedRoom = null;
 
     this.roomDetailsApiService.fetchAllDataForCustomerPortal().subscribe(data => {
 
@@ -348,13 +336,11 @@ export class ReservationDialogNewComponent {
     })
 
     this.bookingService.setDepartureDate(selectedDate);
-    this.isEditingRequirements = false;
   }
 
   onGuestSelection(guests: number) {
     this.selectedGuestsNumber = guests;  
     this.roomToBeDisplayed = this.roomsData.filter(room => room.guestCapacity >= guests);
-    this.isEditingRequirements = false;
   }
 
   selectRoom(room: RoomAndRoomStayDetails) {
@@ -371,12 +357,12 @@ export class ReservationDialogNewComponent {
       const totalPrice = numberOfDays * numberOfGuests * (pricePerDayPerPerson ?? 0);
       this.reservationDetails.totalAmount = totalPrice > 0 ? totalPrice : 0;
       this.paymentDetailsFormGroup.patchValue({
-          paymentAmount: totalPrice > 0 ? totalPrice : 0,
+        paymentAmount: totalPrice > 0 ? totalPrice : 0,
       });
     } else {
         console.log("No matching room found for the selected dates.");
         this.paymentDetailsFormGroup.patchValue({
-            paymentAmount: 0,
+          paymentAmount: 0,
         });
     }
 
@@ -396,10 +382,6 @@ export class ReservationDialogNewComponent {
       numberOfDays: this.reservationDetails.numberOfDays,
       paymentIds: []
     }
-    console.log("Reservation Details: ", this.reservationDetails);
-  }
-  editRequirements() {
-    this.isEditingRequirements = true;
   }
 
   calculateTotalPrice(room: RoomAndRoomStayDetails): number {
@@ -485,11 +467,6 @@ export class ReservationDialogNewComponent {
     }
   }
 
- 
-
-
- 
-
   onCustomerFormSubmit() {
     if(this.customerDetailsFormGroup.valid) {
       if(this.customerDetails?.customerId) {
@@ -550,7 +527,6 @@ export class ReservationDialogNewComponent {
         paymentMode: this.paymentDetailsFormGroup.get('paymentMode')?.value,
         paymentDue: this.reservationDetails?.totalAmount - this.paymentDetailsFormGroup.get('paymentAmount')?.value
     }
-
     this.localStorageService.setLocalStorage(this.customerDetails, this.reservationDetails, this.paymentDetails);
     this.isSubmitted = true;
     console.log("reservationDetails",this.reservationDetails,"customerDetails",this.customerDetails,"paymentDetails",this.paymentDetails)
@@ -607,7 +583,9 @@ export class ReservationDialogNewComponent {
     }
   }
   
-  
+  isSelectedRoom(room: RoomAndRoomStayDetails) {
+    return this.selectedRoom?.roomId === room.roomId;
+  }
   
 
   close() {
@@ -626,7 +604,6 @@ export class ReservationDialogNewComponent {
   }
 
   ngOnDestroy() {
-    // Cleanup logic here
     console.log('CustomerDetailsComponent destroyed');
     const backdrops = document.querySelectorAll('.modal-backdrop.show');
     backdrops.forEach((backdrop) => {

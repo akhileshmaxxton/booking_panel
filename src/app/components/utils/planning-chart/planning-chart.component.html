@@ -1,8 +1,6 @@
 
-
-
 <div class="container-fluid justify-content-center align-items-center">
-  
+
 <!-- <p class="text-center display-3">Planning Chart</p> -->
 
 <div class="overflow-auto flex-column position-relative bg-white mt-4 booking-chart-container">
@@ -64,9 +62,9 @@
             <span
             *ngIf="isStartOfReservation(room.roomId, day)"
             (dblclick)="checkReservation(room.roomId, day, $event)"
-            class="reservation-marker text-start"
+            class="reservation-marker text-start ps-2"
             [ngStyle]="getReservationWidthandStatus(room.roomId, day)"
-            
+
           >
             {{ getCustomerNameForReservation(room.roomId, day) }}
           </span></td>
@@ -120,7 +118,7 @@
               </div>
             </div>
           </div>
-      
+
           <div class="accordion-item">
             <h2 class="accordion-header" id="headingCustomer">
               <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCustomer" aria-expanded="false" aria-controls="collapseCustomer">
@@ -137,7 +135,7 @@
               </div>
             </div>
           </div>
-      
+
           <div class="accordion-item">
             <h2 class="accordion-header" id="headingPayment">
               <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePayment" aria-expanded="false" aria-controls="collapsePayment">
@@ -154,7 +152,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>

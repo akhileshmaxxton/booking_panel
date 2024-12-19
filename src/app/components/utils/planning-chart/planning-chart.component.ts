@@ -120,8 +120,6 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
     const numDays = new Date(year, month + 1, 0).getDate();
     const daysInMonth = this.generateDaysInMonth(date, 1, numDays);
     this.months.push({ month: new Date(year, month), days: daysInMonth });
-
-
    
     setTimeout(() => {
       document.querySelector('.booking-chart-container')?.scrollTo({
@@ -320,9 +318,7 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
     }
   }
   
-  isSelected(roomId: number, day: Date): boolean {
-    // if (this.isNotAvailable(roomId, day) || this.isStartOfReservation(roomId, day) || this.isEndOfReservation(roomId, day) || this.isMiddleOfReservation(roomId, day)) return false;
-    
+  isSelected(roomId: number, day: Date): boolean {    
     const key = `${roomId}_${moment(day).format('YYYY-MM-DD')}`;
     return this.selectedCells.has(key);
   }
@@ -493,7 +489,6 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
 
   openModalForBookedDetais(reservation: any, customer: any, payment: any, room: any) {
     this.selectedDetail = {reservation, customer, payment, room};
-    console.log(this.selectedDetail);
     const modal = new bootstrap.Modal(document.getElementById('detailModal'));
     modal.show();
   }
@@ -502,7 +497,6 @@ export class PlanningChartComponent implements OnInit, AfterViewInit {
   updateStatus(event: any, detail: any) {
     const resservations = this.localStorageApiService.getAllReservationsFromLocalStorage()
     const reservationIndex = resservations.findIndex((res: { reservationId: any; }) => res.reservationId === detail.reservation.reservationId);
-    console.log("reservationIndex", reservationIndex);
     if (reservationIndex !== -1) {
       resservations[reservationIndex].status = event.target.value;
     }
